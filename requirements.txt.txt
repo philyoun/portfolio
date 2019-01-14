@@ -1,0 +1,2 @@
+pymdown-extensions
+https://github.com/mitya57/python-markdown-math/archive/master.zip
