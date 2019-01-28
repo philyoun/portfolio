@@ -4,7 +4,7 @@
 
 #![](cover1.png)
 
-## Introduction
+## Introduction + alpha
 
 통계적 지도 학습의 궁극적 목적은 **input** (predictors, independent variables) 들을 사용하여 **output** (responses, dependent variables)들의 값을 예측하는 것이다.
 
