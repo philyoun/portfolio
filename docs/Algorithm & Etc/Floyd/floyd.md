@@ -4,6 +4,8 @@ library(tidyverse)
 ```
 ## Warning: package 'tidyverse' was built under R version 3.5.2
 ```
+* 이렇게하는거? 오 지리네
+* 이렇게하는거? 오 지리네
 
 ---
 # How to Shuffle Songs?
@@ -17,7 +19,7 @@ Spotify는 우리나라의 벅스, 멜론과 같은 스트리밍 회사이다. �
 
 누가 맞는걸까? 이 페이지에서는 둘 다 맞지만, 좀 더 복잡한 스토리가 있다고 둘러댄다. 
 
-* 이렇게하는거? 오 지리네
+
 
 ## Our perspective 
 
@@ -212,16 +214,64 @@ The White Stripes의 곡들은 빨간색, The xx의 곡들은 검은색, Britney
 2. 그리고 각 아티스트의 시작점도 조금씩 다르게 잡아줘야 한다. 모두 다 시작점이 0이면 안 됨. (random offset)
 3. 같은 아티스트의 곡들도 shuffle해줘야함. 예를 들어서 같은 앨범에서 나온 곡들은 너무 겹치지 않게 해준다거나 하는 식으로.
 
+## Exercise
 
+이걸 구현해야 보자.
+input문장은 다음과 같은 형식이다.
+2\n
+Yesterday\tLet it be\tGee\t뭐있지\n
+Beatles\tBeatles\t소녀시대\t소녀시대\n
+SIGNAL\tI LUV IT\tNew Face\tShape of You\n
+TWICE\tPSY\tPSY\tEd Sheeran\n
 
+이렇게 첫 줄엔 테스트 케이스의 개수가 주어지고, 각 테스트 케이스는 2줄로 구성됨.
+한 줄은 제목, 나머지 한 줄은 아티스트.
 
+그럼 output문장은 다음과 같은 형식이어야 한다.
+뭐있지\tLet it be\tGee\tYesterday\n
+I LUV IT\tShape of You\tNew Face\tSIGNAL\n
+
+이 구현은 파이썬으로 해보자
+
+```ptyhon
+from pandas import Series
+import numpy as np
+import random
+```
 ```python
+# input을 나누기 위해서. 몇 개의 테스트 케이스가 있는지? 각각의 케이스에 대해서 제목 입력값은 무엇이고 아티스트 입력값은 무엇인지?
+cmd_lst = cmd.split('\n')	# 리스트로 입력값들을 나눠서 저장
+num = int(cmd_lst[0])
+for i in range(0, num):
+	songs = cmd_lst[2*i + 1].split('\t')	# 각 테스트 케이스에 대해 제목 입력값
+    artist = cmd_lst[2*i +2].split('\t')	# 각 테스트 케이스에 대해 아티스트 입력값
+    art = list(set(artist))	# 중복을 제거
+    
+# 각 아티스트 별로 몇 곡이나 있는지, 인덱스를 반환. Nested List가 된다.
+lst = []
+for i in art:
+    artist1 = []
+    for j in range(0, len(artist)):
+        if i == artist[j]:
+            artist1.append(j)
+    lst.append(artist1)
+
+# 특정 아티스트의 곡들을 섞어준다. 
+for i in lst:
+	if len(i) > 1:
+    	i = random.shuffle(i)
+    
+
 ```
 
 
 
 
-
+<details>
+<summary>이름?</summary>
+<div markdown = "1">
+이렇게 하는게 맞나요?
+</details>
 
 
 
