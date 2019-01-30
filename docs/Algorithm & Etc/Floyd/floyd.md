@@ -241,10 +241,11 @@ import random
 ```python
 # input을 나누기 위해서. 몇 개의 테스트 케이스가 있는지? 각각의 케이스에 대해서 제목 입력값은 무엇이고 아티스트 입력값은 무엇인지?
 cmd_lst = cmd.split('\n')	# 리스트로 입력값들을 나눠서 저장
-num = int(cmd_lst[0])
-for i in range(0, num):
-	songs = cmd_lst[2*i + 1].split('\t')	# 각 테스트 케이스에 대해 제목 입력값
-    artist = cmd_lst[2*i +2].split('\t')	# 각 테스트 케이스에 대해 아티스트 입력값
+num = int(cmd_lst[0])	# 테스트 케이스가 몇 번인지
+total = [None] * num	# output문장들을 저장할 리스트
+for z in range(0, num):
+	songs = cmd_lst[2*z + 1].split('\t')	# 각 테스트 케이스에 대해 제목 입력값
+    artist = cmd_lst[2*z +2].split('\t')	# 각 테스트 케이스에 대해 아티스트 입력값
     art = list(set(artist))	# 중복을 제거
     
 # 각 아티스트 별로 몇 곡이나 있는지, 인덱스를 반환. Nested List가 된다.
@@ -259,18 +260,135 @@ for i in art:
 # 특정 아티스트의 곡들을 섞어준다. 
 for i in lst:
 	if len(i) > 1:
-    	i = random.shuffle(i)
-    
+    	i = random.shuffle(i)	# 이 기능이 없다면, 맨 앞에 나오는 곡만 맨 앞에 나오게 됨.
+# print(lst)    
 
+# songs를 재배치
+songs_sort = [None] * len(songs)
+k = 0
+for i in lst:
+    for j in i:
+        songs_sort[k] = songs[j]
+        k += 1
+# print(songs_sort)
+
+# 곡의 순서를 정해줄 변수 생성
+order = []
+for i in lst:
+    a = np.random.uniform(0, 0.1, 1)
+    k = 1
+    for j in i:
+        if len(i) > 1:
+            b = 1 / len(i) # 여기다가 조금 더 랜덤한 수를 더 해줘서 random해지게끔. 이 상태로는 딱 정확한 길이.
+            c = a + b * (k - 1)
+            order.append(c)
+            k += 1
+        else:
+            order.append(a)
+# print(order)
+
+# 위에서 생성한 변수에 대해 랭크를 생성
+obj = Series(order)
+rank = obj.rank(); rank
+# print(rank)
+playlist = [None]*len(songs)
+k = 0
+while k != len(songs):
+    playlist[int(rank[k])-1] = songs_sort[k]
+    k +=1
+# print(playlist)
+# total[z] = "\t".join(playlist)
 ```
 
+이렇게 각각의 함수들을 소개했고, 하나의 함수로 묶어서 소개한다.
+```python
+def shuffling(cmd):
+    cmd_lst = cmd.split('\n')
+    num = int(cmd_lst[0])
+    total = [None] * num
+    for z in range(0, num):
+        songs = cmd_lst[2*z + 1].split('\t')
+        artist = cmd_lst[2*z + 2].split('\t')
 
+        # 중복을 제거하기 위해
+        art = list(set(artist))
 
+        # 각 아티스트 별로 몇 곡이나 있는지
+        lst = []
+        for i in art:
+            artist1 = []
+            for j in range(0, len(artist)):
+                if i == artist[j]:
+                    artist1.append(j)
+            lst.append(artist1)
+        
+        # 이 기능이 없다면 아티스트의 특정 곡이 항상 앞에 옴
+        for i in lst:
+            if len(i) > 1:
+                i = random.shuffle(i)
+        # print(lst)
+                
+        # songs를 재배치
+        songs_sort = [None] * len(songs)
+        k = 0
+        for i in lst:
+            for j in i:
+                songs_sort[k] = songs[j]
+                k += 1
 
+        # 곡의 순서를 정하기 위해
+        order = []
+        for i in lst:
+            a = np.random.uniform(0, 0.1, 1)
+            k = 1
+            for j in i:
+                if len(i) > 1:
+                    b = 1 / len(i) # 여기다가 조금 더 랜덤한 수를 더 해줘서 random해지게끔
+                    c = a + b * (k - 1)
+                    order.append(c)
+                    k += 1
+                else:
+                    order.append(a)
+        # print(order)
+
+        # 랭크를 얻기 위해
+        obj = Series(order)
+        rank = obj.rank()
+
+        playlist = [None]*len(songs)
+        k = 0
+        while k != len(songs):
+            playlist[int(rank[k])-1] = songs_sort[k]
+            k +=1
+        total[z] = "\t".join(playlist)
+    return total
+```
+
+```python
+cmd1 = '2\nYesterday\tLet it be \tGee\t뭐있지\nBeatles\tBeatles\t소녀시대\t소녀시대\nSignal\tI LUV IT\tNew Face\tShape of You\nTwice\tPsy\tPsy\tEd Sheeran\n'
+shuffling(cmd1)
+```
+```
+['Yesterday\t뭐있지\tLet it be \tGee', 'New Face\tSignal\tShape of You\tI LUV IT']
+```
+```python
+cmd2 = '1\nI remember\tFree Love\t벌써 12시\tOverfill\tMelodie\tFlow\tPlutotype\t될 대로 되라고 해\tBAAAM\nEpik High\tEpik High\t청하\tMyle.D\tIDIOTAPE\tEpik High\tIDIOTAPE\t개코\t개코\n'
+shuffling(cmd2)
+```
+```
+['Plutotype\tOverfill\t벌써 12시\tFree Love\tBAAAM\tI remember\tMelodie\t될 대로 되라고 해\tFlow']
+```
+
+이런 식으로 잘 나온 것 같다.................
+
+너무너무 힘드누 ㅠㅠ
 <details>
-<summary>이름?</summary>
+<summary>만든 사람만 아는 이 함수의 문제점</summary>
 <div markdown = "1">
-이렇게 하는게 맞나요?
+1. 일단 # 곡의 순서를 정하는 부분에서 , len(i)로 정확하게 나누어 놨다. 25%의 경우에 2~30%로 배분하라는 건 아직 구현하지 않음
+2. 아웃풋도 확실하게 \n으로 문장 끝을 맺을 수 있도록
+3. # 곡 순서 정하는 부분에서, 0과 0.1사이에서 랜덤하게 하나의 수를 뽑도록 했다. 그래서 웬만하면 연이어 같은 아티스트의 곡이 나타나지 않는데, 같은 아티스트의 곡이 엄청나게 많으면 연이어 나타날 수 있다. 그 한계 정도도 구할 수 있을텐데, too much
+4. 위의 shuffling(cmd1)을 했을 때에는 싸이의 노래 New Face와 I LUV IT이 잘 떨어져서 나왔지만, 둘 중 하나가 3번째로 나오면 4번 째는 다른 하나가 되어 연이어서 나타나게 된다.
 </details>
 
 
@@ -283,13 +401,3 @@ for i in lst:
 
 
 
-
-
-
-
-
-
-
-
-
-ㅇㅇ
