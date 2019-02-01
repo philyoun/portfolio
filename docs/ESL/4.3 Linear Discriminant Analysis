@@ -1,0 +1,1 @@
+$x_{p \times 1}, \Sigma_{p \times p}, \mu_{p \times 1}$이기 때문에, $\frac{1}{2}x^T\Sigma^{-1}(\mu_k - \mu_l) = \frac{1}{2}(\mu_k^T - \mu_l^T)\Sigma^{-1}x$가 scalar값이 되어, (4.9)의 식이 성립한다.
