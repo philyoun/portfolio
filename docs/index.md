@@ -2,4 +2,4 @@
 
 ## Hello~
 
-Making changes...아 왜 안변하지
+Making changes...
