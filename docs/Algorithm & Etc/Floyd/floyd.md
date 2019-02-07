@@ -5,7 +5,6 @@ library(tidyverse)
 ## Warning: package 'tidyverse' was built under R version 3.5.2
 ```
 * 이렇게하는거? 오 지리네
-* 이렇게하는거? 오 지리네
 
 ---
 # How to Shuffle Songs?
