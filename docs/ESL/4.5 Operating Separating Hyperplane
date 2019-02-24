@@ -1,0 +1,145 @@
+Optimal Separating Hyperplanes
+This question is closely related to [Elements of Statistical Learning][1] p.132 - p.134.
+I want to reproduce the [Figure 4.14], [Figure 4.16] in p.129 and p.134, respectively.
+
+This is a toy example without given any data, so I made this up by hand.
+```r
+# Data
+x1 = c(1, 2, 2.5, 3.5, 6, 6, 7, 7, 7, 7, 8, 8, 8, 8, 9, 10, 10.5, 11, 11, 14)
+x2 = c(8, 4, 17, 3, 6, 8, 1, 5, 10, 13, 0.5, 2, 6, 7, 8.5, 7, 10, 14, 17, 18)
+group = c('group1', 'group1', 'group2', 'group1', 'group1', 'group1', 'group1', 'group1', 'group2', 'group2',
+	'group1', 'group1', 'group1', 'group2', 'group2', 'group2', 'group2', 'group2', 'group2', 'group2')
+
+dat = tibble(
+	x = x1, 
+    y = x2, 
+    group = factor(group)
+)
+```
+
+In order to show classification by linear regression makes an error, I did the following.
+By regressing the -1/1(if group1 then 1, -1 otherwise) response Y on X with the intercept, 
+```r
+library(tidyverse)
+# To make y into -1/1 according to its group
+dat1 = dat %>%
+	mutate(y = ifelse(group == 'group1', 1, -1))
+
+# Regression
+lm.dat = lm(y ~ x1 + x2, data = dat1)
+```
+
+Then, the orange line in Figure 4.14 would be the set $\left \{{(x_1, x_2): \hat{\beta_0}+\hat{\beta_1}x_1 + \hat{\beta_2}x_2 = 0}  \right \}$, and rewriting it would yield $x_1 = -\frac{\hat{\beta_0}}{\hat{\beta_1}}-\frac{\hat{\beta_2}}{\hat{\beta_1}}x_2$. So I did the following.
+
+이 부분 체크 필요 씨발
+```r
+# In order to draw the linear regression line
+x11 = seq(min(dat1[,1]), max(dat1[,1]), length.out = 100)
+x22 = -coef(lm.dat)[1]/coef(lm.dat)[2] - coef(lm.dat)[3]/coef(lm.dat)[2]*x1
+d1 = tibble(
+  x = x11, 
+  y = x22
+)
+ggplot(data = dat, aes(x = x1, y = x2)) + geom_point(aes(color = group)) + 
+  geom_line(aes(x = x1, y = x2), color = 'orange', size = 3, d1)
+```
+
+Then, you can see the orange linear regression line which makes an error in classifying.
+And I read the separating optimal hyperplane thoroughly, trying to reinvent what they did.
+
+
+To summarize, it is $\underset{\beta, \beta_0}{min}\frac{1}{2}\left \| \beta \right \|^2$ subject to $y_i(x_i^T\beta + \beta_0) \geq 1, i = 1, ..., N$ which is a convex optimization problem, leads to Lagrange function, setting its derivatives leads to $\beta = \sum_{i = 1}^{N}\alpha_iy_ix_i$ (4.50) and $0 = \sum_{i = 1}^{N}\alpha_iy_i$ (4.51).
+The book says, substituting (4.50) and (4.51) leads to $L_D = \sum_{i = 1}^{N}\alpha_i - \frac{1}{2}\sum_{i = 1}^{N}\sum_{k = 1}^{N}\alpha_i\alpha_ky_iy_kx_i^Tx_k$ subject to $\alpha_i \geq 0\;and\;\sum_{i = 1}^{N}\alpha_iy_i = 0$(4.52) which is so-called Wolfe dual. 
+With KKT conditions, we need to satisfy $\alpha_i\left [ y_i(x_i^T\beta+\beta_0) - 1 \right ] = 0, \forall i$ (4.53) as well.
+
+
+We can get support points by doing above, (문법?) then we can get $\beta$, and $\beta_0$ will be obtained by solving (4.53) for any of the support points.
+
+Since I couldn't program the whole convex optimization problem by hand, I used ```library(e1071)``` and used ```svm``` function.
+```r
+# install.packages("e1071")
+library(e1071)
+
+# Fitting SVM
+svm_dat = svm(group ~ ., data = dat)
+summary(svm_dat)
+
+# Tuning
+svm_tune = tune(svm, group ~ ., data = dat, 
+				kernel = 'linear', ranges=list(epsilon=seq(0, 1, 0.01), cost = 2^(2:9)))
+
+# Best model
+best_mod = svm_tune$best.model
+
+
+# You can see SVM did well
+# best_pred = predict(best_mod, dat)
+# table(best_pred, dat1$y)
+
+# After all of these, I could have found support points.
+best_mod$index	# 6th, 13th, 9th, 14th, 16th points are 5 support points.
+best_mod$coefs	# corresponding weights
+```
+Summing up all of the `best_mod$coefs` yield the result (4.51), and we can get $\beta$ (4.50) by doing
+
+```r
+# $\beta$ ; a vector (2 x 1) in this case
+coef1 = t(best_mod$coefs) %*% best_mod$SV; coef1
+```
+
+Finally, in order to get $\beta_0$ in (4.53)
+```r
+beta0 = c()
+beta0[1] = coef1[1]*dat[best_mod$index,][1,1] + coef1[2]*dat[best_mod$index,][1,2]
+beta0[2] = coef1[1]*dat[best_mod$index,][2,1] + coef1[2]*dat[best_mod$index,][2,2]
+```
+I just did for 2 support points out of 5 support points.
+
+```r
+x1 = seq(min(dat1[,1]), max(dat1[,1]), length.out = 100)
+x2.1 = -beta0[1]/coef(lm.dat)[2] - coef(lm.dat)[3]/coef(lm.dat)[2]*x1 # Notice that beta0 has been changed.
+d2 = tibble(
+  x = x1, 
+  y = x2.1
+)
+ggplot(data = dat, aes(x = x1, y = x2)) + geom_point(aes(color = group)) + 
+  geom_line(aes(x = x1, y = x2), color = 'orange', size = 3, d1) +
+  geom_line(aes(x = x1, y = x2.1), color = 'blue', size = 1, d2)
+```
+[그림삽임] We can see that it has been well implemented. Blue line doesn't make any error.
+
+Long story till here. **Here starts my problem.**	
+However, $\hat{\beta_0}$ is not same for any support points!
+According to that Blockquoted parts, $\hat{\beta_0}$ should be same for any points. Which is not the case...
+Notice that beta0[1] and beta0[2] are different above. 
+I don't know why.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  [1]: https://web.stanford.edu/~hastie/ElemStatLearn/printings/ESLII_print12.pdf
