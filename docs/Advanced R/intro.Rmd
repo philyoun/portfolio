@@ -1,8 +1,10 @@
 ---
 title: "AdvancedRIntro"
 author: "phil"
-date: "2019³â 2¿ù 24ÀÏ"
-output: html_document
+date: "2019<eb>…„ 2<ec>›” 24<ec>¼"
+output:
+  md_document:
+    variant: markdown_github
 ---
 
 ```{r setup, include=FALSE}
