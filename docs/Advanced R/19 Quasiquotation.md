@@ -8,3 +8,6 @@
 
 quasiquotation은 함수를 create하는 것을 쉽게 만들어준다.
 어떤 함수? [function's author가 만든 코드]와 [function's user가 만든 코드]를 combine하는 함수
+
+__[Q]{.Q}__: How is `expr()` implemented? Look at its source code.
+   __[A]{.solved}__: `expr()` acts as a simple wrapper, w
