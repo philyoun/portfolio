@@ -90,15 +90,16 @@ Functionals는 함수를 받게 해준다. single input을 받아서 문제를 �
 Functionals는 매우매우 중요한 technique이며, data analysis를 할 때 항상 쓰게 될 것이다.<br />
 <details>
 <summary>추가설명</summary>
-지금은 뭔소리인가 하겠지만, 당장 다음 Chapter를 보기만 해도 그리 어려운 말이 아니다. 그래도 간단한 예를 소개해보자.<br />
+지금은 뭔소리인가 하겠지만, 당장 다음 Chapter를 보기만 해도 그리 어려운 말이 아니다.<br /> 
+그래도 간단한 예를 소개해보자.<br />
 당장 다음 Chapter에 나오는 예를 해보자면, 
-<pre>
-```{r echo=TRUE, message=FALSE, warning=FALSE}
+
+```{r}
 library(purrr)
 triple <- function(x) x * 3
 map(1:3, triple)
 ```
-</pre>
+
 원래 우리가 `triple()`이라는 함수를 `triple(1)`, `triple(2)` 이런 식으로 쓰던가, `lapply()`를 이용해서 쓰던가 했는데, <br />
 가장 먼저 배우게 될 functional인 `purrr::map()`을 통해서 inputs의 개수가 몇 개가 되든간에 일반화해서 가능하게 된 것.
 </details>
