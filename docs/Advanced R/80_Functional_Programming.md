@@ -1,15 +1,27 @@
 Introduction
 ------------
 
-R은 뼛속까지 함수형 언어functional language다. 이게 무슨 뜻이냐면, 분명 기술적인 특징technical properties이 있긴 하지만, 더 중요하게 함수를 중심으로 한 문제를 해결하는데 적합한 언어라는 것. This means that it has certain technical properties, but more importantly that it lends itself to a style of problem solving centred on functions.
+R은 뼛속까지 함수형 언어functional language다.
 
-아래에서 함수형 언어에 대한 기술적인 정의의 간략한 개요를 소개하긴 하지만, 이 책에서 나는 우선적으로 functional style of programming에 집중할 것이다. 왜냐하면 내가 생각하기에 이 것이 data analysis를 하는데 있어 자주 만나는 문제들의 types를 해결하는데 매우 좋은 fit이 되기 때문.
+이게 무슨 뜻이냐면, 분명 기술적인 특징technical properties이 있긴 하지만, 더 중요하게 함수를 중심으로 한 문제를 해결하는데 적합한 언어라는 것.
 
-최근, functional techniques에 대한 관심이 급증하고 있는데, 왜냐하면 이 것들이 modern problems에 대해 효율적이고 우아한 해결책들을 제공하기 때문. functional style은 독립적으로 분석하기에 좋은 함수들을 만든다. 그래서 optimise하거나 parallelise하기에 훨씬 쉽다.
+This means that it has certain technical properties, but more importantly that it lends itself to a style of problem solving centred on functions.
+
+아래에서 함수형 언어에 대한 기술적인 정의의 간략한 개요를 소개하긴 하지만, 이 책에서 나는 우선적으로 functional style of programming에 집중할 것이다.
+
+왜냐하면 내가 생각하기에 이 것이 data analysis를 하는데 있어 자주 만나는 문제들의 types를 해결하는데 매우 좋은 fit이 되기 때문.
+
+최근, functional techniques에 대한 관심이 급증하고 있는데, 왜냐하면 이 것들이 modern problems에 대해 효율적이고 우아한 해결책들을 제공하기 때문.
+
+functional style은 독립적으로 분석하기에 좋은 함수들을 만든다.
+
+그래서 optimise하거나 parallelise하기에 훨씬 쉽다.
 
 함수형 언어의 전통적인 단점이었던, 떨어지는 퍼포먼스나 가끔 예견치 못한 메모리 사용은 최근 몇 년동안 많이 줄었다. poorer performance and sometimes unpredictable memory usage
 
-Functional programming은 Object-oriend programming(OOP)의 보완재complementary이다. OOP는 최근 몇십년동안 지배적인 프로그래밍 패러다임.
+Functional programming은 Object-oriend programming(OOP)의 보완재complementary이다.
+
+OOP는 최근 몇십년동안 지배적인 프로그래밍 패러다임.
 
 Functional Programming Languages
 --------------------------------
@@ -18,9 +30,11 @@ Functional Programming Languages
 
 **첫 번째**, functional 언어는 first-class functions를 가지고 있다. 여타 다른 데이터 구조들과 똑같이 행동하는 함수들. R에서는, 이 말인즉슨, 벡터로 할 수 있는 것들은, 함수를 가지고도 할 수 있다는 뜻이다. 변수에다가 할당할 수도 있고, 리스트에다가 저장할 수도 있고, 다른 함수에다가 arguments로 패스해 줄 수도 있다. 함수 안에다가 생성할 수도 있고, 심지어는 함수의 결과물로 return해줄 수도 있다.
 
-**두 번째**, 많은 함수형 언어들은 함수들이 pure하기를 요구한다. 다음 2가지 특성을 만족하면 함수가 pure하다고 한다. 1) output은 오직 inputs에만 의존한다. 즉, same inputs를 이용해서 다시 호출call해보면, 같은 outputs를 갖는다. `runif()`, `read.csv()`, `Sys.time()`과 같은, 다른 값들을 return하는 함수들은 제외된다.
+**두 번째**, 많은 함수형 언어들은 함수들이 pure하기를 요구한다. 다음 2가지 특성을 만족하면 함수가 pure하다고 한다.
 
-1.  함수가 side-effects가 없어야 한다. global variable의 값을 바꾼다거나, disk에다가 writing을 한다거나, 스크린에 displaying을 한다거나 이런게 없어야 한다. `print()`, `write.csv()`, `<-` 같은 함수들은 제외된다.
+1.  output은 오직 inputs에만 의존한다. 즉, same inputs를 이용해서 다시 호출call해보면, 같은 outputs를 갖는다. `runif()`, `read.csv()`, `Sys.time()`과 같은, 다른 값들을 return하는 함수들은 제외된다.
+
+2.  함수가 side-effects가 없어야 한다. global variable의 값을 바꾼다거나, disk에다가 writing을 한다거나, 스크린에 displaying을 한다거나 이런게 없어야 한다. `print()`, `write.csv()`, `<-` 같은 함수들은 제외된다.
 
 pure 함수들은 이유를 따져보기에reason about 훨씬 더 쉽다. 하지만 상당한 단점이 있다. data analysis를 하는데 random numbers를 생성할 수 없다거나, 디스크로부터 파일을 읽을 수 없다거나 하는 걸 상상해보라.
 
