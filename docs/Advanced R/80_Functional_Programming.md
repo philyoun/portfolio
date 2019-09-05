@@ -46,7 +46,7 @@ functional style을 사용할 때는, 문제의 components를 분해decompose해
 그래서, 이후의 3 chapters에서는 핵심 functional techniques를 다룬다.<br /> 문제를 작은 조각들로 쪼개는데 도와주는 것들.
 
 -   Chapter 9는, 많은 for 루프문들을, functionals로 어떻게 대체할 수 있는지를 보여준다.<br /> Functionals는 다른 함수를 argument로 받는 함수들.<br /> Functionals는 함수를 받게 해준다. single input을 받아서 문제를 해결하는 함수.<br /> 그리고 이걸 inputs가 몇 개가 되든간에 가능하도록 일반화해준다.<br /> Functionals는 매우매우 중요한 technique이며, data analysis를 할 때 항상 쓰게 될 것이다.<br /> <details> <summary>추가설명</summary> 지금은 뭔소리인가 하겠지만, 당장 다음 Chapter를 보기만 해도 그리 어려운 말이 아니다. 그래도 간단한 예를 소개해보자.<br /> 당장 다음 Chapter에 나오는 예를 해보자면,
-    <div>
+    <pre>
 
 ``` r
 library(purrr)
@@ -63,7 +63,7 @@ map(1:3, triple)
     ## [[3]]
     ## [1] 9
 
-</div>
+</pre>
 원래 우리가 `triple()`이라는 함수를 `triple(1)`, `triple(2)` 이런 식으로 쓰던가, `lapply()`를 이용해서 쓰던가 했는데, <br /> 가장 먼저 배우게 될 functional인 `purrr::map()`을 통해서 inputs의 개수가 몇 개가 되든간에 일반화해서 가능하게 된 것. </details> <br />
 
 -   Chapter 10은, function factories를 소개한다.<br /> functions를 생성create하는 functions. <br /> Function factories는 functionals보다는 훨씬 덜 사용되지만, <br /> 코드의 다른 부분 간에 작업을 우아하게 분할하게 해준다.<br /> but can allow you to / elegantly partiton work / between different parts of your code. <br />
