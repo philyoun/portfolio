@@ -17,9 +17,7 @@ functional style은 독립적으로 분석하기에 좋은 함수들을 만든�
 
 Functional programming은 Object-oriend programming(OOP)의 보완재complementary이다. OOP는 최근 몇십년동안 지배적인 프로그래밍 패러다임.
 
-나보기가, 역겨워
-가실 때에는
-제발 line break좀
+나보기가,  역겨워<br /> 가실 때에는<br /> 제발 line break좀
 
 Functional Programming Languages
 --------------------------------
