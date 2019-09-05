@@ -17,10 +17,14 @@ functional style은 독립적으로 분석하기에 좋은 함수들을 만든�
 
 Functional programming은 Object-oriend programming(OOP)의 보완재complementary이다. OOP는 최근 몇십년동안 지배적인 프로그래밍 패러다임.
 
-나보기가
-역겨워
+나보기가, 역겨워
 가실 때에는
-\#\# Functional Programming Languages 모든 프로그래밍 언어는 함수들을 가지고 있다. 그럼 무엇이 프로그래밍 언어를 functional하게 만드는가? 정확히 무엇이 언어를 functional하게 만드는지에는 여러가지 정의들이 있지만, 2개의 공통점two common threads이 있다.
+제발 line break좀
+
+Functional Programming Languages
+--------------------------------
+
+모든 프로그래밍 언어는 함수들을 가지고 있다. 그럼 무엇이 프로그래밍 언어를 functional하게 만드는가? 정확히 무엇이 언어를 functional하게 만드는지에는 여러가지 정의들이 있지만, 2개의 공통점two common threads이 있다.
 
 **첫 번째**, functional 언어는 first-class functions를 가지고 있다. 여타 다른 데이터 구조들과 똑같이 행동하는 함수들. R에서는, 이 말인즉슨, 벡터로 할 수 있는 것들은, 함수를 가지고도 할 수 있다는 뜻이다. 변수에다가 할당할 수도 있고, 리스트에다가 저장할 수도 있고, 다른 함수에다가 arguments로 패스해 줄 수도 있다. 함수 안에다가 생성할 수도 있고, 심지어는 함수의 결과물로 return해줄 수도 있다.
 
