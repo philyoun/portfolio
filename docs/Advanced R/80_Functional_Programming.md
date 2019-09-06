@@ -51,12 +51,6 @@ functional style을 사용할 때는, 문제의 components를 분해decompose해
 <p>
 지금은 뭔소리인가 하겠지만, 당장 다음 Chapter를 배우게 되면 그리 어려운 말이 아니다.<br /> 그래도 간단한 예를 소개해보자.<br /> 당장 다음 Chapter에 나오는 예를 해보자면,
 
-``` r
-library(purrr)
-triple <- function(x) x * 3
-map(1:3, triple)
-```
-
     ## [[1]]
     ## [1] 3
     ## 
@@ -66,7 +60,7 @@ map(1:3, triple)
     ## [[3]]
     ## [1] 9
 
-print("hello world")
+\#\# \[\[1\]\]<br /> \#\# \[1\] 3<br /> \#\# \[\[2\]\]<br /> \#\# \[1\] 6<br /> \#\# \[\[3\]\]<br /> \#\# \[1\] 9<br />
 
 원래 우리가 `triple()`이라는 함수를 `triple(1)`, `triple(2)` 이런 식으로 쓰던가, `lapply()`를 이용해서 쓰던가 했는데, <br /> 가장 먼저 배우게 될 functional인 `purrr::map()`을 통해서 inputs의 개수가 몇 개가 되든간에 일반화해서 가능하게 된 것.
 </p>
