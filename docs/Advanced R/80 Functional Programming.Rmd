@@ -1,8 +1,5 @@
 ---
 title: "Functional Programming"
-markdown: kramdown
-kramdown:
-  parse_block_html: true
 output:
   md_document:
     variant: markdown_github
@@ -117,6 +114,8 @@ Function factories는 functionals보다는 훨씬 덜 사용되지만, <br />
 	코드의 다른 부분 간에 작업을 우아하게 분할하게 해준다.<br />
 	but can allow you to / elegantly partiton work / between different parts of your code.
 <br />
+
+
 <details>
 <summary>이될 도까</summary>
 ㅁㄴㅇ
