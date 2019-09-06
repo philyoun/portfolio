@@ -70,11 +70,20 @@ map(1:3, triple)
 
 <details> <summary>이될 도까</summary> ㅁㄴㅇ
 <p>
-```{r]
+``` r
 library(purrr)
 t <- function(x) x*3
 map(1:3, t)
 ```
+
+    ## [[1]]
+    ## [1] 3
+    ## 
+    ## [[2]]
+    ## [1] 6
+    ## 
+    ## [[3]]
+    ## [1] 9
 
 </p>
 </details>
