@@ -68,26 +68,6 @@ map(1:3, triple)
 
 -   Chapter 10은, function factories를 소개한다.<br /> functions를 생성create하는 functions. <br /> Function factories는 functionals보다는 훨씬 덜 사용되지만, <br /> 코드의 다른 부분 간에 작업을 우아하게 분할하게 해준다.<br /> but can allow you to / elegantly partiton work / between different parts of your code. <br />
 
-<details> <summary>이될 도까</summary> ㅁㄴㅇ
-<p>
-``` r
-library(purrr)
-t <- function(x) x*3
-map(1:3, t)
-```
-
-    ## [[1]]
-    ## [1] 3
-    ## 
-    ## [[2]]
-    ## [1] 6
-    ## 
-    ## [[3]]
-    ## [1] 9
-
-</p>
-</details>
-
 -   Chapter 11은, function operators를 만드는 걸 보여준다.<br /> functions를 input으로 받아서, output으로 functions를 생산produce하는 functions.<br /> 부사adverb같은건데, 일반적으로 함수의 작동을 수정modify한다.<br /> They are like adverbs, because they typically modify the operation of a function.<br />
 
 종합해보면, 이러한 타입들의 함수는 higher-order functions라고 불리고, 2 by 2 테이블로 정리해보면,<br /> ![그림1](https://d33wubrfki0l68.cloudfront.net/1dff819e743f280bbab1c55f8f063e60b6a0d2fb/2269e/diagrams/fp.png)
