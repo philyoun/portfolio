@@ -64,7 +64,7 @@ map(1:3, triple)
     ## [[3]]
     ## [1] 9
 
-원래 우리가 `triple()`이라는 함수를 `triple(1)`, `triple(2)` 이런 식으로 쓰던가, `lapply()`를 이용해서 쓰던가 했는데, <br /> 가장 먼저 배우게 될 functional인 `purrr::map()`을 통해서 inputs의 개수가 몇 개가 되든간에 일반화해서 가능하게 된 것. </details> <br />
+<br /> 원래 우리가 `triple()`이라는 함수를 `triple(1)`, `triple(2)` 이런 식으로 쓰던가, `lapply()`를 이용해서 쓰던가 했는데, <br /> 가장 먼저 배우게 될 functional인 `purrr::map()`을 통해서 inputs의 개수가 몇 개가 되든간에 일반화해서 가능하게 된 것. </details> <br />
 
 -   Chapter 10은, function factories를 소개한다.<br /> functions를 생성create하는 functions. <br /> Function factories는 functionals보다는 훨씬 덜 사용되지만, <br /> 코드의 다른 부분 간에 작업을 우아하게 분할하게 해준다.<br /> but can allow you to / elegantly partiton work / between different parts of your code. <br />
 
