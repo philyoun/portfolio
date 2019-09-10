@@ -3,7 +3,7 @@ Introduction
 
 <strong>R은 뼛속까지 함수형 언어functional language다.</strong>
 
-이게 무슨 뜻이냐면, 분명 기술적인 특징technical properties이 있긴 하지만, <br />      더 중요하게 함수를 중심으로 한 문제를 해결하는데 적합한 언어라는 것.<br />      This means/ that it has certain technical properties, but more importantly / that it lends itself / to a style of problem / solving centred on functions.
+이게 무슨 뜻이냐면, 분명 기술적인 특징technical properties이 있긴 하지만, <br />      더 중요하게 함수를 중심으로 한 문제를 해결하는데 적합한 언어라는 것.<br />      This means/ that it has certain technical properties, but more importantly / that it lends itself / to a style of problem / solving centred on functions.
 
 아래에서 함수형 언어에 대한 기술적인 정의의 간략한 개요brief overview를 소개하긴 하지만, <br /> 이 책에서 나는 우선적으로 functional style of programming에 집중할 것이다.
 
@@ -70,4 +70,4 @@ functional style을 사용할 때는, 문제의 components를 분해decompose해
 
 -   Chapter 11은, function operators를 만드는 걸 보여준다.<br /> functions를 input으로 받아서, output으로 functions를 생산produce하는 functions.<br /> 부사adverb같은건데, 일반적으로 함수의 작동을 수정modify한다.<br /> They are like adverbs, because they typically modify the operation of a function.<br />
 
-종합해보면, 이러한 타입들의 함수는 higher-order functions라고 불리고, 2 by 2 테이블로 정리해보면,<br /> ![그림1](https://d33wubrfki0l68.cloudfront.net/1dff819e743f280bbab1c55f8f063e60b6a0d2fb/2269e/diagrams/fp.png)
+종합해서, 이러한 타입들의 함수는 higher-order functions라고 불리고, 2 by 2 테이블로 정리해보면,<br /> ![그림1](https://d33wubrfki0l68.cloudfront.net/1dff819e743f280bbab1c55f8f063e60b6a0d2fb/2269e/diagrams/fp.png)
