@@ -44,7 +44,9 @@ search_envs()
     ##  [[9]] $ <env: Autoloads>
     ## [[10]] $ <env: package:base>
 
-search path의 마지막 2개 env들은 항상 같다. \* Autoloads env는 delayed bindings를 이용해서 메모리를 save한다. 어떻게? 패키지 오브젝트들을 필요할 때만 로딩하는 방식으로.
+search path의 마지막 2개 env들은 항상 같다.
+
+-   Autoloads env는 delayed bindings를 이용해서 메모리를 save한다. 어떻게? 패키지 오브젝트들을 필요할 때만 로딩하는 방식으로.
 
 -   package:base 혹은 그냥 base라고 하는 base env는, base 패키지의 env다. <br /> 이건 다른 패키지들의 로딩을 시동할 수 있어야하기 때문에 특별하다. <br /> It is special because / it has to be able to bootstrap / the loading of all other packages. <br /> 이 base env는, base\_env()를 통해서 직접적으로 access할 수 있다.
 
@@ -89,7 +91,7 @@ sd
     ## function (x, na.rm = FALSE) 
     ## sqrt(var(if (is.vector(x) || is.factor(x)) x else as.double(x), 
     ##     na.rm = na.rm))
-    ## <bytecode: 0x0000000015c8d118>
+    ## <bytecode: 0x0000000015b01120>
     ## <environment: namespace:stats>
 
 sd()는 var()의 관점으로 정의되어 있다. sd() is defined in terms of var(). <br /> 그래서 만약에 global env에서나 혹은 다른 attach된 패키지 안의, var()이라고 불리는 어떤 함수에 의해, <br />     sd()의 결과가 영향받지 않을까 걱정할 수 있다. <br /> so you might worry that the result of sd() / would be affected / by any function called var() <br />     either in the global env, or in one of the other attached packages. <details> <summary>예를 들어,</summary>
@@ -148,3 +150,102 @@ R은 앞서 설명한 함수 대(對) binding env를 사용해서, 이러한 문
 그래서 `sd()`가 `var`의 값을 찾아볼 때, 항상 패키지 user가 아닌, 패키지 developer가 결정해놓은 env의 sequence들을 찾아가게 된다. <br /> 그래서 package 코드는 user가 어떤 패키지들을 attach시켜놨던간에 항상 같은 방식으로 작동하도록 보장받는 것이다.
 
 위 그림을 보면 알다시피 패키지와 namespace env간에 직접적이 링크direct link는 없다. function env를 통해서만 링크는 정의된다.
+
+### 7.4.4 Execution environments
+
+마지막으로 다뤄야할 중요한 주제는 execution env다. <br /> 다음의 함수를 처음 실행시켜보면 무엇이 나올까? 2번째로 실행시켜보면?
+
+``` r
+g <- function(x) {
+  if (!env_has(current_env(), "a")) {
+    message("Defining a")
+    a <- 1
+  } else {
+    a <- a + 1
+  }
+  a
+}
+```
+
+계속 읽기전에 한 번 생각해보자.
+
+``` r
+g(10)
+```
+
+    ## Defining a
+
+    ## [1] 1
+
+``` r
+g(10)
+```
+
+    ## Defining a
+
+    ## [1] 1
+
+이 함수는 같은 값을 계속 return하는데, Section 6.4.3에서 다루었던 fresh start principle 때문이다. <br /> 함수가 호출될 때마다 host execution에 새로운 env가 생긴다. <br /> 이건 execution env라고 부르고, 이것의 parent는 function env다.
+
+좀 더 간단한 예와 함께 이 과정을 설명해보자. <br /> execution env는 function env를 통해 찾을 수 있다.
+
+``` r
+h <- function(x) {
+  a <- 2
+  x + a
+}
+
+y <- h(1)
+```
+
+![그림8](https://d33wubrfki0l68.cloudfront.net/862b3606a4a218cc98739b224521b649eeac6082/5d3e9/diagrams/environments/execution.png)
+
+우리가 `y <- h(1)`이라고 함수를 호출하면, 1에서처럼, execution env가 생겨서 `x`에다가 1을 assign. <br /> 그리고 2에서처럼, 이 execution env안에서 `a`에다가 2를 assign. <br /> 그리고나서 3에서처럼, execution env는 사라지고, y에다가 3을 return하면서 함수가 complete.
+
+그림에서, execution env의 parent가 function env라는 것을 확인할 수 있다.
+
+execution env는 보통 ephemeral하다. 쓰고나면 없어진다. <br /> 함수가 완료되고 나면, env는 garbage collected된다. <br /> 몇 가지 방법으로 이걸 더 오래남께끔 할 수는 있다. <br /> 첫 번째는 explicit하게 return하는 것.
+
+``` r
+h2 <- function(x) {
+  a <- x * 2
+  current_env()
+}
+
+e <- h2(x = 10)
+env_print(e)
+```
+
+    ## <environment: 00000000124D9B98>
+    ## parent: <environment: global>
+    ## bindings:
+    ##  * a: <dbl>
+    ##  * x: <dbl>
+
+``` r
+fn_env(h2)
+```
+
+    ## <environment: R_GlobalEnv>
+
+여기서도 `h2`의 execution env의 parent가 global env라는 걸 볼 수 있다. function env가 global env이기 때문.
+
+두 번째 방법은 함수같이, env가 binding된 object를 return하도록 하는 것. <br /> Another way to capture it is to return an object with a binding to that environment, like a function. <br /> 다음의 예는 function factory를 사용해서 이 아이디어를 illustrate한다. <br /> `plus()`라는 function factory를 이용해서, `plus_one()`이라는 함수를 만들어볼 것임.
+
+``` r
+plus <- function(x) {
+  function(y) x + y
+}
+
+plus_one <- plus(1)
+plus_one
+```
+
+    ## function(y) x + y
+    ## <environment: 0x00000000187789a0>
+
+다이어그램을 보면, `plus_one()`의 enclosing env가 `plus()`의 execution env라서 조금 복잡하다. ![그림9](https://d33wubrfki0l68.cloudfront.net/853b74c3293fae253c978b73c55f3d0531d746c5/6ffd5/diagrams/environments/closure.png)
+
+우리가 `plus_one()`을 호출하면 무슨 일이 일어나는지? <br /> plus\_one()의 execution env는, 캡쳐된 plus()의 execution env를 parent로 가질 것이다. <br /> What happens when we call plus\_one()? <br /> Its execution environment will have / the captured execution env of plus() as its parent. ![그림10](https://d33wubrfki0l68.cloudfront.net/66676485e6a22c807c19b0c54c8fda6bd1292531/3526e/diagrams/environments/closure-call.png)
+
+function factory에 대해서는 Section 10.2에서 자세하게 배운다.

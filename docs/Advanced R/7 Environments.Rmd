@@ -39,6 +39,7 @@ search_envs()
 ```
 
 search path의 마지막 2개 env들은 항상 같다.
+
 * Autoloads env는 delayed bindings를 이용해서 메모리를 save한다. 어떻게? 패키지 오브젝트들을 필요할 때만 로딩하는 방식으로.
 
 * package:base 혹은 그냥 base라고 하는 base env는, base 패키지의 env다. <br />
@@ -66,6 +67,8 @@ fn_env(f)
 <summary>base R</summary>
 함수 `f`의 env를 access하고 싶다면 environment(f)를 사용해라.
 </details>
+
+
 
 다이어그램에서는, 함수를 다음과 같이 env를 bind하고 있는 '반원이 붙은 네모'로 그릴 것이다. <br />
 In diagrams, I'll draw a function as a rectangle with a rounded end that binds an environment.
@@ -116,6 +119,9 @@ var(1)
 sd(1:2)
 ```
 </details>
+
+
+
 
 R은 앞서 설명한 함수 대(對) binding env를 사용해서, 이러한 문제를 피한다. <br />
 R avoids this problem by taking advantage of the function versus binding env described above.
@@ -175,8 +181,91 @@ S3 메소드 디스패치가 작동하는 방법 때문에 필요했던 역사�
 위 그림을 보면 알다시피 패키지와 namespace env간에 직접적이 링크direct link는 없다. function env를 통해서만 링크는 정의된다.
 
 
+### 7.4.4 Execution environments
+마지막으로 다뤄야할 중요한 주제는 execution env다. <br />
+다음의 함수를 처음 실행시켜보면 무엇이 나올까? 2번째로 실행시켜보면?
+```{r}
+g <- function(x) {
+  if (!env_has(current_env(), "a")) {
+    message("Defining a")
+    a <- 1
+  } else {
+    a <- a + 1
+  }
+  a
+}
+```
+
+계속 읽기전에 한 번 생각해보자.
+```{r}
+g(10)
+g(10)
+```
+
+이 함수는 같은 값을 계속 return하는데, Section 6.4.3에서 다루었던 fresh start principle 때문이다. <br />
+함수가 호출될 때마다 host execution에 새로운 env가 생긴다. <br />
+이건 execution env라고 부르고, 이것의 parent는 function env다.
 
 
+좀 더 간단한 예와 함께 이 과정을 설명해보자. <br />
+execution env는 function env를 통해 찾을 수 있다.
+```{r}
+h <- function(x) {
+  a <- 2
+  x + a
+}
+
+y <- h(1)
+```
+![그림8](https://d33wubrfki0l68.cloudfront.net/862b3606a4a218cc98739b224521b649eeac6082/5d3e9/diagrams/environments/execution.png)
+
+우리가 `y <- h(1)`이라고 함수를 호출하면, 1에서처럼, execution env가 생겨서 `x`에다가 1을 assign. <br />
+그리고 2에서처럼, 이 execution env안에서 `a`에다가 2를 assign. <br />
+그리고나서 3에서처럼, execution env는 사라지고, y에다가 3을 return하면서 함수가 complete.
+
+그림에서, execution env의 parent가 function env라는 것을 확인할 수 있다. 
+
+execution env는 보통 ephemeral하다. 쓰고나면 없어진다. <br />
+함수가 완료되고 나면, env는 garbage collected된다. <br />
+몇 가지 방법으로 이걸 더 오래남께끔 할 수는 있다. <br />
+첫 번째는 explicit하게 return하는 것.
+```{r}
+h2 <- function(x) {
+  a <- x * 2
+  current_env()
+}
+
+e <- h2(x = 10)
+env_print(e)
+fn_env(h2)
+```
+
+여기서도 `h2`의 execution env의 parent가 global env라는 걸 볼 수 있다. function env가 global env이기 때문.
+
+두 번째 방법은 함수같이, env가 binding된 object를 return하도록 하는 것. <br />
+Another way to capture it is to return an object with a binding to that environment, like a function. <br />
+다음의 예는 function factory를 사용해서 이 아이디어를 illustrate한다. <br />
+`plus()`라는 function factory를 이용해서, `plus_one()`이라는 함수를 만들어볼 것임.
+
+```{r}
+plus <- function(x) {
+  function(y) x + y
+}
+
+plus_one <- plus(1)
+plus_one
+```
+
+다이어그램을 보면, `plus_one()`의 enclosing env가 `plus()`의 execution env라서 조금 복잡하다. 
+![그림9](https://d33wubrfki0l68.cloudfront.net/853b74c3293fae253c978b73c55f3d0531d746c5/6ffd5/diagrams/environments/closure.png)
+
+우리가 `plus_one()`을 호출하면 무슨 일이 일어나는지?  <br />
+plus_one()의 execution env는, 캡쳐된 plus()의 execution env를 parent로 가질 것이다. <br />
+What happens when we call plus_one()? <br />
+Its execution environment will have / the captured execution env of plus() as its parent.
+![그림10](https://d33wubrfki0l68.cloudfront.net/66676485e6a22c807c19b0c54c8fda6bd1292531/3526e/diagrams/environments/closure-call.png)
+
+function factory에 대해서는 Section 10.2에서 자세하게 배운다.
 
 
 
