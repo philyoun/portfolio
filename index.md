@@ -1,5 +1,9 @@
 # Welcome to Phil's Blog
 
-## Hello~
+## Hello
 
-Making changes...
+
+배우고 습득한 것을 종이로 남기는 것에는 한계가 있습니다.
+
+Internet에 기록을 영구적으로 남겨 필요할 때 언제든지 참고하고, 기억을 일깨울 수 있도록, 정리를 하는 작업입니다.
+
