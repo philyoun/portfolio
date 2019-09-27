@@ -91,7 +91,7 @@ sd
     ## function (x, na.rm = FALSE) 
     ## sqrt(var(if (is.vector(x) || is.factor(x)) x else as.double(x), 
     ##     na.rm = na.rm))
-    ## <bytecode: 0x0000000015b01120>
+    ## <bytecode: 0x0000000015aee308>
     ## <environment: namespace:stats>
 
 sd()는 var()의 관점으로 정의되어 있다. sd() is defined in terms of var(). <br /> 그래서 만약에 global env에서나 혹은 다른 attach된 패키지 안의, var()이라고 불리는 어떤 함수에 의해, <br />     sd()의 결과가 영향받지 않을까 걱정할 수 있다. <br /> so you might worry that the result of sd() / would be affected / by any function called var() <br />     either in the global env, or in one of the other attached packages. <details> <summary>예를 들어,</summary>
@@ -121,7 +121,7 @@ sd(1:2)
 
     ## [1] 0.7071068
 
-</details>
+</details> <br /> <br /> <br /> <br />
 
 R은 앞서 설명한 함수 대(對) binding env를 사용해서, 이러한 문제를 피한다. <br /> R avoids this problem by taking advantage of the function versus binding env described above.
 
@@ -216,7 +216,7 @@ e <- h2(x = 10)
 env_print(e)
 ```
 
-    ## <environment: 00000000124D9B98>
+    ## <environment: 00000000186F6870>
     ## parent: <environment: global>
     ## bindings:
     ##  * a: <dbl>
@@ -242,10 +242,10 @@ plus_one
 ```
 
     ## function(y) x + y
-    ## <environment: 0x00000000187789a0>
+    ## <environment: 0x0000000018f5b080>
 
 다이어그램을 보면, `plus_one()`의 enclosing env가 `plus()`의 execution env라서 조금 복잡하다. ![그림9](https://d33wubrfki0l68.cloudfront.net/853b74c3293fae253c978b73c55f3d0531d746c5/6ffd5/diagrams/environments/closure.png)
 
-우리가 `plus_one()`을 호출하면 무슨 일이 일어나는지? <br /> plus\_one()의 execution env는, 캡쳐된 plus()의 execution env를 parent로 가질 것이다. <br /> What happens when we call plus\_one()? <br /> Its execution environment will have / the captured execution env of plus() as its parent. ![그림10](https://d33wubrfki0l68.cloudfront.net/66676485e6a22c807c19b0c54c8fda6bd1292531/3526e/diagrams/environments/closure-call.png)
+우리가 `plus_one()`을 호출하면 무슨 일이 일어나는지? <br /> plus\_one()의 execution env는, 캡쳐된 plus()의 execution env를 parent로 가질 것이다. <br /> What happens when we call plus\_one()? <br /> Its execution environment will have / the captured execution env of plus() as its parent. <br /> 그래서 plus()의 execution env가 더 오래 남아있다. ![그림10](https://d33wubrfki0l68.cloudfront.net/66676485e6a22c807c19b0c54c8fda6bd1292531/3526e/diagrams/environments/closure-call.png)
 
 function factory에 대해서는 Section 10.2에서 자세하게 배운다.

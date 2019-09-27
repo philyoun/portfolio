@@ -67,7 +67,8 @@ fn_env(f)
 <summary>base R</summary>
 함수 `f`의 env를 access하고 싶다면 environment(f)를 사용해라.
 </details>
-
+ <br /> <br /> <br /> <br />
+ 
 
 
 다이어그램에서는, 함수를 다음과 같이 env를 bind하고 있는 '반원이 붙은 네모'로 그릴 것이다. <br />
@@ -119,7 +120,10 @@ var(1)
 sd(1:2)
 ```
 </details>
-
+<br />
+<br />
+<br />
+<br />
 
 
 
@@ -262,19 +266,56 @@ plus_one
 우리가 `plus_one()`을 호출하면 무슨 일이 일어나는지?  <br />
 plus_one()의 execution env는, 캡쳐된 plus()의 execution env를 parent로 가질 것이다. <br />
 What happens when we call plus_one()? <br />
-Its execution environment will have / the captured execution env of plus() as its parent.
+Its execution environment will have / the captured execution env of plus() as its parent. <br />
+그래서 plus()의 execution env가 더 오래 남아있다.
 ![그림10](https://d33wubrfki0l68.cloudfront.net/66676485e6a22c807c19b0c54c8fda6bd1292531/3526e/diagrams/environments/closure-call.png)
 
 function factory에 대해서는 Section 10.2에서 자세하게 배운다.
 
 
+## 7.5 Call stacks
+마지막으로 설명해야할 env는, caller env. <br />
+rlang::caller_env()로 access할 수 있다. <br />
+함수가 호출되는 곳의 env를 공급해준다. 그래서 함수가 어떻게 만들어지에 따라 달라지는게 아니고, 함수가 어떻게 호출되어지느냐에 따라 달라진다. <br />
+위에서 봤듯이, env를 argument로 받는 함수를 작성할 때, 유용한 디폴트이다. 
+
+<details>
+<summary>base R</summary>
+`parent.frame()`이랑 `caller_env()`와 같은 것이다. 이름은 frame인데, frame이 아니라 env를 return한다.
+</details>
+ <br /> <br /> <br /> <br />
 
 
+caller env를 충분히 이해하기 위해서는, 2개의 연관된 개념들concepts을 다루어야 한다. **frame**으로 만들어진 **call stack**. <br />
+함수를 실행하는 것은, 2가지 타입들의 context를 만든다. <br />
+Executing a function creates two types of context. <br />
+이미 하나는 배웠다. execution env. <br />
+이건 function env의 child. 그리고 이건 함수를 어디에 만들어지는지에 따라 결정된다. <br />
+또 다른 하나는 call stack. 얘는 함수를 어디에 호출되어지는지에 따라 결정됨.
 
+### 7.5.1 Simple call stacks
+간단한 sequence of calls를 illustrate해보자: f()는 g()를, g()는 h()를 call한다. <br />
+```{r}
+f <- function(x) {
+  g(x = 2)
+}
 
+g <- function(x) {
+  h(x = 3)
+}
 
+h <- function(x) {
+  stop()
+}
+```
 
-
+R에서 call stack을 가장 흔하게 보는 방법은, error가 발생했을때 traceback()을 살펴보는 것이다.
+```{r}
+f(x = 1)
+```
+```{r}
+traceback()
+```
 
 
 
