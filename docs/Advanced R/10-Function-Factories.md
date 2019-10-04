@@ -28,11 +28,11 @@ cube(3)
 
     ## [1] 27
 
-Function factories를 가능케하는 개별적인 components들에 대해선 이미 다 배웠다. <br />
+Function factories를 가능케하는 개별적인 구성요소components들에 대해선 이미 다 배웠다. <br />
 
--   Section 6.2.3에서, R's first-class functions에 대해 배웠다. <br /> R에서는 `<-`를 이용해서, 오브젝트에 이름을 bind하는 것과 같은 방식으로, 함수function에 이름을 bind할 수 있다.
+-   Section 6.2.3에서, R's first-class functions에 대해 배웠다. <br />소 R에서는 `<-`를 이용해서, 오브젝트에 이름을 bind하는 것과 같은 방식으로, 함수function에 이름을 bind할 수 있다.
 
--   Section 7.4.2에서, 함수가 만들어질 때, 함수를 갖고 있는 env를 캡쳐(enclose)한다는 걸 배웠다. <br /> In Section 7.4.2, you learned that a function captures(encloses) the environment / in which it is created.
+-   Section 7.4.2에서, 함수는 그 함수가 만들어질 때, 함수를 갖고 있는 env를 캡쳐(enclose)한다는 걸 배웠다. <br /> In Section 7.4.2, you learned that a function captures(encloses) the environment / in which it is created.
 
 -   Section 7.4.4에서, 함수가 실행될 때마다, 새로운 execution env를 만든다는 것을 배웠다. <br /> 이 env는 보통 ephemeral하지만, 여기서는 manufactured function의 enclosing env가 된다.
 
@@ -90,7 +90,7 @@ square
     ## function(x){
     ##     x ^ exp
     ##   }
-    ## <environment: 0x0000000014655678>
+    ## <environment: 0x0000000014136278>
 
 ``` r
 cube
@@ -99,8 +99,8 @@ cube
     ## function(x){
     ##     x ^ exp
     ##   }
-    ## <bytecode: 0x000000001378a4e8>
-    ## <environment: 0x0000000013f5ea30>
+    ## <bytecode: 0x0000000012b7a370>
+    ## <environment: 0x0000000013b9b200>
 
 x가 어디서 오는건지는 명확한데, R은 어떻게 exp와 관련되어 있는 값을 찾는거지? <br /> bodies가 똑같기 때문에, manufactured function을 print out해보는건 별 도움이 안된다. <br /> 대신에 enclosing env의 내용물이 중요한 factors다. <br /> rlang::env\_print()를 이용해서 좀 더 인사이트를 얻을 수 있다.
 
@@ -108,7 +108,7 @@ x가 어디서 오는건지는 명확한데, R은 어떻게 exp와 관련되어 
 env_print(square)
 ```
 
-    ## <environment: 0000000014655678>
+    ## <environment: 0000000014136278>
     ## parent: <environment: global>
     ## bindings:
     ##  * exp: <dbl>
@@ -117,7 +117,7 @@ env_print(square)
 env_print(cube)
 ```
 
-    ## <environment: 0000000013F5EA30>
+    ## <environment: 0000000013B9B200>
     ## parent: <environment: global>
     ## bindings:
     ##  * exp: <dbl>
@@ -288,3 +288,109 @@ lobstr::obj_size(g2)
     ## 12,976 B
 
 \[그림6\]
+
+### 10.2.6 Exercises
+
+1.  `force()`의 정의는 단순하다:
+
+``` r
+force
+```
+
+    ## function (x) 
+    ## x
+    ## <bytecode: 0x0000000012db16d0>
+    ## <environment: namespace:base>
+
+`force(x)`가 x보다 나은 이유는 무엇일까?
+
+1.  base R은 2개의 function factories, `approxfun()`과 `ecdf()`를 갖고 있다. documentation을 읽고, 이 함수들이 뭘하고 무엇을 return하는지 알아내라. ?approxfun
+
+2.  `i`라는 index를 argument를 받는 함수 `pick()`을 만들어라. argument `x`를 `i`로 subset한 함수를 return해야함. <br /> 그러니까, `pick(1)(x)`은, `x[[1]]`와 같은 것이어야하고, `lapply(mtcars, pick(5))`은, `lapply(mtcars, function(x) x[[5]])`와 같은 것이어야 한다.
+
+pick &lt;- function(){
+
+1.  numeric vector의 ith central moment를 계산하는 함수를 만드는 함수를 만들어라. <br /> 다음의 코드를 실행해봄으로써 잘 만들어졌는지 테스트를 해볼 수 있다.
+
+10.3 Graphical factories
+------------------------
+
+ggplot2에서 몇몇 예를 보면서, 유용한 function factories에 대해 탐구해보자
+
+### 10.3.1 Labelling
+
+scales 패키지의 목표 중 하나는, ggplot2에서 라벨label을 customise하기 쉽게 만들어주는 것이다. <br /> 축들axes과 범례legends의 세부 내용을 컨트롤할 수 있는 많은 함수들을 공급provide해준다. <br /> 포맷 함수들formatter functions는, 축 브레이크axis breaks의 외형을 컨트롤할 수 있는 유용한 class of functions다. <br /> 첫 눈에 보기엔 조금 이상하다: number를 형식화format하기 위해 호출하는데, function을 return하니깐.
+
+``` r
+y <- c(12345, 123456, 1234567)
+comma_format()(y)
+```
+
+    ## [1] "12,345"    "123,456"   "1,234,567"
+
+``` r
+number_format(scale = 1e-3, suffix = " K")(y)
+```
+
+    ## [1] "12 K"    "123 K"   "1 235 K"
+
+즉, 기본 인터페이스는 function factory다. <br /> 언뜻 보기엔, 조금의 이득을 위해서 엄청 복잡하기만 해진 것 같다. <br /> 하지만 ggplot2의 스케일과 좋은 상호작용interaction을 하는게, `label` argument에서 함수를 받아주기 때문.
+
+``` r
+df <- data.frame(x = 1, y = y)
+par(mfrow = c(2, 2))
+core <- ggplot(df, aes(x, y)) +
+  geom_point() +
+  scale_x_continuous(breaks = 1, labels = NULL) +
+  labs(x = NULL, y = NULL)
+
+core
+```
+
+![](10-Function-Factories_files/figure-markdown_github/unnamed-chunk-16-1.png)
+
+``` r
+core + scale_y_continuous(
+  labels = comma_format()
+)
+```
+
+![](10-Function-Factories_files/figure-markdown_github/unnamed-chunk-16-2.png)
+
+``` r
+core + scale_y_continuous(
+  labels = number_format(scale = 1e-3, suffix = " K")
+)
+```
+
+![](10-Function-Factories_files/figure-markdown_github/unnamed-chunk-16-3.png)
+
+``` r
+core + scale_y_continuous(
+  labels = scientific_format()
+)
+```
+
+![](10-Function-Factories_files/figure-markdown_github/unnamed-chunk-16-4.png)
+
+### 10.3.2 Histogram bins
+
+`geom_histogram()`의 `binwidth` argument도 함수가 될 수 있다는게 잘 알려진 특성feature이다. <br /> 이건 특히나 유용한게, 각 그룹에 따라 function이 execute될 수 있기 때문에, 다른 측면facets에 따라 다른 binwidth를 가질 수 있다는 것.
+
+이 아이디어를 illustrate, 고정된 binwidth가 유용하지 않은 예를 만들어 보이겠다.
+
+``` r
+sd <- c(1, 5, 15)
+n <- 100
+
+df <- data.frame(x = rnorm(3 * n, sd = sd), sd = rep(sd, n))
+
+ggplot(df, aes(x)) +
+  geom_histogram(binwidth = 2) +
+  facet_wrap(~ sd, scales = "free_x") +
+  labs(x = NULL)
+```
+
+![](10-Function-Factories_files/figure-markdown_github/unnamed-chunk-17-1.png)
+
+여기서 각 facet는 같은 수의 observations를 갖고 있는데, 여기서 variability가 매우 다르다. <br /> binwidths가 달라지게 해서,
