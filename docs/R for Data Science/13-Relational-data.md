@@ -4,9 +4,9 @@
 13.1 Introduction
 -----------------
 
-데이터 분석을 하는데 있어, 하나만의 table을 쓰는 경우는 거의 없다. <br /> 보통 여러 개의 테이블들이 있고, 니가 궁금한 것에 대해 대답을 하기 위해선, 이것들을 잘 조합combine해야됨. <br /> 종합해서, 이 multiple tables of data를 relational data라고 부른다. <br /> 그냥 개별적인 데이터셋들이 아니라, relations가 중요하기 때문이다.
+데이터 분석을 하는데 있어, 단 하나의 table을 쓰는 경우는 거의 없다. <br /> 보통 여러 개의 테이블들이 있고, 니가 궁금한 것에 대해 대답을 하기 위해선, 이것들을 잘 결합combine해야됨. <br /> 종합해서, 이 multiple tables of data를 relational data라고 부른다. <br /> 단순히 개별적인 데이터셋들이 아니라, relations가 중요하기 때문이다.
 
-Relations라는건, 항상 2개의 테이블에서 정의되는거다. <br /> 모든 relations들은 이 간단한 아이디어에서 만들어진 것. <br /> 3개 이상의 테이블에서의 relations라는건 항상 2개씩의 relations의 특성임. 확장의 개념으로 생각하자. <br /> the relations of three or more tables / are always a property of the relations between each pair.
+Relations라는건, 항상 2개의 테이블에서 정의되는거다. <br /> 모든 relations들은 이 간단한 아이디어에서 만들어진 것. <br /> 3개 이상의 테이블에서의 relations라는건 항상 2개씩의 relations의 특성. 확장의 개념으로 생각하자. <br /> the relations of three or more tables / are always a property of the relations between each pair.
 
 Relational data에 대해 다루기 위해서는, pairs of tables에 사용되는 verbs를 알아야됨. <br /> 3가지의 families of verbs가 있음.
 
@@ -22,39 +22,13 @@ dplyr에서 two-table verbs를 사용함으로써, `nycflights13`의 relational 
 
 ``` r
 library(tidyverse)
-```
-
-    ## Warning: package 'tidyverse' was built under R version 3.5.2
-
-    ## -- Attaching packages ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- tidyverse 1.2.1 --
-
-    ## √ ggplot2 3.1.0     √ purrr   0.2.5
-    ## √ tibble  2.1.3     √ dplyr   0.7.8
-    ## √ tidyr   0.8.2     √ stringr 1.3.1
-    ## √ readr   1.3.1     √ forcats 0.4.0
-
-    ## Warning: package 'ggplot2' was built under R version 3.5.2
-
-    ## Warning: package 'tibble' was built under R version 3.5.3
-
-    ## Warning: package 'readr' was built under R version 3.5.2
-
-    ## Warning: package 'forcats' was built under R version 3.5.2
-
-    ## -- Conflicts ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- tidyverse_conflicts() --
-    ## x dplyr::filter() masks stats::filter()
-    ## x dplyr::lag()    masks stats::lag()
-
-``` r
 library(nycflights13)
 ```
-
-    ## Warning: package 'nycflights13' was built under R version 3.5.2
 
 13.2 nycflights13
 -----------------
 
-relational data를 배우기 위해서 nycflights13 패키지를 사용할 것이다. <br /> 이 패키지는 4개의 tibbles를 갖고 있다. <br /> 이 tibbles는 data transformation을 할 때 썼던, `flights`라는 테이블과 연관이 있는.
+relational data를 배우기 위해서 nycflights13 패키지를 사용할 것이다. <br /> 이 패키지는 4개의 tibbles를 갖고 있다. <br /> 이 tibbles는, data transformation을 할 때 썼던, `flights`라는 테이블과 연관이 있는 tibble들.
 
 `airlines`: 항공사 이름을 단축된 코드로 볼 수 있도록 해준다.
 
@@ -82,7 +56,7 @@ airlines
     ## 15 WN      Southwest Airlines Co.     
     ## 16 YV      Mesa Airlines Inc.
 
-`airports`: 각 공항에 대한 정보를 준다. faa airport code로 확인할 수 있는.
+`airports`: 각 공항에 대한 정보를 준다. `faa`라는 airport code로 identify가능.
 
 ``` r
 airports
@@ -103,7 +77,7 @@ airports
     ## 10 0S9   Jefferson County Intl  48.1 -123.    108    -8 A     America/Los_~
     ## # ... with 1,448 more rows
 
-`planes`: 각 비행기 정보를 준다. tailnum로 확인할 수 있는.
+`planes`: 각 비행기 정보를 준다. `tailnum`로 identify가능.
 
 ``` r
 planes
@@ -148,7 +122,7 @@ weather
 
 다이어그램으로 이 테이블들 간의 관계를 표시했는데, ![그림1](https://d33wubrfki0l68.cloudfront.net/245292d1ea724f6c3fd8a92063dcd7bfb9758d02/5751b/diagrams/relational-nycflights.png)
 
-다이어그램은 좀 복잡하긴한데, 필드에 나가서 보게 될 것에 비하면 간단한 편이다. <br /> 이러한 다이어그램을 이해하는 것의 key는, 각 relation은 한 쌍의 테이블만을 고려한다는 것. <br /> The key to understanding diagrams like this / is to remember / each relation always concerns a pair of tables. <br /> 다 이해할 필요는 없고, 테이블 간의 (니가 관심있는)chain of relations만 이해해라.
+다이어그램은 좀 복잡하긴한데, 필드에 나가서 보게 될 것에 비하면 간단한 편! <br /> 이러한 다이어그램을 이해하는 것의 key는, 각 relation은 한 쌍의 테이블만을 고려한다는 것. <br /> The key to understanding diagrams like this / is to remember / each relation always concerns a pair of tables. <br /> 다 이해할 필요는 없고, 테이블 간의 (니가 관심있는)chain of relations만 이해해라.
 
 이 nycflights13에 관해선, <br /> `flights`는 `planes`와 하나의 변수인, `tailnum`을 통해 연결된다. <br /> `flights`는 `airlines`와 `carrier` 변수를 통해 연결된다. <br /> `flights`는 `airports`와 두 가지 방법, `origin`과 `dest` 변수들을 통해 연결된다. <br /> `flights`는 `weather`와, `origin`(출발지), `year`, `month`, `day` 그리고 `hour`를 통해 연결된다.
 
