@@ -1,0 +1,20 @@
+Analyst Internship Test
+=======================
+
+이번에 스타트업 analyst internship에 지원하게 되었다. 사전과제를 받았고, 근 이틀을 온전히 여기에 쏟아부었다. 그냥 제출하고 끝내기엔 아쉬우니 이렇게 시간 조금만 투자해서 남겨두자.
+
+문제
+----
+
+<p class="comment">
+본 스프레드시트는 가상의 공연별 티켓 판매량 데이터입니다. 1) 아래 설명을 참고하여 'ticket\_sales'를 예측 할 수 있는 'predictive model'을 만들어주세요. 2) feature engineering 및 modeling 과정을 설명해주세요. 자유로운 방식으로 전달해주시면 됩니다. 3) 결과물을 송부하실 때는 아래 내용을 반드시 포함해주세요.   : feature engineering 및 modeling의 전체 코드, 과정 및 평가 방식에 대한 설명 "주요 식별 데이터는 마스킹되었고, 수치형 데이터의 경우 암호화 되었습니다. 분석에는 영향이 없으므로 별도의 복호없이 사용하시면 됩니다. " concert\_list
+artist 아티스트 continent 공연 대륙 city 공연 도시 closing\_date "예측 분석 마감일 (해당 공연 예측에 사용되는 데이터는 언제나 마감일 기준 과거의 데이터여야 합니다.) \* 예) closing\_date = '2019-09-09'일 경우, 2019년 9월 9일 이전의 데이터를 사용하여 예측 분석해야함" make 공연에 대한 MMT의 make 카운트 population 공연 해당 국가의 특정 연령층 인구 수 gdp 공연 해당 국가의 gdp tastemaker\_count 공연 해당 국가의 '아무 공연'에 make를 누른 사람의 수 ticket\_sales 공연 티켓 판매량
+
+artist\_list artist 아티스트 gender 아티스트의 성별 ( 0 : 남성, 1 : 여성, 2 : 혼성 )
+
+vlive\_data 아티스트의 V Live 데이터 artist 아티스트 upload\_date 비디오의 업로드 날짜 follower 아티스트의 V LIVE 팔로워 수 playtime 비디오의 재생 시간 ( 총 재생된 시간이 아닌, Video 자체의 길이 ) view\_count 비디오의 총 재생 횟수 like\_count 비디오의 '좋아요' 개수 comment\_count 비디오의 댓글 수
+
+mv\_data 아티스트의 뮤직비디오 데이터 artist 아티스트 upload\_date 뮤직비디오의 업로드 날짜 view\_count 뮤직비디오 재생 횟수 like\_count 뮤직비디오의 '좋아요' 개수 dislike\_count 뮤직비디오의 '싫어요' 개수 comment\_count 뮤직비디오의 댓글 수
+
+twitter\_data 아티스트의 트위터 데이터 artist 아티스트 upload\_date 트윗의 업로드 날짜 follower 아티스트의 트위터 팔로워 수 total\_tweet 아티스트가 작성한 총 트윗 개수 like\_count 해당 트윗의 '좋아요' 개수 retweet\_count 해당 트윗의 리트윗 수 comment\_count 해당 트윗의 댓글 수
+</p>
