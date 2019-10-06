@@ -30,8 +30,7 @@ border-radius: 5px;
 2) feature engineering 및 modeling 과정을 설명해주세요. 자유로운 방식으로 전달해주시면 됩니다. <br />
 3) 결과물을 송부하실 때는 아래 내용을 반드시 포함해주세요: feature engineering 및 modeling의 전체 코드, 과정 및 평가 방식에 대한 설명 <br />
 "주요 식별 데이터는 마스킹되었고, 수치형 데이터의 경우 암호화 되었습니다. 분석에는 영향이 없으므로 별도의 복호없이 사용하시면 됩니다."
-
-
+ <br />
 <strong>concert_list</strong> <br />
 artist	아티스트 <br />
 continent	공연 대륙 <br />
@@ -74,3 +73,58 @@ like_count	해당 트윗의 '좋아요' 개수 <br />
 retweet_count	해당 트윗의 리트윗 수 <br />
 comment_count	해당 트윗의 댓글 수 <br />
 </p>
+
+언제까지 링크가 존재할지 모르겠지만, https://bit.ly/2n69uPE 으로 데이터를 다운받을 수 있다.
+
+## 단상
+이 작업을 하면서, 학교다닐적 과제 생각이 많이 났다.
+EDA(Exploratory Data Analysis, 탐색적자료분석)수업에서 과제를 받으면, 데이터를 살펴보는데만 시간이 엄청나게 걸린다.
+분석 자체는 웬만한 경우에 있어, 코드 몇 줄 걸리지 않는다.
+물론, 그 코드 자체를 충분히 잘 알고 있어야 제대로 쓰는 것이지만, 프로그램이 코드를 실행해주기 때문에 코드 몇 줄짜리다.
+
+제일 시간이 많이 걸리는 부분은 데이터 전처리Data Processing와 EDA다. 
+
+자기자신과 관련이 없는 이런 데이터들을 주의깊게 살펴볼 사람은 거의 없겠지만, 일단 남겨두자. 
+
+## Data, Library Import
+```{r message=FALSE, warning=FALSE, paged.print=FALSE}
+library(tidyverse)
+library(lubridate)
+library(neuralnet)
+
+setwd("C:/Users/Phil2/Downloads")
+concert <- read_csv("data_concert.csv")[-10]
+artist <- read_csv("data_artist.csv")
+vlive <- read_csv("data_vlive.csv")
+mv <- read_csv("data_mv.csv")
+twitter <- read_csv("data_twitter.csv")
+concert
+artist
+vlive
+mv
+twitter
+```
+
+그런데 작업을 하다보니, 꽤나 중대한 오류를 발견했다. 
+`concert` 테이블의 `closing_date()`를 항상 염두에 두어야 하는데, 날짜에서 2016.6.4 < 2016.9.6은 참이지만, 2016.6.4 < 2016.10.8은 거짓이다. 06.04 < 10.08는 참으로 인식을 하니, 날짜 부분에 수정이 필요하다.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
