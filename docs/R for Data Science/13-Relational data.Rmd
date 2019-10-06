@@ -84,28 +84,184 @@ The key to understanding diagrams like this / is to remember / each relation alw
 ## 13.3 Keys
 2개의 tables를 연결시켜주는 변수들을, **keys**라고 부른다. <br />
 keys는 관측치를 unique하게 identify해주는 변수(혹은 변수들). <br />
-간단한 케이스들에서는, 하나의 변수가 관측치를 identify하기에 충분하다.
+간단한 케이스들에서는, 하나의 변수가 관측치를 identify하기에 충분하다. <br />
+&emsp;&emsp;&emsp;&emsp;예를 들어, 각 비행기는 `tailnum`으로 unique하게 identify된다. <br />
+다른 케이스에서는 여러 개의 변수가 필요할 수 있다. <br />
+&emsp;&emsp;&emsp;&emsp;예를 들어, `weather` 자료에서, 관측치를 unique하게 identify하기 위해선, 다섯 개의 변수들이 필요하다. `year`, `month`, `day`, `hour` 그리고 `origin`.
+
+2가지 타입의 key가 있다. <br />
+- **primary key**는 자기 자신의 테이블에서 관측치를 unique하게 identify해주는 것. <br />
+&emsp;&emsp;&emsp;&emsp;예를 들어, `planes` 테이블에서, `tailnum`은 각 plane을 unique하게 identify해주니깐 primary key다.
+
+- **foreign key**는 다른 테이블의 관측치를 unique하게 identify해주는 것. <br />
+&emsp;&emsp;&emsp;&emsp;예를 들어, `flights`에서 `tailnum`은, `planes`에서 관측치를 unique하게 identify해주니깐 foreign key다.
+
+하나의 변수는, primary key와 foreign key 둘 다 될 수 있다. <br />
+예를 들어, `origin`은 `weather` 테이블의 primary key 중 일부지만, `airport` 테이블의 foreign key이기도 하다.
+
+너의 테이블에서, primary keys를 identify하고 났으면, 진짜로 unique하게 각 관측치를 identify하는지 확인해보는건 좋은 습관이다. <br />
+하나의 방법은 primary key별로 `count()`를 해서, `n` 1보다 큰지를 확인해보는 것.
+```{r}
+planes %>% 
+  count(tailnum) %>% 
+  filter(n > 1)
+
+weather %>% 
+  count(year, month, day, hour, origin) %>% 
+  filter(n > 1)
+```
+가끔, 명백한 primary key가 없는 테이블이 있을 수도 있다. <br />
+그 어떠한 변수 조합들도 관측치 하나만을 identify해주지 못하는 것임. <br />
+예를 들어, `flights` 테이블에서 primary key는 무엇일까? <br />
+특정한 날짜에다가 flight나 tailnum를 추가하면 unique하게 identify해주지 않을까? 하지만 확인해보면 아니다.
+```{r}
+flights %>% 
+  count(year, month, day, flight) %>% 
+  filter(n > 1)
+
+flights %>% 
+  count(year, month, day, tailnum) %>% 
+  filter(n > 1)
+```
+맨 처음 이 데이터를 다룰 때, 각 flight number는 하루에 한 번만 쓰일 거라고 순진하게 생각했다. <br />
+그럼 이제 특정한 비행specific flight에 대해 소통하기가 쉬웠을텐데, 불운하게도 안 그랬다. <br />
+가끔 이렇게 테이블에 primary key가 없으면, `mutate()`나 `row_number()`을 통해서 하나 만들어주는게 유용하다. <br />
+이러고나면 어떤 필터링을 하고 난 후, original data로 다시 한번 체크할 때, 관측치를 매치하기 쉽게 해준다. <br />
+이런 key를 **surrogate key**라고 부른다. 
+
+primary key랑, 다른 테이블에서 상응하는 foreign key는 **relation**을 형성한다. <br />
+A primary key and the corresponding foreign key in another table form a **relation**. <br />
+Relations이란건 기본적으로 일대다one-to-many다. <br />
+예를 들어, 각 비행flight은 하나의 비행기를 가지고 있는데, 각 비행기는 여러 개의 비행flight을 가지고 있다. <br />
+다른 데이터에선 가끔씩 일대일one-to-one 관계를 볼 수 있다. <br />
+이건 일대다one-to-many의 특별한 케이스라고 볼 수 있다. 
+
+다대다many-to-many 관계를, 다대일many-to-one에다 일대다one-to-many를 합쳐서 만들수도 있다. <br />
+예를 들어, `airlines`와 `airports`간의 다대다many-to-many 관계를 볼 수 있다. <br />
+각 airline은 여러 개의 airports로 비행을 하고, 각 airport는 여러 개의 airlines를 호스트host하고.
+
+
+## 13.4 Mutating joins
+한 쌍의 테이블을 결합combining할 첫 번째 도구는 mutating join을 하는 것. <br />
+두 개의 테이블들에서 변수를 결합할 수 있도록 도와준다. <br />
+먼저 keys를 통해서 관측치observation를 매치하고, 하나의 테이블에서 다른 테이블로 변수를 통해 복사를 하는 것이다. <br />
+말로 하는게 더 어렵다. 예를 보면 간단하다. 
+
+`flights`데이터에 칼럼이 너무 많기 때문에, 몇 개의 칼럼만 따로 뽑은 `flights2`를 쓰겠다.
+```{r}
+flights2 <- flights %>% 
+  select(year:day, hour, origin, dest, tailnum, carrier)
+flights2
+```
+
+이 `flights2`의 데이터에다가 새로운 칼럼을 추가하고, 항공사 풀네임을 넣고 싶다고 치자. <br />
+`left_join()`을 이용해서 `airlines`와 `flights2`를 결합할 수 있다. 
+```{r}
+flights2 %>% 
+  select(-origin, -dest) %>% 
+  left_join(airlines, by = "carrier")
+```
+`airlines`랑 겹치는 key인 `carrier`로 결합한걸 볼 수 있음.
+
+`name`이라는 변수가 `flights2`에 추가된 걸 볼 수 있다. <br />
+그래서 이런 타입의 join을 mutating join이라고 부른다. <br />
+이 케이스는, `mutate()`랑 R의 base subsetting을 이용해서 똑같이 할 수 있긴하다.
+```{r}
+flights2 %>% 
+  select(-origin, -dest) %>% 
+  mutate(name = airlines$name[match(carrier, airlines$carrier)])
+```
+하지만 이렇게 하면 여러 개 변수들로 매치를 시켜야할 때는, 일반화하기가 힘들고, 전반적인 의도를 이해하기 위해선 잘 읽어봐야한다.
+
+이 다음의 section들은, mutating join이 어떻게 작동하는지 디테일하게 설명해준다. <br />
+joins의 유용한 시각적 표현을 통해서 하나씩 배워보자. 4개의 mutating join들. <br />
+the inner join, 3개의 outer joins. <br />
+리얼 데이터들로 작업할 때는, keys가 항상 unique하게 관측치를 identify하는 건 아니기 때문에, 만약에 unique match가 없을 때는 어떻게 해야할지에 대해서도 다룬다. 
+
+### 13.4.1 Understanding joins
+joins가 어떻게 작동하는지 배우는데 도움을 주기위해, 다음과 같은 시각적 representation을 주겠다.
+![그림2](https://d33wubrfki0l68.cloudfront.net/108c0749d084c03103f8e1e8276c20e06357b124/5f113/diagrams/join-setup.png)
+
+```{r}
+x <- tribble(
+  ~key, ~val_x,
+  1, "x1",
+  2, "x2",
+  3, "x3"
+)
+
+y <- tribble(
+  ~key, ~val_y,
+  1, "y1",
+  2, "y2",
+  4, "y3"
+)
+```
+색이 있는 칼럼이 "key" 변수를 represent한다. <br />
+이 값으로 테이블 간에 행을 매치시키는 것임. used to match the rows between the tables. <br />
+회색 칼럼은 "key"값 옆에 따라나오는 "value" 칼럼이다. <br />
+이 예제에서는 하나만의 key 변수가 나오지만, 여러 개의 key 값들과 여러 개의 값들에 대해서도 일반화 가능하다.
+
+join이라는 건 `x`의 각 행을, `y`의 몇 개의 행이 되든 상관없이 연결을 하는 것이다. <br />
+아래의 다이어그램은 가능한 매치를, 선들의 교차intersection으로 보였다.
+![그림3](https://d33wubrfki0l68.cloudfront.net/820b012580731f2134f90ee9c6388994c2343683/27703/diagrams/join-setup2.png)
+
+(`x`의 key 칼럼이랑 value 칼럼이랑 자리가 바뀐 걸 볼 수 있는데, 그냥 joins 매치는 key에 기반하고 있다는 걸 강조하기 위해서다. 별 거 아니다.)
+
+실제로 join이 되는 것은, 점으로 표시된다. <br />
+점의 개수 = 매치의 개수 = output의 행 개수
+
+### 13.4.2 Inner join
+가장 단순한 타입의 join은 **inner join**이다. <br />
+keys가 같은 관측치들을 매치시키는 것. 
+An inner join / matches pairs of observations / whenever their keys are equal.
+![그림4](https://d33wubrfki0l68.cloudfront.net/3abea0b730526c3f053a3838953c35a0ccbe8980/7f29b/diagrams/join-inner.png)
+
+(정확하게 말하자면, keys가 equality 연산자operator를 사용해 매치하기 때문에, **inner equijoin**이라고 부른다. 그런데 대부분의 join이 equijoin이라 그냥 간단하게 inner join이라고 부름)
+
+inner join의 output은, 새로운 데이터 프레임. key값, x값, y값이 칼럼으로 있는. <br />
+어떤 변수가 key인지는 `by`를 사용해서 dplyr에 알려줄 수 있다.
+```{r}
+x %>% 
+  inner_join(y, by = "key")
+```
+
+inner join의 가장 중요한 특징으로는, 매치되지 않은 행들은 결과에 포함되지 않는다는 것이다. <br />
+이 말인즉슨, 관측치를 잃기가 너무 쉽기 때문에, inner join은 data analysis에 일반적으로 적합하지 않다는 것.
+
+### 13.4.3 Outer joins
+inner join은, 두 테이블 모두에 등장하는 관측치만을 keep했다. <br />
+**outer join**은 둘 중 하나의 테이블에만 존재해도, 관측치를 keep한다. <br />
+3가지 타입의 outer join이 있다.
+
+- **left join**은, `x`에 있는 관측치들을 모두 keep. <br />
+- **right join**은, `y`에 있는 관측치들을 모두 keep. <br />
+- **full join**은, `x`와 `y`에 있는 모든 관측치들을 keep.
+
+이 join들은, 각 테이블에 "가상의" 관측치들을 추가함으로써 작동하는 것. <br />
+key값에 맞는 관측치가 없다면, `NA`로 채워서 만든다. 무슨 말인지 그림을 보면 쉽다.
+![그림5](https://d33wubrfki0l68.cloudfront.net/9c12ca9e12ed26a7c5d2aa08e36d2ac4fb593f1e/79980/diagrams/join-outer.png)
+
+가장 흔하게 이용되는 join은, left join이다. <br />
+기존의 테이블에다가, 추가적인 데이터를 추가하고자 할 때. <br />
+기존의 관측치들은, 매치가 없더라고 그대로 유지하고자 하는 것. <br />
+left join이 디폴트가 되야 한다. 다른 걸 써야하는게 아니라면 이걸 써라.
+
+벤 다이어그램을 통해서도 이 join들을 표현할 수 있는데, <br />
+![그림6](https://d33wubrfki0l68.cloudfront.net/aeab386461820b029b7e7606ccff1286f623bae1/ef0d4/diagrams/join-venn.png)
+
+그런데 훌륭한 표현representation은 아니다. <br />
+어떤 테이블의 관측치들을 유지시켜주는지는 기억을 되살려줄지는 몰라도, 큰 한계가 있다. <br />
+벤 다이어그램은 keys가 관측치를 unique하게 identify하지 못할 때 어떤 일이 일어나는지 보여주지 못한다. <br />
+앞으로 살펴볼 그림들은, 그런 경우에 있어서도 어떻게 하는지 표현해줌.
+
+### 13.4.4 Duplicate Keys
+이 때까지 모든 다이어그램들은, keys가 unique하다고 가정했다. 하지만 항상 그런 것은 아니다. <br />
+이 섹션에서는, keys가 unique하지 않을 때는 어떻게 하는지에 대해 설명한다. <br />
+2가지의 가능성이 있다.
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+# 내가 알아보기 쉽게 좀 딱 정리하고 싶은데 흠..
 
