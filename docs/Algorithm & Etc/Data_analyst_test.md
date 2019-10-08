@@ -579,7 +579,7 @@ mv %>%
     ##  9 145a1215 2014-07-09       0.603      0.695         0.341         0.245
     ## 10 145a1215 2015-08-05       0.355      0.788         0.225         0.594
 
-artist\[4\]는 2016-09-08에 내놓은 뮤직비디오가 히트를 쳤다. 그럼 그 이후로 ticket sales가 늘어났을까?
+name\[4\]는 2016-09-08에 내놓은 뮤직비디오가 히트를 쳤다. 그럼 그 이후로 ticket sales가 늘어났을까?
 
 ``` r
 concert %>% 
@@ -639,7 +639,7 @@ mv %>%
     ## 15 a9fba206 2016-05-07       0.202      0.599         0.142         0.305
     ## 16 a9fba206 2018-05-16       0.161      1.13          0.193         0.736
 
-artist\[13\]은 2017-04-27에 내놓은 뮤직비디오가 나름 히트를 쳤다. 그럼 그 이후의 ticket sales는?
+name\[13\]은 2017-04-27에 내놓은 뮤직비디오가 나름 히트를 쳤다. 그럼 그 이후의 ticket sales는?
 
 ``` r
 concert %>% 
@@ -675,3 +675,258 @@ concert %>%
 근데 make가 늘어봐야 ticket sales는 별로 늘지 않았다. 이건 좀 주의 깊게 볼 부분인 것 같다.
 
 ### vlive
+
+이제 vlive로 넘어가보자. <br /> vlive의 경우에도, twitter 자료처럼 follower수가 변하지 않는 에러가 있다. <br /> mv가 히트를 친 전후로, follower 수가 어떻게 변하는지를 보고 싶었는데 불가능했다.
+
+``` r
+vlive_follower <- list()
+for(i in 1:length(name)){
+  vlive_follower[[i]] <- vlive %>% 
+    filter(artist == name[i]) %>% 
+    select(follower) %>% 
+    unique %>% 
+    pull
+}
+vlive_follower
+```
+
+    ## [[1]]
+    ## [1] 0.6590945
+    ## 
+    ## [[2]]
+    ## [1] 0.9592239 0.9592233
+    ## 
+    ## [[3]]
+    ## [1] 0.9234259
+    ## 
+    ## [[4]]
+    ## [1] 1.567623 1.567620
+    ## 
+    ## [[5]]
+    ## [1] 2.114474 2.114475 2.114472
+    ## 
+    ## [[6]]
+    ## [1] 0.4219141 0.4219068
+    ## 
+    ## [[7]]
+    ## [1] 0.142937
+    ## 
+    ## [[8]]
+    ## [1] 1.283467
+    ## 
+    ## [[9]]
+    ## [1] 0.4277924 0.4277930
+    ## 
+    ## [[10]]
+    ## [1] 0.08609141 0.08608974 0.08609085
+    ## 
+    ## [[11]]
+    ## [1] 0.06737213 0.06737770
+    ## 
+    ## [[12]]
+    ## [1] 3.548083 3.548075
+    ## 
+    ## [[13]]
+    ## [1] 0.4653039 0.4653167 0.4653173
+    ## 
+    ## [[14]]
+    ## [1] 0.8107003 0.8106992
+    ## 
+    ## [[15]]
+    ## [1] 1.246296 1.246295
+    ## 
+    ## [[16]]
+    ## [1] 0.07140891 0.07141336 0.07141280
+    ## 
+    ## [[17]]
+    ## [1] 0.01126888 0.01126999
+    ## 
+    ## [[18]]
+    ## [1] 0.8414419 0.8414375
+    ## 
+    ## [[19]]
+    ## [1] 0.1735160 0.1735171
+    ## 
+    ## [[20]]
+    ## [1] 0.1562596 0.1562418
+    ## 
+    ## [[21]]
+    ## [1] 0.2720947 0.2720941
+    ## 
+    ## [[22]]
+    ## [1] 0.01789789 0.01789845
+
+리스트 안의 숫자가 거의 변하지 않는 것으로 보아, 에러가 있음을 알 수 있다.
+
+그렇다면 follower 말고, view\_count라도 늘지 않았을까? <br /> 결론을 내자면 전혀 영향이 없었다.
+
+``` r
+before1 <- vlive %>% 
+  filter(artist == name[4]) %>% 
+  filter(upload_date < "2016-09-08") %>% 
+  arrange(desc(upload_date)) %>% 
+  select(view_count)
+
+after1 <- vlive %>% 
+  filter(artist == name[4]) %>% 
+  filter(upload_date >= "2016-09-08") %>% 
+  arrange(upload_date) %>% 
+  select(view_count)
+
+par(mfrow = c(1, 2))
+boxplot(before1, ylim = c(0, 4), main = "Before hit 2016-09-08 Boxplot")
+boxplot(after1, ylim = c(0, 4), main = "After hit 2016-09-08 Boxplot")
+```
+
+![](Data_analyst_test_files/figure-markdown_github/unnamed-chunk-21-1.png) 앞서 해봤던, name\[4\]의 2016-09-08의 히트작 전후의 boxplot을 그려본 것이다. <br /> 딱히 차이가 없는 것을 볼 수 있다.
+
+name\[13\]의 2017-04-27의 히트작의 경우에는?
+
+``` r
+before2 <- vlive %>% 
+  filter(artist == name[13]) %>% 
+  filter(upload_date < "2017-04-27") %>% 
+  arrange(desc(upload_date)) %>% 
+  select(view_count)
+
+after2 <- vlive %>% 
+  filter(artist == name[13]) %>% 
+  arrange(upload_date) %>% 
+  select(view_count)
+
+par(mfrow = c(1, 2))
+boxplot(before2, ylim = c(0, 1), main = "Before hit 2017-04-27 Boxplot")
+boxplot(after2, ylim = c(0, 1), main = "After hit 2017-04-27 Boxplot")
+```
+
+![](Data_analyst_test_files/figure-markdown_github/unnamed-chunk-22-1.png)
+
+이 경우에도 별로 늘었다고 할 수가 없다. <br /> 뮤직 비디오가 히트를 치고 나면, 인기를 얻어서 그 이후에 vlive도 더 많이 볼 것이다...하는 그런 가정은 안 통하는 것이다.
+
+자 이제 데이터를 살펴보자.
+
+``` r
+boxplot(vlive$view_count, main = "vlive$view_count Boxplot")
+```
+
+![](Data_analyst_test_files/figure-markdown_github/unnamed-chunk-23-1.png)
+
+``` r
+boxplot(vlive$like_count, main = "vlive$like_count Boxplot")
+```
+
+![](Data_analyst_test_files/figure-markdown_github/unnamed-chunk-23-2.png)
+
+``` r
+boxplot(vlive$comment_count, main = "vlive$comment_count Boxplot")
+```
+
+![](Data_analyst_test_files/figure-markdown_github/unnamed-chunk-23-3.png) 이전 자료들과 마찬가지로 극심한 비대칭을 볼 수 있다. 로그 변환을 해주자.
+
+``` r
+boxplot(log(vlive$view_count), main = "log(vlive$view_count) Boxplot")
+```
+
+![](Data_analyst_test_files/figure-markdown_github/unnamed-chunk-24-1.png)
+
+``` r
+boxplot(log(vlive$like_count), main = "log(vlive$like_count) Boxplot")
+```
+
+![](Data_analyst_test_files/figure-markdown_github/unnamed-chunk-24-2.png)
+
+``` r
+boxplot(log(vlive$comment_count), main = "log(vlive$comment_count) Boxplot")
+```
+
+![](Data_analyst_test_files/figure-markdown_github/unnamed-chunk-24-3.png) 대칭화가 잘 되었다.
+
+vlive도 마찬가지로 view가 많으면 like가 많고, <br /> view가 많으면 count도 많고, <br /> like가 많으면 comment도 많지 않을까? <br /> 당연히 그렇다.
+
+``` r
+par(mfrow = c(1, 1))
+plot(log(vlive$view_count), log(vlive$like_count), 
+     main = "log(vlive$view_count) vs log(vlive$like_count) Plot") # view가 많으면 like도 많음. 높은 상관성
+```
+
+![](Data_analyst_test_files/figure-markdown_github/unnamed-chunk-25-1.png)
+
+``` r
+plot(log(vlive$view_count), log(vlive$comment_count), 
+     main = "log(vlive$view_count) vs log(vlive$comment_count) Plot") # view가 많으면 comment도 많음.
+```
+
+![](Data_analyst_test_files/figure-markdown_github/unnamed-chunk-25-2.png)
+
+``` r
+plot(log(vlive$like_count), log(vlive$comment_count), 
+     main = "log(vlive$like_count) vs log(vlive$comment_count) Plot") # like가 많으면 comment도 많음.
+```
+
+![](Data_analyst_test_files/figure-markdown_github/unnamed-chunk-25-3.png)
+
+그런데 playtime의 경우에는? <br /> playtime이 길어질수록 view도 늘어나고, like도 늘어나고, comment도 늘어나는 그런건 없을까?
+
+``` r
+plot(log(vlive$playtime), log(vlive$view_count),
+     main = "log(vlive$playtime) vs log(vlive$view_count) Plot")
+```
+
+![](Data_analyst_test_files/figure-markdown_github/unnamed-chunk-26-1.png)
+
+``` r
+plot(log(vlive$playtime), log(vlive$like_count),
+     main = "log(vlive$playtime) vs log(vlive$like_count) Plot")
+```
+
+![](Data_analyst_test_files/figure-markdown_github/unnamed-chunk-26-2.png)
+
+``` r
+plot(log(vlive$playtime), log(vlive$comment_count),
+     main = "log(vlive$playtime) vs log(vlive$comment_count) Plot")
+```
+
+![](Data_analyst_test_files/figure-markdown_github/unnamed-chunk-26-3.png) 없다. 처음에는 playtime이 길어지면 그만큼 보는 사람도 늘어나고, like도 늘어나고, 그만큼 comment도 늘어날거라 생각했는데, 아니었다.
+
+그래서 결론적으로 vlive의 경우에는 많이 참고할 것 없이 최근 upload된 것의 view\_count 정도만 참고하자.
+
+### overall
+
+이것도 EDA의 부산물인데, 전반적으로 살펴보았을 때의 이것저것들에 대해 알아본 것이다. <br /> name\[9\]는 꽤 활동기간이 오래된 가수 <br /> name\[12\]는 빅네임. ticket sales도 항상 많음. <br /> name\[13\]은 2017.4.27의 히트 이후 make는 확 늘었지만 ticket sales는 확 늘지 않음 <br /> name\[14\]는 2017.3.1, 2017.11.15의 히트 이후 make는 확 늘었지만 ticket sales는 뭐 비슷 <br /> name\[16\], name\[19\]은 히트작도 없고 ticket sales도 비슷비슷. 근데 얘는 비슷한 날, 같은 국가의 여러 도시에 공연을 돌았음. <br /> name\[18\]은 2018.1.23의 히트 이후에 ticket sales가 많이 많이 늘었음. 1.5 배 이상 <br /> 전반적으로, name\[4\], name\[5\], name\[12\], name\[18\]가 빅네임
+
+그리고 make와 ticket sales는 별로 상관이 없어 보인다.
+
+### concert
+
+gdp와 ticket sales는 별로 연관이 없다. 어짜피 볼 애들은 정해져있고, 그들만 본다. <br /> population도 마찬가지, make도 마찬가지.
+
+``` r
+plot(concert$gdp, concert$ticket_sales, main = "concert$gdp vs concert$ticket_sales Plot")
+```
+
+![](Data_analyst_test_files/figure-markdown_github/unnamed-chunk-27-1.png)
+
+``` r
+plot(concert$population, concert$ticket_sales, main = "concert$population vs concert$ticket_sales Plot")
+```
+
+![](Data_analyst_test_files/figure-markdown_github/unnamed-chunk-27-2.png)
+
+``` r
+plot(concert$make, concert$ticket_sales, main = "concert$make vs concert$ticket_sales Plot")
+```
+
+![](Data_analyst_test_files/figure-markdown_github/unnamed-chunk-27-3.png)
+
+make가 많으면 근처에 친구들도 많아서 tastemaker도 많을 것 같다.
+
+``` r
+plot(concert$make, concert$tastemaker_count, main = "concert$make vs concert$tastemaker_count Plot")
+```
+
+![](Data_analyst_test_files/figure-markdown_github/unnamed-chunk-28-1.png) 그렇지 않다.
+
+자 지루하고 길고 긴 EDA가 끝났다. 그럼 이제 Feature engineering으로 넘어가보자. <br /> 이 때까지 EDA에서 얻은 결론들을 어떻게 반영하는게 좋을까?
+
+Feature Engineering
+-------------------
