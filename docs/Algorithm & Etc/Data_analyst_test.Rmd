@@ -105,8 +105,258 @@ mv
 twitter
 ```
 
-그런데 작업을 하다보니, 꽤나 중대한 오류를 발견했다. 
+그런데 작업을 하다보니, 꽤나 중대한 오류를 발견했다. <br /> 
 `concert` 테이블의 `closing_date()`를 항상 염두에 두어야 하는데, 날짜에서 2016.6.4 < 2016.9.6은 참이지만, 2016.6.4 < 2016.10.8은 거짓이다. 06.04 < 10.08는 참으로 인식을 하니, 날짜 부분에 수정이 필요하다.
+
+```{r}
+concert <- concert %>% 
+  mutate(closing_date = ymd(closing_date))
+vlive <- vlive %>% 
+  mutate(upload_date = ymd(upload_date))
+mv <- mv %>% 
+  mutate(upload_date = ymd(upload_date))
+twitter <- twitter %>% 
+  mutate(upload_date = ymd(upload_date))
+```
+
+### Basic Info
+`artist`에서 볼 수 있듯이, 총 아티스트는 22명이다. 
+```{r}
+name <- unique(concert$artist)
+name
+length(name)
+```
+
+`closing_date()`는 총 몇개일까?
+```{r}
+dates <- unique(concert$closing_date)
+dates
+length(dates)
+```
+총 49개인 것을 확인할 수 있다.
+
+
+자, 그럼 특정 아티스트가 특정 날짜에 콘서트를 열었다면? <br />
+그 날짜까지의 `mv`, `vlive`, `twitter`의 자료를 어떻게 종합할 수 있을까?
+```{r}
+vlive %>% 
+  filter(artist == name[1]) %>% 
+  filter(upload_date <= dates[4])
+# mv %>% 
+#   filter(artist == name[1]) %>% 
+#   filter(upload_date <= dates[4])
+# twitter %>%
+#   filter(artist == name[1]) %>%
+#   filter(upload_date <= dates[4])
+```
+
+이런 식으로, filter를 만들 수 있다.
+```{r}
+what_filter <- function(what, name, date) {
+  what %>% 
+    filter(artist == name) %>% 
+    filter(upload_date <= date)
+}
+what_filter(vlive, name[1], dates[4])
+```
+
+## EDA
+### Twitter
+먼저, 데이터의 분포를 알아보자.
+```{r}
+par(mfrow = c(2, 2))
+boxplot(twitter$comment_count, main = "twitter$comment_count Boxplot") 
+boxplot(twitter$retweet_count, main = "twitter$retweet_count Boxplot")
+boxplot(twitter$like_count, main = "twitter$like_count Boxplot")
+```
+boxplot을 보면 알 수 있듯이, 비대칭이 심하고, outlier값들이 많은 것을 보아, 로그 변환이 필요한 것을 볼 수 있다.
+
+```{r}
+par(mfrow = c(2, 2))
+boxplot(log(twitter$comment_count), main = "log(twitter$comment_count) Boxplot")
+boxplot(log(twitter$retweet_count), main = "log(twitter$retweet_count) Boxplot")
+boxplot(log(twitter$like_count), main = "log(twitter$like_count) Boxplot")
+```
+이렇게 로그변환을 하고 나면, 대칭화가 잘 된 것을 확인할 수 있음
+
+그런데 하다보면 이러한 의문이 든다. <br />
+reteweet이 많으면 comment도 많고, comment가 많으면 like도 많고, retweet이 많으면 like도 많지 않을까? <br />
+plot을 그려보면 된다.
+```{r message=FALSE, warning=FALSE}
+par(mfrow = c(1, 1))
+plot(log(twitter$retweet_count), log(twitter$comment_count),
+     main = "log(twitter$retweet_count) vs log(twitter$comment_count)") # retweet과 comment간의 높은 상관성
+plot(log(twitter$comment_count), log(twitter$like_count),
+     main = "log(twitter$comment_count) vs log(twitter$like_count)") # comment와 like간의 높은 상관성
+plot(log(twitter$retweet_count), log(twitter$like_count),
+     main = "log(twitter$retweet_count) vs log(twitter$like_count)") # retweet과 like간의 매우 높은 상관성을 볼 수 있다.
+```
+
+Retweet과 comment간의 높은 상관성, Comment와 like간의 높은 상관성, retweet과 like간의 높은 상관성을 볼 수 있다. <br />
+그래서 결론적으로, 이 twitter 자료에서 셋 중에 하나만 반영해줘도 될 것 같다. 
+
+또한 몇 가지 문제점을 발견했다. <br />
+먼저, twitter의 follower 수가 거의 변하지 않는 걸 볼 수 있다.
+```{r}
+artist_follower <- list()
+for(i in 1:length(name)){
+  artist_follower[[i]] <- twitter %>% 
+    filter(artist == name[i]) %>% 
+    select(follower) %>% 
+    unique %>% 
+    pull
+}
+artist_follower
+```
+이걸 보면, 리스트 안의 숫자가 거의 변하지 않는 걸 볼 수 있다. <br />
+즉, dates별로 총 follwer 수는 증가하거나 감소해야하는데, 그렇지 않다는 것이다.
+
+마찬가지로, total_tweet, 총 트윗 수도 dates별로 변하질 않는다.
+```{r}
+artist_total_tweet <- list()
+for(i in 1:length(name)){
+  artist_total_tweet[[i]] <- twitter %>% 
+    filter(artist == name[i]) %>% 
+    select(total_tweet) %>% 
+    unique %>% 
+    pull
+}
+artist_total_tweet
+```
+여기서도 리스트 안의 숫자가 거의 변하지 않는다. <br />
+즉, dates별로 총 트윗 수가 증가해야하는데, 그렇지 않다는 것이다. 
+
+
+사실 이 twitter 자료를 공신력 있는 자료를 통해 수치화시켜서 반영해보려 구글 검색을 해보았다. <br />
+Twitter impact라는 것이 있고, https://arxiv.org/ftp/arxiv/papers/1404/1404.5239.pdf를 참고해서, retweet과 follower를 적절히 반영한 객관적인 값을 도출해보려 했는데, <br />
+follwer의 수와 total_tweet수에 거의 차이가 없는 에러가 있고, 수치가 암호화되어 retweet이 1 미만인 등 여러가지 문제가 있어 대입이 불가능했다. 
+
+### mv
+뮤직 비디오의 경우에는, twitter와 같은 impact를 수치화시키는 논문을 찾지 못했다. <br />
+맨 처음에는 생각해보았을 때, view x (like - dislike) x comment라고 생각했는데, 앞으로 알아보면, view가 많으면 comment도 많은 걸 볼 수 있다. <br />
+그래서 최종적으로는 view x (like - dislike)만 포함하기로 결론내렸다.
+
+이것도 데이터의 분포를 먼저 살펴보자.
+```{r}
+par(mfrow = c(2, 2))
+boxplot(mv$view_count, main = "mv$view_count Boxplot")
+boxplot(mv$like_count, main = "mv$like_count Boxplot")
+boxplot(mv$dislike_count, main = "mv$dislike_count Boxplot")
+boxplot(mv$comment_count, main = "mv$comment_count Boxplot")
+```
+boxplot을 보면, twitter때와 마찬가지로 로그 변환이 필요한 것을 볼 수 있다.
+
+```{r}
+par(mfrow = c(2, 2))
+boxplot(log(mv$view_count), main = "log(mv$view_count) Boxplot")
+boxplot(log(mv$like_count), main = "log(mv$like_count) Boxplot")
+boxplot(log(mv$dislike_count), main = "log(mv$dislike_count) Boxplot")
+boxplot(log(mv$comment_count), main = "log(mv$comment_count) Boxplot")
+```
+대칭화가 잘 된 것을 볼 수 있다.
+
+뮤직비디오의 경우에는 like와 dislike는 반비례 관계가 아닐까? <br />
+즉, like가 많으면 dislike가 적고, like가 적으면 dislike가 많지 않을까?
+```{r}
+plot(log(mv$like_count), log(mv$dislike_count), main = "log(mv$like_count) vs log(mv$dislike_count) Plot")
+```
+그렇지 않은 것을 볼 수 있다. 둘은 정비례 관계다. <br />
+좋아하는 사람이 많으면 싫어하는 사람도 많다.
+
+나머지는 우리가 생각한 것과 마찬가지다. <br />
+view가 많으면, like도 많고, <br />
+view가 많으면, dislike도 많으며, <br />
+view가 많으면, comment도 많다. <br />
+comment가 많으면, like도 많고, <br />
+comment가 많으면, dislike도 많다.
+
+```{r}
+par(mfrow = c(1, 1))
+plot(log(mv$view_count), log(mv$like_count), 
+     main = "log(mv$view_count) vs log(mv$like_count) Plot") # view가 많으면, like도 많음
+plot(log(mv$view_count), log(mv$dislike_count), 
+     main = "log(mv$view_count) vs log(mv$dislike_count) Plot") # view가 많으면, dislike도 많음
+plot(log(mv$comment_count), log(mv$like_count), 
+     main = "log(mv$comment_count) vs log(mv$like_count) Plot") # comment가 많으면, like도 많고
+plot(log(mv$comment_count), log(mv$dislike_count), 
+     main = "log(mv$comment_count) vs log(mv$dislike_count) Plot") # comment가 많으면, dislike도 많음
+
+plot(log(mv$view_count), log(mv$comment_count), 
+     main = "log(mv$view_count) vs log(mv$comment_count) Plot") # view가 많으면, comment도 많음
+```
+
+EDA를 이렇게 하다보면, 여러가지 아이디어들이 떠오른다. <br />
+뮤직비디오가 히트를 치고나면, ticket_sales가 확 늘지는 않을까? <br />
+히트곡이라는게 중요하니깐. <br />
+예를 찾아보자.
+```{r}
+mv %>% 
+  filter(artist == name[4]) %>%
+  arrange(desc(view_count))
+```
+artist[4]는 2016-09-08에 내놓은 뮤직비디오가 히트를 쳤다. 그럼 그 이후로 ticket sales가 늘어났을까?
+
+```{r}
+concert %>% 
+  filter(artist == name[4]) %>% 
+  filter(closing_date < "2016-09-08") %>% 
+  select(artist, closing_date, make, ticket_sales)
+
+concert %>% 
+  filter(artist == name[4]) %>% 
+  filter(closing_date >= "2016-09-08") %>% 
+  select(artist, closing_date, make, ticket_sales)
+```
+실제로 꽤늘어난 것을 확인할 수 있다.
+
+하지만 꼭 그런 것은 아니다.
+```{r}
+mv %>% 
+  filter(artist == name[13]) %>%
+  arrange(desc(view_count))
+```
+artist[13]은 2017-04-27에 내놓은 뮤직비디오가 나름 히트를 쳤다. 그럼 그 이후의 ticket sales는?
+```{r}
+concert %>% 
+  filter(artist == name[13]) %>% 
+  filter(closing_date < "2017-04-27") %>% 
+  select(artist, closing_date, make, ticket_sales)
+
+concert %>% 
+  filter(artist == name[13]) %>% 
+  filter(closing_date >= "2017-04-27") %>% 
+  select(artist, closing_date, make, ticket_sales)
+```
+그 이후로 make는 확실하게 많이 늘어난 것을 볼 수 있는데, ticket sales는 별로 늘지 않았다. 
+
+근데 make가 늘어봐야 ticket sales는 별로 늘지 않았다. 이건 좀 주의 깊게 볼 부분인 것 같다.
+
+### vlive
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
