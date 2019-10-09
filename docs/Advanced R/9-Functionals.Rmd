@@ -9,7 +9,7 @@ output:
 ## 9.1 Introduction
 
 코드가 더 믿을만하려면, 더 투명해야 한다. <br />
-특히나, nested conditions랑 loop는 의심을 갖고 보아야 한다. <br />
+특히나, nested conditions랑 루프는 의심을 갖고 보아야 한다. <br />
 복잡한 control flows는 프로그래머를 혼란스럽게 한다. <br />
 복잡한 코드는 종종 버그를 숨기고 있다. <br />
 To become significantly more reliable, code must become more transparent. <br />
@@ -17,7 +17,7 @@ In particular, nested conditions and loops must be viewed with great suspicion. 
 Complicated control flows confuse programmers. <br />
 Messy code often hides bugs.
 
-*자 그래서 functional 무엇이냐? function과는 어떻게 다른 것인가?* <br />
+**자 그래서 functional 무엇이냐? function과는 어떻게 다른 것인가?** <br />
 functional은, input을 함수로 받고, output을 벡터로 return하는 함수. <br />
 A functional is a function / that takes a function as an input / and returns a vector as output.
 
@@ -71,7 +71,8 @@ triple <- function(x) x * 3
 map(1:3, triple)
 ```
 
-시각적으로 나타내면, ![그림1](https://d33wubrfki0l68.cloudfront.net/f0494d020aa517ae7b1011cea4c4a9f21702df8b/2577b/diagrams/functionals/map.png)
+시각적으로 나타내면, 
+![그림1](https://d33wubrfki0l68.cloudfront.net/f0494d020aa517ae7b1011cea4c4a9f21702df8b/2577b/diagrams/functionals/map.png)
 
 <style>
 p.comment {
@@ -102,16 +103,98 @@ simple_map <- function(x, f, ...) {
 }
 ```
 
-실제 `purrr::map()`은 몇 가지 차이점이 있다. <br />
+실제 `purrr::map()`은 이렇게 만들어지진 않았다. 몇 가지 차이점이 있다. <br />
 C언어로 써서 성능을 조금이라도 더 짜냈고, 이름을 보존하고, Section 9.2.2에서 배울 몇 가지 지름길들을 지원한다.
 
 <p class="comment">
-`map()`과 동등한 base 함수는 `lapply()`다. <br />
-유일한 차이는 `lapply()`는 밑에서 배우게 될 helpers를 지원하지 않는다는 것이다. <br />
-그래서 만약에 purrr에서 `map()`만 쓸 것이라면, 추가적인 의존성additional dependency를 스킵하고 `lapply()`를 쓰면 된다.
+<code>map()</code>과 동등한 base 함수는 <code>lapply()</code>다. <br />
+유일한 차이는 <code>lapply()</code>는 밑에서 배우게 될 helpers를 지원하지 않는다는 것이다. <br />
+그래서 만약에 purrr에서 <code>map()</code>만 쓸 것이라면, 추가적인 의존성additional dependency를 스킵하고 <code>lapply()</code>를 쓰면 된다.
 </p>
 
 ### 9.2.1 Producing atomic vectors
+`map()`은 리스트를 return하는데, map family가 가장 일반적일 수 있게 해주는 거다.
+왜냐하면 그 어떤 것이라도 리스트에 넣을 수 있기 때문.
+
+그런데 더 간단한 데이터 구조data structure가 가능한데 꼭 리스트를 return하게 하는 것은 불편.
+그렇기 때문에 4가지의 더 특정한 변형들이 있다. `map_lgl()`, `map_int()`, `map_dbl()`, `map_chr()`
+각각은 특정화된specified 타입의 벡터를 return해준다.
+
+1) `map_chr()`은 항상 character vector를 return한다.
+```{r}
+map_chr(mtcars, typeof)
+```
+
+2) `map_lgl()`은 항상 logical vector를 return한다.
+```{r}
+map_lgl(mtcars, is.double)
+```
+
+3) `map_int()`은 항상 integer vector를 return한다.
+```{r}
+n_unique <- function(x) length(unique(x))
+map_int(mtcars, n_unique)
+```
+
+4) `map_dbl()`은 항상 double vector를 return한다.
+```{r}
+map_dbl(mtcars, mean)
+```
+
+purrr은, 접미사suffix만 봐도 output이 무엇이 될지를 알 수 있도록 했다.
+`_dbl`이면 double vector가 output이겠구나! 하게끔. 
+
+모든 `map_*()`함수들은 어떠한 타입의 벡터든 input으로 받을 수 있다. 
+`mtcars`는 데이터 프레임이고, 데이터 프레임은 같은 길이의 벡터들을 갖고 있는 리스트들이다. 
+벡터 때와 마찬가지로 그림으로 그려서 표현해보면,
+![그림2](https://d33wubrfki0l68.cloudfront.net/12f6af8404d9723dff9cc665028a35f07759299d/d0d9a/diagrams/functionals/map-list.png)
+
+모든 map 함수들은 input과 같은 길이를 갖는 output 벡터를 return해야한다. 
+이 말인즉슨, `.f`의 각 호출call이 single value를 return해야한다는 것이다. 
+만약 그렇지 않다면, 에러가 나온다.
+
+```{r error = TRUE}
+pair <- function(x) c(x, x)
+map_dbl(1:2, pair)
+```
+
+이 때의 에러는, `.f`가 잘못된 타입일 때 얻게되는 에러와 같다.
+```{r error = TRUE}
+map_dbl(1:2, as.character)
+```
+
+위 2가지의 경우에 있어, 그냥 `map()`을 쓰는게 낫다. 
+왜냐하면 `map()`은 어떠한 타입의 output이든 다 받아주기 때문이다.
+이러고나면 output이 어떻게 생겼는지를 알 수 있고, 뭘해야할지를 알게 된다. 
+```{r, collapse = TRUE}
+map(1:2, pair)
+map(1:2, as.character)
+```
+
+<p class="comment">
+<strong>base R에서는</strong>
+base R은 atomic vector를 return하는 2개의 apply 함수들을 가지고 있다.
+<code>sapply()</code>랑 <code>vapply()</code>.
+<code>sapply()</code>는 비추하는데, 왜냐하면 얘는 results를 간단화simplify시키려고 노력을 하기 때문에,
+list를 return할 수도, vector를 return할 수도, matrix를 return할 수도 있기 때문이다.
+이러면 프로그램을 하기가 힘들어지고, non-interactive 셋팅에서는 피해야할 일이다. 
+<code>vapply()</code>는 <code>FUN.VALUE</code>라는 template를 제공해서, output shape를 describe해주기 때문에 더 안전하다. 
+만약 purrr을 이용하고 싶지 않다면, <code>sapply()</code>가 아닌, <code>vapply()</code>를 항상 이용하기를 권한다. 
+<code>vapply()</code>의 단점으로는, 너무 장황하다는 것이다.verbosity
+예를 들어, <code>map_dbl(x, mean, na.rm = TRUE)</code>
+</p>
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
