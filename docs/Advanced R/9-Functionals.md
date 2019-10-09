@@ -13,11 +13,11 @@
 ``` r
 randomise <- function(f) f(runif(1e3))
 randomise(mean)
-## [1] 0.5119816
+## [1] 0.5128038
 randomise(mean)
-## [1] 0.4939301
+## [1] 0.5132047
 randomise(sum)
-## [1] 503.2567
+## [1] 490.2109
 ```
 
 이미 functional을 사용해봤을 수 있다. <br /> for 루프문을 대신하기 위해 base R의 `lapply()`, `apply()`나 `tapply()` 혹은 purrr의 `map()`을 써봤을거다. <br /> 혹은 수학적 functional인 `integrate()`나 `optim()`을 써봤을 수도 있다.
@@ -207,9 +207,9 @@ as_mapper(~ length(unique(.x)))
 x <- map(1:3, ~ runif(2))
 str(x)
 ## List of 3
-##  $ : num [1:2] 0.444 0.525
-##  $ : num [1:2] 0.609 0.494
-##  $ : num [1:2] 0.0351 0.3652
+##  $ : num [1:2] 0.0994 0.1768
+##  $ : num [1:2] 0.928 0.666
+##  $ : num [1:2] 0.0145 0.9627
 ```
 
 짧고 간단한 함수들에 사용할 걸 대비해 이 사용법을 익혀두자. <br /> 한 줄이 넘어갈 정도로 길어지거나 `{}`을 사용할 정도가 되면, name을 붙여줄 때가 된 것이다.
@@ -277,9 +277,9 @@ plus <- function(x, y) x + y
 
 x <- c(0, 0, 0, 0)
 map_dbl(x, plus, runif(1))
-## [1] 0.1344227 0.1344227 0.1344227 0.1344227
+## [1] 0.6834568 0.6834568 0.6834568 0.6834568
 map_dbl(x, ~ plus(.x, runif(1)))
-## [1] 0.1796132 0.5292955 0.0523603 0.8186037
+## [1] 0.2229405 0.5975147 0.8804228 0.4352864
 ```
 
 ### 9.2.4 Argument names
@@ -323,7 +323,7 @@ purrr 함수들은 이러한 충돌을, 흔히 사용하는 `x`, `f` 대신에 `
 </p>
 ### 9.2.5 Varying another argument
 
-이 때까지, map()의 첫 번째 argument는 항상 function의 첫 번째 argument가 되었다. <br /> 하지만, 만약에 첫 번째 argument는 일정constant하고, different argument가 변하기vary를 바란다면? <br /> 그림으로 따지자면 다음과 같이. ![그림5]()
+이 때까지, map()의 첫 번째 argument는 항상 function의 첫 번째 argument가 되었다. <br /> 하지만, 만약에 첫 번째 argument는 일정constant하고, different argument가 변하기vary를 바란다면? <br /> 그림으로 따지자면 다음과 같이. ![그림5](https://d33wubrfki0l68.cloudfront.net/6d0b927ba5266f886cc721ae090afcc5e872a748/f8636/diagrams/functionals/map-arg-flipped.png "width:30px")
 
 직접적으로 하는 방법은 없다. 하지만 대신에, 2가지 트릭을 이용해 할 수 있다. <br /> 이 예를 좀 묘사illustrate해보자면, 좀 일반적이지 않은 그런 값들이 있는 벡터가 있고, <br />     mean을 구하는데 있어, triming에다가 다른 값들을 넣어 탐구를 해보고 싶다치자. <br /> 이 경우에, `mean()`의 first argument는 일정하고constant, `trim`이라는 second argument가 vary하기를 원하는 거다.
 
@@ -336,21 +336,21 @@ x <- rcauchy(1000)
 
 ``` r
 map_dbl(trims, ~ mean(x, trim = .x))
-## [1]  2.38461394 -0.02226349  0.01713448  0.02879763
+## [1] 1.90348252 0.13738236 0.09913348 0.05066887
 ```
 
 그런데 얘는 x와 .x를 둘 다 사용하고 있기 때문에, 헷갈린다. <br /> `~` 사용하는 걸 포기함으로써 좀 더 깔끔하게 만들 수 있다.
 
 ``` r
 map_dbl(trims, function(trim) mean(x, trim = trim))
-## [1]  2.38461394 -0.02226349  0.01713448  0.02879763
+## [1] 1.90348252 0.13738236 0.09913348 0.05066887
 ```
 
 1.  너무 알고 있는게 많아서, R의 flexible argument 매칭 룰을 사용할 수도 있다. <br /> 예를 들어, `mean(x, trim = 0.1)`을 `mean(0.1, x = x)`라고 쓸 수도 있는데, 이렇게 `map_dbl()`을 call할 수 있다.
 
 ``` r
 map_dbl(trims, mean, x = x)
-## [1]  2.38461394 -0.02226349  0.01713448  0.02879763
+## [1] 1.90348252 0.13738236 0.09913348 0.05066887
 ```
 
 그런데 이 방법technique은 추천하지 않는다. <br /> 왜냐하면, 독자가 .f의 argument order와 R의 argument matching rules를 둘 다 이해하고 있다는 가정 하에 하는 것이기 때문.
@@ -360,4 +360,85 @@ map_dbl(trims, mean, x = x)
 9.3 Purrr style
 ---------------
 
-더 많은
+더 많은 map 변형들variants을 탐구해보기 전에, <br /> 상당히 현실적인 문제들을, 여러 개의 purrr 함수들을 사용해서 어떻게 해결하는지 봐보자.
+
+이 toy example에서, 각 subgroup에 대한 model을 fitting하고, 모델의 계수를 추출해보자. <br /> `mtcars` 데이터를 cylinders의 개수에 따라, `base::split()` 함수를 이용해, 그룹으로 쪼갤 것이다.
+
+``` r
+by_cyl <- split(mtcars, mtcars$cyl)
+```
+
+이러면 3개의 데이터 프레임들을 갖고 있는 list가 생긴다. 각각 4, 6, 8개의 cylinders를 갖고 있는 차들.
+
+이제 각각에 대해 linear model을 fit하고, 두 번째 계수, 즉, slope를 추출하고 싶다고 하자. <br /> 다음은 purrr을 통해 어떻게 해야할지를 보여준다.
+
+``` r
+by_cyl %>% 
+  map(~ lm(mpg ~ wt, data = .x)) %>% 
+  map(coef) %>% 
+  map_dbl(2) # intercept를 얻고 싶었다면 1을 넣겠지.
+##         4         6         8 
+## -5.647025 -2.780106 -2.192438
+```
+
+(`%>%`라는 pipe를 본 적이 없다면, Section 6.3에 설명되어 있다.)
+
+각 line이 하나의 step을 요약encapsulate하고 있기 때문에, 쉽게 이 functional 뭐하고 있는지를 구분할 수 있고, <br /> purrrr helpers들이 우리가 각 step에서 뭘 해야하는지를 간결하게 묘사하고 있다. <br /> 그래서 위 코드가 쉽다. <br /> and the purrr helpers allow us / to very concisely describe / what to do in each step.
+
+base R로는 이 문제를 어떻게 풀 수 있을까? <br /> 분명히 위의 각 purrr 함수를 동등한 base 함수로 대체할 수 있다.
+
+``` r
+by_cyl %>%
+    lapply(function(data) lm(mpg ~ wt, data = data)) %>%
+    lapply(coef) %>%
+    vapply(function(x) x[[2]], double(1))
+##         4         6         8 
+## -5.647025 -2.780106 -2.192438
+```
+
+하지만, pipe를 쓰고 있기 때문에 진짜 base R만을 쓴 것은 아니다. <br /> 순수하게 base R로만 하려고 하면, 중간과정을 넣어야하고, 각 step에서 뭔가를 조금 더 해야한다.
+
+``` r
+models <- lapply(by_cyl, function(data) lm(mpg ~ wt, data = data))
+vapply(models, function(x) coef(x)[[2]], double(1))
+##         4         6         8 
+## -5.647025 -2.780106 -2.192438
+```
+
+혹은, 물론 for 루프를 사용할 수도 있다.
+
+``` r
+intercepts <- double(length(by_cyl))
+for (i in seq_along(by_cyl)) {
+    model <- lm(mpg ~ wt, data = by_cyl[[i]])
+    intercepts[[i]] <- coef(model)[[2]]
+}
+intercepts
+## [1] -5.647025 -2.780106 -2.192438
+```
+
+purrr에서, apply 함수로, for 루프로, 옮겨가면서 더 많은 iteration을 해야한다는 걸 볼 수 있다. <br /> purrr에서는 map(), map(), map\_dbl()으로 총 3번 iterate <br /> apply 함수들은 lapply(), vapply()로 총 2번 iterate <br /> for 루프문을 이용했을 때는 한 번 iterate
+
+각 스텝이 더 많고(줄이 많고), 간단할수록 코드를 더 이해하기 쉽고 나중에 수정하기도 편해서 좋다.
+
+9.4 Map variants
+----------------
+
+map()의 주요 변형primary variants으로는 총 23개가 있다. <br /> 이 때까지 5개를 배웠고, (`map()`, `map_lgl()`, `map_int()`, `map_dbl()`, `map_chr()`) <br /> 이 말인즉슨 18개 남았다는 뜻. ~~나이스~~ <br /> 하지만 다 따로 배워야하는 건 아니고, 5개의 새로운 아이디어만 배우면 되게끔 purrr을 디자인했다.
+
+-   output이 input과 같은 타입이 되도록, `modify()`
+-   2개의 inputs에 대해 iterate하도록, `map2()`
+-   index를 이용해서 iterate하도록, `imap()`
+-   아무것도 return하지 않도록, `walk()`
+-   몇 개의 input이 되든 상관없이 iterate하도록, `pmap()`
+
+map family의 함수들은, orthogonal한 input과 output을 갖고 있는데, <br /> 이 말인즉슨 모든 family를 inputs를 행에, outputs를 열에 두고서, 행렬matrix로 조직organise해볼 수 있다는 거다.
+
+row에 있는 아이디어를 이해하고 나면, 칼럼에 있는 것과 결합시킬 수 있다. <br /> column에 있는 아이디어를 이해하고 나면, row에 있는 것과 결합시킬 수 있다.
+
+|                      |   List   | Atomic            | Same type   |    Nothing|
+|----------------------|:--------:|-------------------|-------------|----------:|
+| One argument         |  `map()` | `map_lgl()`, ...  | `modify()`  |   `walk()`|
+| Two arguments        | `map2()` | `map2_lgl()`, ... | `modify2()` |  `walk2()`|
+| One argument + index | `imap()` | `imap_lgl()`, ... | `imodify()` |  `iwalk()`|
+| N arguments          | `pmap()` | `pmap_lgl()`, ... | -           |  `pwalk()`|
