@@ -13,11 +13,11 @@
 ``` r
 randomise <- function(f) f(runif(1e3))
 randomise(mean)
-## [1] 0.4983236
+## [1] 0.5001617
 randomise(mean)
-## [1] 0.4930522
+## [1] 0.490094
 randomise(sum)
-## [1] 496.8842
+## [1] 507.986
 ```
 
 이미 functional을 사용해봤을 수 있다. <br /> for 루프문을 대신하기 위해 base R의 `lapply()`, `apply()`나 `tapply()` 혹은 purrr의 `map()`을 써봤을거다. <br /> 혹은 수학적 functional인 `integrate()`나 `optim()`을 써봤을 수도 있다.
@@ -44,16 +44,15 @@ library(purrr)
 ``` r
 triple <- function(x) x * 3
 map(1:3, triple)
+## [[1]]
+## [1] 3
+## 
+## [[2]]
+## [1] 6
+## 
+## [[3]]
+## [1] 9
 ```
-
-    ## [[1]]
-    ## [1] 3
-    ## 
-    ## [[2]]
-    ## [1] 6
-    ## 
-    ## [[3]]
-    ## [1] 9
 
 시각적으로 나타내면, ![그림1](https://d33wubrfki0l68.cloudfront.net/f0494d020aa517ae7b1011cea4c4a9f21702df8b/2577b/diagrams/functionals/map.png)
 
@@ -81,7 +80,7 @@ simple_map <- function(x, f, ...) {
 }
 ```
 
-실제 `purrr::map()`은 이렇게 만들어지진 않았다. 몇 가지 차이점이 있다. <br /> C언어로 써서 성능을 조금이라도 더 짜냈고, 이름을 보존하고, Section 9.2.2에서 배울 몇 가지 지름길들을 지원한다.
+실제 `purrr::map()`은 이렇게 만들어지진 않았다. 몇 가지 차이점이 있다. <br /> C언어로 써서 성능을 조금이라도 더 짜냈고, 이름을 보존하고, Section 9.2.2에서 배울 몇 가지 shorcuts들을 지원한다.
 
 <p class="comment">
 <code>map()</code>과 동등한 base 함수는 <code>lapply()</code>다. <br /> 유일한 차이는 <code>lapply()</code>는 밑에서 배우게 될 helpers를 지원하지 않는다는 것이다. <br /> 그래서 만약에 purrr에서 <code>map()</code>만 쓸 것이라면, 추가적인 의존성additional dependency를 스킵하고 <code>lapply()</code>를 쓰면 된다.
@@ -96,42 +95,38 @@ simple_map <- function(x, f, ...) {
 
 ``` r
 map_chr(mtcars, typeof)
+##      mpg      cyl     disp       hp     drat       wt     qsec       vs 
+## "double" "double" "double" "double" "double" "double" "double" "double" 
+##       am     gear     carb 
+## "double" "double" "double"
 ```
-
-    ##      mpg      cyl     disp       hp     drat       wt     qsec       vs 
-    ## "double" "double" "double" "double" "double" "double" "double" "double" 
-    ##       am     gear     carb 
-    ## "double" "double" "double"
 
 1.  `map_lgl()`은 항상 logical vector를 return한다.
 
 ``` r
 map_lgl(mtcars, is.double)
+##  mpg  cyl disp   hp drat   wt qsec   vs   am gear carb 
+## TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
 ```
-
-    ##  mpg  cyl disp   hp drat   wt qsec   vs   am gear carb 
-    ## TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
 
 1.  `map_int()`은 항상 integer vector를 return한다.
 
 ``` r
 n_unique <- function(x) length(unique(x))
 map_int(mtcars, n_unique)
+##  mpg  cyl disp   hp drat   wt qsec   vs   am gear carb 
+##   25    3   27   22   22   29   30    2    2    3    6
 ```
-
-    ##  mpg  cyl disp   hp drat   wt qsec   vs   am gear carb 
-    ##   25    3   27   22   22   29   30    2    2    3    6
 
 1.  `map_dbl()`은 항상 double vector를 return한다.
 
 ``` r
 map_dbl(mtcars, mean)
+##        mpg        cyl       disp         hp       drat         wt 
+##  20.090625   6.187500 230.721875 146.687500   3.596563   3.217250 
+##       qsec         vs         am       gear       carb 
+##  17.848750   0.437500   0.406250   3.687500   2.812500
 ```
-
-    ##        mpg        cyl       disp         hp       drat         wt 
-    ##  20.090625   6.187500 230.721875 146.687500   3.596563   3.217250 
-    ##       qsec         vs         am       gear       carb 
-    ##  17.848750   0.437500   0.406250   3.687500   2.812500
 
 purrr은, 접미사suffix만 봐도 output이 무엇이 될지를 알 수 있도록 했다. <br /> `_dbl`이면 double vector가 output이겠구나! 하게끔.
 
@@ -150,11 +145,10 @@ map_dbl(1:2, pair)
 
 ``` r
 map_dbl(1:2, as.character)
+## Error: Can't coerce element 1 from a character to a double
 ```
 
-    ## Error: Can't coerce element 1 from a character to a double
-
-위 2가지의 경우에 있어, 그냥 `map()`을 쓰는게 낫다. <br /> 왜냐하면 `map()`은 어떠한 타입의 output이든 다 받아주기 때문이다. <br /> 이러고나면 output이 어떻게 생겼는지를 알 수 있고, 뭘해야할지를 알게 된다.
+위 2가지의 경우에 있어, 그냥 `map()`을 쓰는게 낫다. <br /> 왜냐하면 `map()`은 어떠한 타입의 output이든 다 받아주기 때문이다. <br /> 이러고나면 output이 어떻게 생겼는지를 알 수 있고, 뭘 해야할지를 알게 된다.
 
 ``` r
 map(1:2, pair)
@@ -172,39 +166,36 @@ map(1:2, as.character)
 ```
 
 <p class="comment">
-<strong>base R에서는</strong> base R은 atomic vector를 return하는 2개의 apply 함수들을 가지고 있다. <br /> <code>sapply()</code>랑 <code>vapply()</code>. <br /> <code>sapply()</code>는 비추하는데, 왜냐하면 얘는 results를 간단화simplify시키려고 노력을 하기 때문에, <br /> list를 return할 수도, vector를 return할 수도, matrix를 return할 수도 있기 때문이다. <br /> 이러면 프로그램을 하기가 힘들어지고, non-interactive 셋팅에서는 피해야할 일이다. <br /> <code>vapply()</code>는 <code>FUN.VALUE</code>라는 template를 제공해서, output shape를 describe해주기 때문에 더 안전하다. <br /> 만약 purrr을 이용하고 싶지 않다면, <code>sapply()</code>가 아닌, <code>vapply()</code>를 항상 이용하기를 권한다. <br /> <code>vapply()</code>의 단점으로는, 너무 장황하다는 것이다.verbosity <br /> 예를 들어, <code>map\_dbl(x, mean, na.rm = TRUE)</code>를 base R로 써보려고 하면, <br /> <code>vapply(x, mean, na.rm = TRUE, FUN.VALUE = double(1))</code>이다.
+<strong>base R에서는</strong> <br /> base R은 atomic vector를 return하는 2개의 apply 함수들을 가지고 있다. <br /> <code>sapply()</code>랑 <code>vapply()</code>. <br /> <code>sapply()</code>는 비추하는데, 왜냐하면 얘는 results를 간단화simplify시키려고 노력을 하기 때문에, <br /> list를 return할 수도, vector를 return할 수도, matrix를 return할 수도 있기 때문이다. <br /> 이러면 프로그램을 하기가 힘들어지고, non-interactive 셋팅에서는 피해야할 일이다. <br /> <code>vapply()</code>는 <code>FUN.VALUE</code>라는 template를 제공해서, output shape를 describe해주기 때문에 더 안전하다. <br /> 만약 purrr을 이용하고 싶지 않다면, <code>sapply()</code>가 아닌, <code>vapply()</code>를 항상 이용하기를 권한다. <br /> <code>vapply()</code>의 단점으로는, 너무 장황하다는 것이다.verbosity <br /> 예를 들어, <code>map\_dbl(x, mean, na.rm = TRUE)</code>를 base R로 써보려고 하면, <br /> <code>vapply(x, mean, na.rm = TRUE, FUN.VALUE = double(1))</code>이다.
 </p>
 ### 9.2.2 Anonymous functions and shortcuts
 
-이미 존재하는 함수와 `map()`을 쓰는 것 대신에, inline anonymous 함수를 쓸 수도 있다.(Section 6.2.3) <br /> (anonymous 함수라는게 대단한 것은 아니고, 그냥 한 줄짜리 간단한 함수를 일컫는 것이다.)
+이미 존재하는 함수와 `map()`을 쓰는 것 대신에, inline anonymous 함수를 쓸 수도 있다.(Section 6.2.3) <br /> (anonymous 함수라는게 대단한 것은 아니고, 이름도 붙일 필요 없는 그냥 한 줄짜리 간단한 함수.)
 
 ``` r
 map_dbl(mtcars, function(x) length(unique(x)))
+##  mpg  cyl disp   hp drat   wt qsec   vs   am gear carb 
+##   25    3   27   22   22   29   30    2    2    3    6
 ```
-
-    ##  mpg  cyl disp   hp drat   wt qsec   vs   am gear carb 
-    ##   25    3   27   22   22   29   30    2    2    3    6
 
 anonymous 함수는 굉장히 유용하지만, 문법syntax이 좀 길다. 그래서 purrr은 shortcut을 제공한다.
 
 ``` r
 map_dbl(mtcars, ~ length(unique(.x)))
+##  mpg  cyl disp   hp drat   wt qsec   vs   am gear carb 
+##   25    3   27   22   22   29   30    2    2    3    6
 ```
 
-    ##  mpg  cyl disp   hp drat   wt qsec   vs   am gear carb 
-    ##   25    3   27   22   22   29   30    2    2    3    6
-
-모든 함수들이 `~`(twiddle이라고 발음함)로 시작하는 formula를 함수function로 번역해주기 때문에, 이게 작동한다. <br /> `as_mapper()`를 사용해서 무엇이 일어나고 있는지를 확인할 수 있다.
+모든 함수들이 `~`(twiddle이라고 발음함)로 시작하는 formula를 함수function로 번역해주기 때문에, 이게 가능하다. <br /> `as_mapper()`를 사용해서 무엇이 일어나고 있는지를 확인할 수 있다.
 
 ``` r
 as_mapper(~ length(unique(.x)))
+## <lambda>
+## function (..., .x = ..1, .y = ..2, . = ..1) 
+## length(unique(.x))
+## attr(,"class")
+## [1] "rlang_lambda_function" "function"
 ```
-
-    ## <lambda>
-    ## function (..., .x = ..1, .y = ..2, . = ..1) 
-    ## length(unique(.x))
-    ## attr(,"class")
-    ## [1] "rlang_lambda_function" "function"
 
 이 함수 argument는 유별나보이지만quirky, <br /> 하나의 argument를 갖고 있는 함수에 대해서는 `.`를 통해서 refer을, <br /> 두개의 arguments를 갖고 있는 함수에 대해서는 `.x`와 `.y`를 통해서 refer을, <br /> 그 이상의 arguments를 갖고 있는 함수에 대해서는 `..1`, `..2`, `..3` 등등을 통해 refer을 할 수 있도록 해준다.
 
@@ -215,12 +206,11 @@ as_mapper(~ length(unique(.x)))
 ``` r
 x <- map(1:3, ~ runif(2))
 str(x)
+## List of 3
+##  $ : num [1:2] 0.173 0.635
+##  $ : num [1:2] 0.233 0.858
+##  $ : num [1:2] 0.259 0.556
 ```
-
-    ## List of 3
-    ##  $ : num [1:2] 0.382 0.655
-    ##  $ : num [1:2] 0.086 0.742
-    ##  $ : num [1:2] 0.122 0.56
 
 짧고 간단한 함수들에 사용할 걸 대비해 이 사용법을 익혀두자. <br /> 한 줄이 넘어갈 정도로 길어지거나 `{}`을 사용할 정도가 되면, name을 붙여줄 때가 된 것이다.
 
@@ -255,6 +245,41 @@ map_chr(x, "z", .default = NA)
 ```
 
 <p class="comment">
-<strong>base R에서는</strong> <code>lapply()</code>와 같은 base R 함수들도, 이름을 string으로 니가 제공해줄 수는 있다. <br /> 하지만 별로 유용하지는 않은게, <code>lapply(x, "f")</code>는 거의 항상 <code>lapply(x, f)</code>와 같고, <br /> 타이핑만 늘어날 뿐이기 때문이다.
+<strong>base R에서는</strong> <br /> <code>lapply()</code>와 같은 base R 함수들도, 이름을 string으로 니가 제공해줄 수는 있다. <br /> 하지만 별로 유용하지는 않은게, <code>lapply(x, "f")</code>는 거의 항상 <code>lapply(x, f)</code>와 같고, <br /> 타이핑만 늘어날 뿐이기 때문이다.
 </p>
 ### 9.2.3 Passing argument with `...`
+
+니가 호출하는 함수에다가 추가적인 인자들additional arguments을 패스해놓는 것은 종종 유용하다. 예를 들어, `mean()`이라는 함수에다가 `na.rm = TRUE`를 패스하고 싶다고 치자. 하나의 방법은 anonymous 함수를 이용하는 것이다.
+
+``` r
+x <- list(1:5, c(1:10, NA))
+map_dbl(x, ~ mean(.x, na.rm = TRUE))
+## [1] 3.0 5.5
+```
+
+하지만 map 함수들은 `...`를 패스해줄 수 있기 때문에, 더 간단한 form이 가능하다.
+
+``` r
+map_dbl(x, mean, na.rm = TRUE)
+## [1] 3.0 5.5
+```
+
+그림을 보면 더 쉽게 이해가 가능하다. `f` 다음에 나오는 어떠한 arguments건 간에, `map()`은 데이터에다가 `f()`를 하고, **그 다음에** 넣어준다. ![그림3](https://d33wubrfki0l68.cloudfront.net/e1b3536a7556aef348f546a79277125c419a5fdc/0c0a1/diagrams/functionals/map-arg.png)
+
+중요한 점은, 이 패스되는 arguments들은 decompose되지 않는다는 것이다. `map()`에서 첫 번째로 넣어지는 arguments들은 decompose되었는데, 패스되는 additional arguments들은 decompose안된다. 그림을 보고 제대로 이해하자. ![그림4](https://d33wubrfki0l68.cloudfront.net/a468c847ea8aca9a6131492e1e7431f418259eaf/ce4e0/diagrams/functionals/map-arg-recycle.png)
+
+additional arguments도 decompose되는 것은 Section 9.4.2와 Section 9.4.5에서 배울 것이다. map variants에서.
+
+`map()`에다가 이렇게 additional arguments를 패스해놓는 것이랑, anonymous 함수를 이용해서 거기에다가 extra argument를 넣어놓는 것이랑은 미묘하게 다르다. 전자는 `map()`이 실행될 때 한 번만 evaluate되고, 후자는 `f()`가 실행될 때마다 새롭게 evaluate된다. `map()`이 불러질 때 한번만 evaluate되는 것이 아니라. 다음의 예를 보면 이해가 된다.
+
+``` r
+plus <- function(x, y) x + y
+
+x <- c(0, 0, 0, 0)
+map_dbl(x, plus, runif(1))
+## [1] 0.5709587 0.5709587 0.5709587 0.5709587
+map_dbl(x, ~ plus(.x, runif(1)))
+## [1] 0.04072129 0.89863174 0.88076533 0.74392978
+```
+
+### 9.2.4 Argument names
