@@ -13,11 +13,11 @@
 ``` r
 randomise <- function(f) f(runif(1e3))
 randomise(mean)
-## [1] 0.5001617
+## [1] 0.5119816
 randomise(mean)
-## [1] 0.490094
+## [1] 0.4939301
 randomise(sum)
-## [1] 507.986
+## [1] 503.2567
 ```
 
 이미 functional을 사용해봤을 수 있다. <br /> for 루프문을 대신하기 위해 base R의 `lapply()`, `apply()`나 `tapply()` 혹은 purrr의 `map()`을 써봤을거다. <br /> 혹은 수학적 functional인 `integrate()`나 `optim()`을 써봤을 수도 있다.
@@ -207,9 +207,9 @@ as_mapper(~ length(unique(.x)))
 x <- map(1:3, ~ runif(2))
 str(x)
 ## List of 3
-##  $ : num [1:2] 0.173 0.635
-##  $ : num [1:2] 0.233 0.858
-##  $ : num [1:2] 0.259 0.556
+##  $ : num [1:2] 0.444 0.525
+##  $ : num [1:2] 0.609 0.494
+##  $ : num [1:2] 0.0351 0.3652
 ```
 
 짧고 간단한 함수들에 사용할 걸 대비해 이 사용법을 익혀두자. <br /> 한 줄이 넘어갈 정도로 길어지거나 `{}`을 사용할 정도가 되면, name을 붙여줄 때가 된 것이다.
@@ -249,7 +249,7 @@ map_chr(x, "z", .default = NA)
 </p>
 ### 9.2.3 Passing argument with `...`
 
-니가 호출하는 함수에다가 추가적인 인자들additional arguments을 패스해놓는 것은 종종 유용하다. 예를 들어, `mean()`이라는 함수에다가 `na.rm = TRUE`를 패스하고 싶다고 치자. 하나의 방법은 anonymous 함수를 이용하는 것이다.
+니가 호출하는 함수에다가 추가적인 인자들additional arguments을 패스해놓는 것은 종종 유용하다. <br /> 예를 들어, `mean()`이라는 함수에다가 `na.rm = TRUE`를 패스하고 싶다고 치자. <br /> 하나의 방법은 anonymous 함수를 이용하는 것이다.
 
 ``` r
 x <- list(1:5, c(1:10, NA))
@@ -264,22 +264,100 @@ map_dbl(x, mean, na.rm = TRUE)
 ## [1] 3.0 5.5
 ```
 
-그림을 보면 더 쉽게 이해가 가능하다. `f` 다음에 나오는 어떠한 arguments건 간에, `map()`은 데이터에다가 `f()`를 하고, **그 다음에** 넣어준다. ![그림3](https://d33wubrfki0l68.cloudfront.net/e1b3536a7556aef348f546a79277125c419a5fdc/0c0a1/diagrams/functionals/map-arg.png)
+그림을 보면 더 쉽게 이해가 가능하다. <br /> `f` 다음에 나오는 어떠한 arguments건 간에, `map()`은 데이터에다가 `f()`를 하고, **그 다음에** 넣어준다. ![그림3](https://d33wubrfki0l68.cloudfront.net/e1b3536a7556aef348f546a79277125c419a5fdc/0c0a1/diagrams/functionals/map-arg.png)
 
-중요한 점은, 이 패스되는 arguments들은 decompose되지 않는다는 것이다. `map()`에서 첫 번째로 넣어지는 arguments들은 decompose되었는데, 패스되는 additional arguments들은 decompose안된다. 그림을 보고 제대로 이해하자. ![그림4](https://d33wubrfki0l68.cloudfront.net/a468c847ea8aca9a6131492e1e7431f418259eaf/ce4e0/diagrams/functionals/map-arg-recycle.png)
+중요한 점은, 이 패스되는 arguments들은 decompose되지 않는다는 것이다. <br /> `map()`에서 첫 번째로 넣어지는 arguments들은 decompose되었는데, 패스되는 additional arguments들은 decompose안된다. <br /> 그림을 보고 제대로 이해하자. <br /> ![그림4](https://d33wubrfki0l68.cloudfront.net/a468c847ea8aca9a6131492e1e7431f418259eaf/ce4e0/diagrams/functionals/map-arg-recycle.png)
 
 additional arguments도 decompose되는 것은 Section 9.4.2와 Section 9.4.5에서 배울 것이다. map variants에서.
 
-`map()`에다가 이렇게 additional arguments를 패스해놓는 것이랑, anonymous 함수를 이용해서 거기에다가 extra argument를 넣어놓는 것이랑은 미묘하게 다르다. 전자는 `map()`이 실행될 때 한 번만 evaluate되고, 후자는 `f()`가 실행될 때마다 새롭게 evaluate된다. `map()`이 불러질 때 한번만 evaluate되는 것이 아니라. 다음의 예를 보면 이해가 된다.
+`map()`에다가 이렇게 additional arguments를 패스해놓는 것이랑, anonymous 함수를 이용해서 거기에다가 extra argument를 넣어놓는 것이랑은 미묘하게 다르다. <br /> 전자는 `map()`이 실행될 때 한 번만 evaluate되고, <br /> 후자는 `f()`가 실행될 때마다 새롭게 evaluate된다. `map()`이 불러질 때 한번만 evaluate되는 것이 아니라. <br /> 다음의 예를 보면 이해가 된다.
 
 ``` r
 plus <- function(x, y) x + y
 
 x <- c(0, 0, 0, 0)
 map_dbl(x, plus, runif(1))
-## [1] 0.5709587 0.5709587 0.5709587 0.5709587
+## [1] 0.1344227 0.1344227 0.1344227 0.1344227
 map_dbl(x, ~ plus(.x, runif(1)))
-## [1] 0.04072129 0.89863174 0.88076533 0.74392978
+## [1] 0.1796132 0.5292955 0.0523603 0.8186037
 ```
 
 ### 9.2.4 Argument names
+
+여기서는 argument names를 써주자 하는 것, 그리고 왜`x`나 `f` 대신에 `.x`, `.f`를 사용하는지를 알게 된다.
+
+다이어그램에서는, 전반적인 구조를 이해하라고 argument names를 다 생략해놨었다. <br /> 하지만 작성하는 코드에서는, 읽기 쉬게끔, full names를 다 써놓기를 권장한다. <br /> 예를 들어, `map(x, mean, 0.1)`은 완벽하게 유효한valid 코드이지만, `mean(x[[1]], 0.1)`이란 뜻이고, <br /> 읽는 사람은 `mean()`의 두 번째 argument는 `trim`이란 걸 기억해야 한다. <br /> 읽는 사람이 불필요하게 고생하지 않도록, `map(x, mean, trim = 0.1)`이라고 써주자. <br />
+
+이게 `map()`의 arguments들이 좀 이상해보이는 이유다. <br /> `x`, `f`라고 안 쓰고, `.x`, `.f`라고 쓴다. <br /> 왜 이렇게 하는지 예를 들어서 보여주겠다. <br /> 위에 `map()`이 어떻게 implement되었는지를 간단하게 보인, `simple_map()`을 다시 봐보자.
+
+``` r
+simple_map <- function(x, f, ...) {
+  out <- vector("list", length(x))
+  for (i in seq_along(x)) {
+    out[[i]] <- f(x[[i]], ...)
+  }
+  out
+}
+```
+
+그리고 `bootstrap_summary()`라는 함수가 있다.
+
+``` r
+bootstrap_summary <- function(x, f) {
+  f(sample(x, replace = TRUE))
+}
+```
+
+``` r
+simple_map(mtcars, bootstrap_summary, f = mean)
+```
+
+    ## Error in mean.default(x[[i]], ...): 'trim' must be numeric of length one
+
+왜 이런 에러가 발생하는걸까? <br /> `simple_map()`을 호출한다는건 `simple_map(x = mtcars, f = mean, bootstrap_summary)`이랑 같은 것이고, <br /> named 매칭이랑 positional 매칭이랑 충돌한다.
+
+purrr 함수들은 이러한 충돌을, 흔히 사용하는 `x`, `f` 대신에 `.x`, `.f`를 사용함으로써, 가능성을 줄였다. <br /> 물론, 이러한 테크닉은 완벽하진 않다. (여전히 `.x`, `.f`를 이용하는 함수도 있을테니깐) <br /> 하지만 이러면 99퍼센트는 문제를 회피할 수 있다. <br /> 여전히 남은 1퍼센트의 경우에 있어서는 anonymous 함수를 사용하자.
+
+<p class="comment">
+<strong>base R에서는</strong> <br /> <code>...</code>를 사용하는 base 함수들은, 이런 원치 않는 argument 매칭을 피하기 위해 여러가지 naming convention을 사용한다. <br /> 1. apply 함수들은 대부분 대문자를 사용함. ex) <code>X</code>, <code>FUN</code> <br /> 2. <code>transform()</code>는 좀 더 이국적인exotic 접두사prefix를 사용한다. <code>\_</code> <br /> 이러면 이름이 더 비문법적non-syntatic이 되기 때문에, <code>`</code>로 감싸줘야한다. Section 2.2.1에서 나왔던대로. <br /> 이러면 원치않은 매칭이 일어날 일이 매우 줄어든다. <br /> 3. 다른 functionals들,`uniroot()`나`optim()\`은 충돌을 피하기 위한 아무런 노력도 하지 않지만, 특별히 만들어진 함수들을 사용하기 때문에, <br /> 충돌이 일어날 일이 적다.
+</p>
+### 9.2.5 Varying another argument
+
+이 때까지, map()의 첫 번째 argument는 항상 function의 첫 번째 argument가 되었다. <br /> 하지만, 만약에 첫 번째 argument는 일정constant하고, different argument가 변하기vary를 바란다면? <br /> 그림으로 따지자면 다음과 같이. ![그림5]()
+
+직접적으로 하는 방법은 없다. 하지만 대신에, 2가지 트릭을 이용해 할 수 있다. <br /> 이 예를 좀 묘사illustrate해보자면, 좀 일반적이지 않은 그런 값들이 있는 벡터가 있고, <br />     mean을 구하는데 있어, triming에다가 다른 값들을 넣어 탐구를 해보고 싶다치자. <br /> 이 경우에, `mean()`의 first argument는 일정하고constant, `trim`이라는 second argument가 vary하기를 원하는 거다.
+
+``` r
+trims <- c(0, 0.1, 0.2, 0.5)
+x <- rcauchy(1000)
+```
+
+1.  가장 간단한 방법은, argument order를 rearrange하는 anonymous function을 사용하는 것.
+
+``` r
+map_dbl(trims, ~ mean(x, trim = .x))
+## [1]  2.38461394 -0.02226349  0.01713448  0.02879763
+```
+
+그런데 얘는 x와 .x를 둘 다 사용하고 있기 때문에, 헷갈린다. <br /> `~` 사용하는 걸 포기함으로써 좀 더 깔끔하게 만들 수 있다.
+
+``` r
+map_dbl(trims, function(trim) mean(x, trim = trim))
+## [1]  2.38461394 -0.02226349  0.01713448  0.02879763
+```
+
+1.  너무 알고 있는게 많아서, R의 flexible argument 매칭 룰을 사용할 수도 있다. <br /> 예를 들어, `mean(x, trim = 0.1)`을 `mean(0.1, x = x)`라고 쓸 수도 있는데, 이렇게 `map_dbl()`을 call할 수 있다.
+
+``` r
+map_dbl(trims, mean, x = x)
+## [1]  2.38461394 -0.02226349  0.01713448  0.02879763
+```
+
+그런데 이 방법technique은 추천하지 않는다. <br /> 왜냐하면, 독자가 .f의 argument order와 R의 argument matching rules를 둘 다 이해하고 있다는 가정 하에 하는 것이기 때문.
+
+1.  Section 9.4.5에서 배울 `pmap()`을 쓰는 방법도 있다.
+
+9.3 Purrr style
+---------------
+
+더 많은
