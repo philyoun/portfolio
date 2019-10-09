@@ -13,11 +13,11 @@
 ``` r
 randomise <- function(f) f(runif(1e3))
 randomise(mean)
-## [1] 0.5128038
+## [1] 0.4889273
 randomise(mean)
-## [1] 0.5132047
+## [1] 0.489791
 randomise(sum)
-## [1] 490.2109
+## [1] 506.9031
 ```
 
 이미 functional을 사용해봤을 수 있다. <br /> for 루프문을 대신하기 위해 base R의 `lapply()`, `apply()`나 `tapply()` 혹은 purrr의 `map()`을 써봤을거다. <br /> 혹은 수학적 functional인 `integrate()`나 `optim()`을 써봤을 수도 있다.
@@ -101,7 +101,7 @@ map_chr(mtcars, typeof)
 ## "double" "double" "double"
 ```
 
-1.  `map_lgl()`은 항상 logical vector를 return한다.
+2. `map_lgl()`은 항상 logical vector를 return한다.
 
 ``` r
 map_lgl(mtcars, is.double)
@@ -109,7 +109,7 @@ map_lgl(mtcars, is.double)
 ## TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
 ```
 
-1.  `map_int()`은 항상 integer vector를 return한다.
+3. `map_int()`은 항상 integer vector를 return한다.
 
 ``` r
 n_unique <- function(x) length(unique(x))
@@ -118,7 +118,7 @@ map_int(mtcars, n_unique)
 ##   25    3   27   22   22   29   30    2    2    3    6
 ```
 
-1.  `map_dbl()`은 항상 double vector를 return한다.
+4. `map_dbl()`은 항상 double vector를 return한다.
 
 ``` r
 map_dbl(mtcars, mean)
@@ -207,9 +207,9 @@ as_mapper(~ length(unique(.x)))
 x <- map(1:3, ~ runif(2))
 str(x)
 ## List of 3
-##  $ : num [1:2] 0.0994 0.1768
-##  $ : num [1:2] 0.928 0.666
-##  $ : num [1:2] 0.0145 0.9627
+##  $ : num [1:2] 0.0223 0.7066
+##  $ : num [1:2] 0.495 0.552
+##  $ : num [1:2] 0.969 0.708
 ```
 
 짧고 간단한 함수들에 사용할 걸 대비해 이 사용법을 익혀두자. <br /> 한 줄이 넘어갈 정도로 길어지거나 `{}`을 사용할 정도가 되면, name을 붙여줄 때가 된 것이다.
@@ -277,9 +277,9 @@ plus <- function(x, y) x + y
 
 x <- c(0, 0, 0, 0)
 map_dbl(x, plus, runif(1))
-## [1] 0.6834568 0.6834568 0.6834568 0.6834568
+## [1] 0.8441357 0.8441357 0.8441357 0.8441357
 map_dbl(x, ~ plus(.x, runif(1)))
-## [1] 0.2229405 0.5975147 0.8804228 0.4352864
+## [1] 0.03506259 0.38196867 0.71835723 0.37133646
 ```
 
 ### 9.2.4 Argument names
@@ -336,26 +336,26 @@ x <- rcauchy(1000)
 
 ``` r
 map_dbl(trims, ~ mean(x, trim = .x))
-## [1] 1.90348252 0.13738236 0.09913348 0.05066887
+## [1] -7.24640036  0.05732821  0.05482457  0.03404175
 ```
 
 그런데 얘는 x와 .x를 둘 다 사용하고 있기 때문에, 헷갈린다. <br /> `~` 사용하는 걸 포기함으로써 좀 더 깔끔하게 만들 수 있다.
 
 ``` r
 map_dbl(trims, function(trim) mean(x, trim = trim))
-## [1] 1.90348252 0.13738236 0.09913348 0.05066887
+## [1] -7.24640036  0.05732821  0.05482457  0.03404175
 ```
 
-1.  너무 알고 있는게 많아서, R의 flexible argument 매칭 룰을 사용할 수도 있다. <br /> 예를 들어, `mean(x, trim = 0.1)`을 `mean(0.1, x = x)`라고 쓸 수도 있는데, 이렇게 `map_dbl()`을 call할 수 있다.
+2. 너무 알고 있는게 많아서, R의 flexible argument 매칭 룰을 사용할 수도 있다. <br /> 예를 들어, `mean(x, trim = 0.1)`을 `mean(0.1, x = x)`라고 쓸 수도 있는데, 이렇게 `map_dbl()`을 call할 수 있다.
 
 ``` r
 map_dbl(trims, mean, x = x)
-## [1] 1.90348252 0.13738236 0.09913348 0.05066887
+## [1] -7.24640036  0.05732821  0.05482457  0.03404175
 ```
 
 그런데 이 방법technique은 추천하지 않는다. <br /> 왜냐하면, 독자가 .f의 argument order와 R의 argument matching rules를 둘 다 이해하고 있다는 가정 하에 하는 것이기 때문.
 
-1.  Section 9.4.5에서 배울 `pmap()`을 쓰는 방법도 있다.
+3. Section 9.4.5에서 배울 `pmap()`을 쓰는 방법도 있다.
 
 9.3 Purrr style
 ---------------
@@ -424,7 +424,7 @@ purrr에서, apply 함수로, for 루프로, 옮겨가면서 더 많은 iteratio
 9.4 Map variants
 ----------------
 
-map()의 주요 변형primary variants으로는 총 23개가 있다. <br /> 이 때까지 5개를 배웠고, (`map()`, `map_lgl()`, `map_int()`, `map_dbl()`, `map_chr()`) <br /> 이 말인즉슨 18개 남았다는 뜻. ~~나이스~~ <br /> 하지만 다 따로 배워야하는 건 아니고, 5개의 새로운 아이디어만 배우면 되게끔 purrr을 디자인했다.
+map()의 주요 변형primary variants으로는 총 23개가 있다. <br /> 이 때까지 5개를 배웠고, (`map()`, `map_lgl()`, `map_int()`, `map_dbl()`, `map_chr()`) <br /> 이 말인즉슨 18개 남았다는 뜻. <br /> 하지만 다 따로 배워야하는 건 아니고, 5개의 새로운 아이디어만 배우면 되게끔 purrr을 디자인했다.
 
 -   output이 input과 같은 타입이 되도록, `modify()`
 -   2개의 inputs에 대해 iterate하도록, `map2()`

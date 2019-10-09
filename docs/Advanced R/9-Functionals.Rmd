@@ -125,18 +125,18 @@ C언어로 써서 성능을 조금이라도 더 짜냈고, 이름을 보존하�
 map_chr(mtcars, typeof)
 ```
 
-2. `map_lgl()`은 항상 logical vector를 return한다.
+2\. `map_lgl()`은 항상 logical vector를 return한다.
 ```{r collapse=TRUE}
 map_lgl(mtcars, is.double)
 ```
 
-3. `map_int()`은 항상 integer vector를 return한다.
+3\. `map_int()`은 항상 integer vector를 return한다.
 ```{r collapse=TRUE}
 n_unique <- function(x) length(unique(x))
 map_int(mtcars, n_unique)
 ```
 
-4. `map_dbl()`은 항상 double vector를 return한다.
+4\. `map_dbl()`은 항상 double vector를 return한다.
 ```{r collapse=TRUE}
 map_dbl(mtcars, mean)
 ```
@@ -371,7 +371,7 @@ map_dbl(trims, ~ mean(x, trim = .x))
 map_dbl(trims, function(trim) mean(x, trim = trim))
 ```
 
-2. 너무 알고 있는게 많아서, R의 flexible argument 매칭 룰을 사용할 수도 있다. <br />
+2\. 너무 알고 있는게 많아서, R의 flexible argument 매칭 룰을 사용할 수도 있다. <br />
 예를 들어, `mean(x, trim = 0.1)`을 `mean(0.1, x = x)`라고 쓸 수도 있는데, 이렇게 `map_dbl()`을 call할 수 있다.
 ```{r collapse=TRUE}
 map_dbl(trims, mean, x = x)
@@ -379,7 +379,7 @@ map_dbl(trims, mean, x = x)
 그런데 이 방법technique은 추천하지 않는다. <br />
 왜냐하면, 독자가 .f의 argument order와 R의 argument matching rules를 둘 다 이해하고 있다는 가정 하에 하는 것이기 때문.
 
-3. Section 9.4.5에서 배울 `pmap()`을 쓰는 방법도 있다.
+3\. Section 9.4.5에서 배울 `pmap()`을 쓰는 방법도 있다.
 
 ## 9.3 Purrr style
 더 많은 map 변형들variants을 탐구해보기 전에, <br />
@@ -443,7 +443,7 @@ for 루프문을 이용했을 때는 한 번 iterate
 ## 9.4 Map variants
 map()의 주요 변형primary variants으로는 총 23개가 있다. <br />
 이 때까지 5개를 배웠고, (`map()`, `map_lgl()`, `map_int()`, `map_dbl()`, `map_chr()`) <br />
-이 말인즉슨 18개 남았다는 뜻. ~~나이스~~ <br />
+이 말인즉슨 18개 남았다는 뜻. <br />
 하지만 다 따로 배워야하는 건 아니고, 5개의 새로운 아이디어만 배우면 되게끔 purrr을 디자인했다.
 
 - output이 input과 같은 타입이 되도록, `modify()`
@@ -464,3 +464,19 @@ column에 있는 아이디어를 이해하고 나면, row에 있는 것과 결�
 |     Two arguments     | `map2()`| `map2_lgl()`, ... | `modify2()`| `walk2()` |
 | One argument + index  | `imap()`| `imap_lgl()`, ... | `imodify()`| `iwalk()` |
 |     N arguments       | `pmap()`| `pmap_lgl()`, ... |     -      | `pwalk()` |
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
