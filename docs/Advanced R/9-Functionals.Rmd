@@ -159,7 +159,7 @@ purrr은, 접미사suffix만 봐도 output이 무엇이 될지를 알 수 있도
 `mtcars`는 데이터 프레임이고, 데이터 프레임은 같은 길이의 벡터들을 갖고 있는 리스트들이다. <br />
 data frames are lists containing vectors of the same length. <br />
 벡터 때와 마찬가지로 그림으로 그려서 표현해보면,
-![그림2](https://d33wubrfki0l68.cloudfront.net/12f6af8404d9723dff9cc665028a35f07759299d/d0d9a/diagrams/functionals/map-list.png)
+![그림2](https://d33wubrfki0l68.cloudfront.net/12f6af8404d9723dff9cc665028a35f07759299d/d0d9a/diagrams/functionals/map-list.png){ width=50% }
 
 모든 map 함수들은 input과 같은 길이를 갖는 output 벡터를 return해야한다. <br />
 이 말인즉슨, `.f`의 각 호출call이 single value를 return해야한다는 것이다. <br />
@@ -280,12 +280,12 @@ map_dbl(x, mean, na.rm = TRUE)
 
 그림을 보면 더 쉽게 이해가 가능하다. <br />
 `f` 다음에 나오는 어떠한 arguments건 간에, `map()`은 데이터에다가 `f()`를 하고, **그 다음에** 넣어준다. 
-![그림3](https://d33wubrfki0l68.cloudfront.net/e1b3536a7556aef348f546a79277125c419a5fdc/0c0a1/diagrams/functionals/map-arg.png)
+![그림3](https://d33wubrfki0l68.cloudfront.net/e1b3536a7556aef348f546a79277125c419a5fdc/0c0a1/diagrams/functionals/map-arg.png){ width=50% }
 
 중요한 점은, 이 패스되는 arguments들은 decompose되지 않는다는 것이다. <br />
 `map()`에서 첫 번째로 넣어지는 arguments들은 decompose되었는데, 패스되는 additional arguments들은 decompose안된다. <br />
 그림을 보고 제대로 이해하자. <br />
-![그림4](https://d33wubrfki0l68.cloudfront.net/a468c847ea8aca9a6131492e1e7431f418259eaf/ce4e0/diagrams/functionals/map-arg-recycle.png)
+![그림4](https://d33wubrfki0l68.cloudfront.net/a468c847ea8aca9a6131492e1e7431f418259eaf/ce4e0/diagrams/functionals/map-arg-recycle.png){ width=50% }
 
 additional arguments도 decompose되는 것은 Section 9.4.2와 Section 9.4.5에서 배울 것이다. map variants에서.
 
@@ -349,10 +349,10 @@ purrr 함수들은 이러한 충돌을, 흔히 사용하는 `x`, `f` 대신에 `
 <strong>base R에서는</strong> <br />
 <code>...</code>를 사용하는 base 함수들은, 이런 원치 않는 argument 매칭을 피하기 위해 여러가지 naming convention을 사용한다. <br />
 1. apply 함수들은 대부분 대문자를 사용함. ex) <code>X</code>, <code>FUN</code> <br />
-2. <code>transform()</code>는 좀 더 이국적인exotic 접두사prefix를 사용한다. <code>_</code> <br />
+2. <code>transform()</code>는 <code>_</code>라는 좀 더 이국적인exotic 접두사prefix를 사용한다. <br />
 이러면 이름이 더 비문법적non-syntatic이 되기 때문에, <code>`</code>로 감싸줘야한다. Section 2.2.1에서 나왔던대로. <br />
 이러면 원치않은 매칭이 일어날 일이 매우 줄어든다. <br />
-3. 다른 functionals들, `uniroot()`나 `optim()`은 충돌을 피하기 위한 아무런 노력도 하지 않지만, 특별히 만들어진 함수들을 사용하기 때문에, <br />
+3. 다른 functionals들, <code>uniroot()</code>나 <code>optim()</code>은 충돌을 피하기 위한 아무런 노력도 하지 않지만, 특별히 만들어진 함수들을 사용하기 때문에, <br />
 충돌이 일어날 일이 적다. 
 </p>
 
@@ -360,7 +360,7 @@ purrr 함수들은 이러한 충돌을, 흔히 사용하는 `x`, `f` 대신에 `
 이 때까지, map()의 첫 번째 argument는 항상 function의 첫 번째 argument가 되었다. <br />
 하지만, 만약에 첫 번째 argument는 일정constant하고, different argument가 변하기vary를 바란다면? <br />
 그림으로 따지자면 다음과 같이.
-![그림5](https://d33wubrfki0l68.cloudfront.net/6d0b927ba5266f886cc721ae090afcc5e872a748/f8636/diagrams/functionals/map-arg-flipped.png){: width="100" height="100"}
+![그림5](https://d33wubrfki0l68.cloudfront.net/6d0b927ba5266f886cc721ae090afcc5e872a748/f8636/diagrams/functionals/map-arg-flipped.png){ width=50% }
 
 직접적으로 하는 방법은 없다. 하지만 대신에, 2가지 트릭을 이용해 할 수 있다. <br />
 이 예를 좀 묘사illustrate해보자면, 좀 일반적이지 않은 그런 값들이 있는 벡터가 있고, <br />
@@ -547,7 +547,7 @@ ws를 additional arguments로 passing하는 걸로는 안 된다. <br />
 map_dbl(xs, weighted.mean, w = ws)
 ```
 그림으로 표현하자면, 이런 식으로.
-![그림6](https://d33wubrfki0l68.cloudfront.net/a468c847ea8aca9a6131492e1e7431f418259eaf/ce4e0/diagrams/functionals/map-arg-recycle.png)
+![그림6](https://d33wubrfki0l68.cloudfront.net/a468c847ea8aca9a6131492e1e7431f418259eaf/ce4e0/diagrams/functionals/map-arg-recycle.png){ width=50% }
 
 그래서, 이제는 새로운 툴이 필요하다: `map2()` 얘는 two arguments를 vectorised over한다. <br />
 이 말인즉슨, `.x`와 `.y` 둘 다 `.f`의 각 call에서 달라진다varied. <br />
@@ -557,14 +557,14 @@ This means both .x and .y are varied in each call to .f
 map2_dbl(xs, ws, weighted.mean)
 ```
 그림으로 표현하면, 이렇게.
-![그림7](https://d33wubrfki0l68.cloudfront.net/f5cddf51ec9c243a7c13732b0ce46b0868bf8a31/501a8/diagrams/functionals/map2.png)
+![그림7](https://d33wubrfki0l68.cloudfront.net/f5cddf51ec9c243a7c13732b0ce46b0868bf8a31/501a8/diagrams/functionals/map2.png){ width=50% }
 
 그리고 additional arguments도 그냥 똑같이 .f 다음에 넣어주면 된다.
 ```{r collapse=TRUE}
 map2_dbl(xs, ws, weighted.mean, na.rm = TRUE)
 ```
 그림으로 표현하면, 이렇게.
-![그림8](https://d33wubrfki0l68.cloudfront.net/7a545699ff7069a98329fcfbe6e42b734507eb16/211a5/diagrams/functionals/map2-arg.png)
+![그림8](https://d33wubrfki0l68.cloudfront.net/7a545699ff7069a98329fcfbe6e42b734507eb16/211a5/diagrams/functionals/map2-arg.png){ width=50% }
 
 `map2()`의 기본적인 implementation은 간단하고, `map()`의 implementation과 꽤나 비슷하다. <br />
 하나의 벡터로만 iterating over하는 것이 아니라, 2개를 병렬in parallel로 iterate한다.
@@ -619,12 +619,12 @@ walk(names, welcome)
 ```
 그림을 보면, `map()`과의 중요한 차이점을 캡쳐하려고 노력해놨다. <br />
 outputs는 ephemeral, input이 invisibly하게 return된다.
-![그림9](https://d33wubrfki0l68.cloudfront.net/d16783978b0d33756af9951ad3fba2596eb8e934/233ba/diagrams/functionals/walk.png)
+![그림9](https://d33wubrfki0l68.cloudfront.net/d16783978b0d33756af9951ad3fba2596eb8e934/233ba/diagrams/functionals/walk.png){ width=50% }
 
 `walk()`의 가장 유용한 변형variant은 `walk2()`다. <br />
 왜냐하면, 매우 흔한 side-effect는 무언가를 디스크에 저장하는 것. <br />
 그리고 무엇인가 저장할 때 항상 2개의 값이 필요하다. object랑, 저장할 경로. <br />
-![그림10](https://d33wubrfki0l68.cloudfront.net/19d5f7d265107c81dded3e98319d48ec01821308/b8621/diagrams/functionals/walk2.png)
+![그림10](https://d33wubrfki0l68.cloudfront.net/19d5f7d265107c81dded3e98319d48ec01821308/b8621/diagrams/functionals/walk2.png){ width=50% }
 
 예를 들어, 데이터 프레임들의 리스트를 가지고 있고, (여기서는 `split()`을 이용해서 만들었음) <br />
 &emsp;&emsp;&emsp;&emsp;각각을 separate CSV 파일로 저장하고 싶다고 하자. `walk2()`를 이용하면 쉽다.
@@ -684,7 +684,7 @@ imap_chr(x, ~ paste0("The highest value of ", .y, " is ", max(.x)))
 &emsp;&emsp;&emsp;&emsp;arguments가 몇 개이던간에, single list만 input으로 supply해주면 된다. <br />
 대부분의 케이스에, 같은 길이를 갖는 벡터들의 리스트. 즉, 데이터 프레임과 매우 유사할 것이다. <br />
 다음의 그림에 그 관계를 최대한 강조해보았다.
-![그림11](https://d33wubrfki0l68.cloudfront.net/e426c5755e2e65bdcc073d387775db79791f32fd/92902/diagrams/functionals/pmap.png)
+![그림11](https://d33wubrfki0l68.cloudfront.net/e426c5755e2e65bdcc073d387775db79791f32fd/92902/diagrams/functionals/pmap.png){ width=50% }
 
 그래서, `map2()`와 `pmap()`간의 간단한 equivalence가 성립한다. <br />
 `map2(x, y, f)`는 `pmap(list(x, y), f)`와 같은 것이다. 
@@ -699,7 +699,7 @@ pmap_dbl(list(xs, ws), weighted.mean)
 ```{r collapse=TRUE}
 pmap_dbl(list(xs, ws), weighted.mean, na.rm = TRUE)
 ```
-![그림12](https://d33wubrfki0l68.cloudfront.net/2eb2eefe34ad6d114da2a22df42deac8511b4788/5a538/diagrams/functionals/pmap-arg.png)
+![그림12](https://d33wubrfki0l68.cloudfront.net/2eb2eefe34ad6d114da2a22df42deac8511b4788/5a538/diagrams/functionals/pmap-arg.png){ width=50% }
 
 
 `pmap()`과 다른 map 함수들과의 가장 큰 차이점은, <br />
@@ -733,7 +733,7 @@ params <- tibble::tribble(
 
 pmap(params, runif)
 ```
-![그림13](https://d33wubrfki0l68.cloudfront.net/e698354d802ce16f83546db63c45a19b8d51f45e/43de7/diagrams/functionals/pmap-3.png)
+![그림13](https://d33wubrfki0l68.cloudfront.net/e698354d802ce16f83546db63c45a19b8d51f45e/43de7/diagrams/functionals/pmap-3.png){ width=50% }
 
 여기서, column names가 중요하다. `runif()`의 arguments를 맞춰주기 위해 신중하게 정했다. <br />
 그래서 `pmap(params, runif)`는, `runif(n = 1L, min = 0, max =1)`, `runif(n = 2L, min = 10, max =100)`, `runif(n = 3L, min = 100, max =1000)`와 같은 것임. <br />
@@ -760,7 +760,7 @@ map family 다음으로, 가장 중요한 함수 family는 reduce family다. <br
 reduce()는 길이 n짜리 벡터를 받고, 한 번에 한 쌍의 값들을 함수 호출해서, 길이 1짜리 벡터를 생산한다. <br />
 produces a vector of length 1 / by calling a function / with a pair of values / at a time. <br />
 즉, reduce(1:4, f)라고 하면, 이건 f(f(f(1, 2) ,3), 4) 와 같은 것임. <br />
-![그림14](https://d33wubrfki0l68.cloudfront.net/9c239e1227c69b7a2c9c2df234c21f3e1c74dd57/eec0e/diagrams/functionals/reduce.png)
+![그림14](https://d33wubrfki0l68.cloudfront.net/9c239e1227c69b7a2c9c2df234c21f3e1c74dd57/eec0e/diagrams/functionals/reduce.png){ width=50% }
 
 `reduce()`는, 2개의 inputs로 작동하는 함수를 generalise해서, <br />
 &emsp;&emsp;&emsp;&emsp;inputs의 개수가 any number이 될 수 있도록 하기에 좋은 방법.
@@ -797,7 +797,7 @@ reduce(l, union)
 map family와 같이, additional arguments를 패스해줄 수도 있다. <br />
 `intersect()`, `union()`은 extra arguments를 받지 않기 때문에 여기서 보여줄 수는 없지만, <br />
 원리는 단순하고 그림과 같이 나타내줄 수 있다.
-![그림15](https://d33wubrfki0l68.cloudfront.net/3f81c662fd1b426d7ce21e9369a10adcaa776272/f4809/diagrams/functionals/reduce-arg.png)
+![그림15](https://d33wubrfki0l68.cloudfront.net/3f81c662fd1b426d7ce21e9369a10adcaa776272/f4809/diagrams/functionals/reduce-arg.png){ width=50% }
 
 `reduce()`의 에센스는 for loop문에다가 simple wrapper을 한 것이다.
 ```{r}
@@ -851,7 +851,7 @@ reduce(integer(), `+`)
 
 `.init`이 여기서는 무엇이 되야하는가? <br />
 알아보기 위해서, `.init`이 주어졌을 때 무슨 일이 일어나는지 확인해보아야.
-![그림16](https://d33wubrfki0l68.cloudfront.net/b5835b80325b22f9460992f7bc9de5e0cf56de2c/27994/diagrams/functionals/reduce-init.png)
+![그림16](https://d33wubrfki0l68.cloudfront.net/b5835b80325b22f9460992f7bc9de5e0cf56de2c/27994/diagrams/functionals/reduce-init.png){ width=50% }
 그래서, `reduce(1, `+`, init)`이라고 하면, 결과물은 `1 + init`이 된다. <br />
 result는 1이어야하니깐, `.init`은 0이어야만 한다.
 ```{r collapse=TRUE}
@@ -885,8 +885,8 @@ input으로 넣는 vector 길이가 0이나 1일 때는, 항상 결과물이 무
 만약 `x`의 elements가 4개면, `f`는 3번만 불러질 것이다. <br />
 `init`을 supply했다면, `f`는 4번 불러질 것이다.
 
-![그림17](https://d33wubrfki0l68.cloudfront.net/53bacd82334446922156f4d326faf4eb1e24cf52/43d72/diagrams/functionals/reduce2.png)
-![그림18](https://d33wubrfki0l68.cloudfront.net/4ceabb280177b4e143d94670b8ef018f66a106ed/2fdc7/diagrams/functionals/reduce2-init.png)
+![그림17](https://d33wubrfki0l68.cloudfront.net/53bacd82334446922156f4d326faf4eb1e24cf52/43d72/diagrams/functionals/reduce2.png){ width=50% }
+![그림18](https://d33wubrfki0l68.cloudfront.net/4ceabb280177b4e143d94670b8ef018f66a106ed/2fdc7/diagrams/functionals/reduce2-init.png){ width=50% }
 
 도대체 뭘 할 때 쓸모있을지조차 예상이 안 가서 이해가 안 된다. 와닿지가 않는듯.
 
