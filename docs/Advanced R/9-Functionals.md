@@ -13,11 +13,11 @@
 ``` r
 randomise <- function(f) f(runif(1e3))
 randomise(mean)
-## [1] 0.4968411
+## [1] 0.4974015
 randomise(mean)
-## [1] 0.5131484
+## [1] 0.499224
 randomise(sum)
-## [1] 499.2769
+## [1] 518.7277
 ```
 
 이미 functional을 사용해봤을 수 있다. <br /> for 루프문을 대신하기 위해 base R의 `lapply()`, `apply()`나 `tapply()` 혹은 purrr의 `map()`을 써봤을거다. <br /> 혹은 수학적 functional인 `integrate()`나 `optim()`을 써봤을 수도 있다.
@@ -207,9 +207,9 @@ as_mapper(~ length(unique(.x)))
 x <- map(1:3, ~ runif(2))
 str(x)
 ## List of 3
-##  $ : num [1:2] 0.713 0.637
-##  $ : num [1:2] 0.695 0.222
-##  $ : num [1:2] 0.641 0.969
+##  $ : num [1:2] 0.93 0.329
+##  $ : num [1:2] 0.857 0.904
+##  $ : num [1:2] 0.5872 0.0372
 ```
 
 짧고 간단한 함수들에 사용할 걸 대비해 이 사용법을 익혀두자. <br /> 한 줄이 넘어갈 정도로 길어지거나 `{}`을 사용할 정도가 되면, name을 붙여줄 때가 된 것이다.
@@ -277,9 +277,9 @@ plus <- function(x, y) x + y
 
 x <- c(0, 0, 0, 0)
 map_dbl(x, plus, runif(1))
-## [1] 0.3368995 0.3368995 0.3368995 0.3368995
+## [1] 0.530865 0.530865 0.530865 0.530865
 map_dbl(x, ~ plus(.x, runif(1)))
-## [1] 0.05199222 0.44299649 0.94776442 0.79015540
+## [1] 0.9888639 0.6006016 0.5950579 0.2472748
 ```
 
 ### 9.2.4 Argument names
@@ -336,21 +336,21 @@ x <- rcauchy(1000)
 
 ``` r
 map_dbl(trims, ~ mean(x, trim = .x))
-## [1] 1.92455432 0.06520499 0.06677286 0.07662918
+## [1]  7.00752322 -0.08072479 -0.07157334 -0.05694937
 ```
 
 그런데 얘는 x와 .x를 둘 다 사용하고 있기 때문에, 헷갈린다. <br /> `~` 사용하는 걸 포기함으로써 좀 더 깔끔하게 만들 수 있다.
 
 ``` r
 map_dbl(trims, function(trim) mean(x, trim = trim))
-## [1] 1.92455432 0.06520499 0.06677286 0.07662918
+## [1]  7.00752322 -0.08072479 -0.07157334 -0.05694937
 ```
 
 2. 너무 알고 있는게 많아서, R의 flexible argument 매칭 룰을 사용할 수도 있다. <br /> 예를 들어, `mean(x, trim = 0.1)`을 `mean(0.1, x = x)`라고 쓸 수도 있는데, 이렇게 `map_dbl()`을 call할 수 있다.
 
 ``` r
 map_dbl(trims, mean, x = x)
-## [1] 1.92455432 0.06520499 0.06677286 0.07662918
+## [1]  7.00752322 -0.08072479 -0.07157334 -0.05694937
 ```
 
 그런데 이 방법technique은 추천하지 않는다. <br /> 왜냐하면, 독자가 .f의 argument order와 R의 argument matching rules를 둘 다 이해하고 있다는 가정 하에 하는 것이기 때문.
@@ -510,8 +510,8 @@ map\_dbl()을 사용해서 unweighted means를 구할 수는 있다.
 
 ``` r
 map_dbl(xs, mean)
-## [1]        NA 0.4227057 0.5836442 0.5590240 0.4846820 0.6629063 0.4239559
-## [8] 0.6004996
+## [1]        NA 0.5724354 0.4997709 0.6029285 0.6953671 0.4114356 0.5176773
+## [8] 0.5670982
 ```
 
 ws를 additional arguments로 passing하는 걸로는 안 된다. <br /> 왜냐하면 `.f` 뒤에 나오는 arguments는 transformed되지 않기 때문이다.
@@ -527,8 +527,8 @@ map_dbl(xs, weighted.mean, w = ws)
 
 ``` r
 map2_dbl(xs, ws, weighted.mean)
-## [1]        NA 0.4350005 0.5827378 0.5381789 0.4914782 0.6555599 0.4726504
-## [8] 0.6105837
+## [1]        NA 0.6252098 0.4845407 0.5860316 0.6884781 0.4439670 0.4699220
+## [8] 0.6104214
 ```
 
 그림으로 표현하면, 이렇게. ![그림7](https://d33wubrfki0l68.cloudfront.net/f5cddf51ec9c243a7c13732b0ce46b0868bf8a31/501a8/diagrams/functionals/map2.png)
@@ -537,8 +537,8 @@ map2_dbl(xs, ws, weighted.mean)
 
 ``` r
 map2_dbl(xs, ws, weighted.mean, na.rm = TRUE)
-## [1] 0.6283057 0.4350005 0.5827378 0.5381789 0.4914782 0.6555599 0.4726504
-## [8] 0.6105837
+## [1] 0.5122003 0.6252098 0.4845407 0.5860316 0.6884781 0.4439670 0.4699220
+## [8] 0.6104214
 ```
 
 그림으로 표현하면, 이렇게. ![그림8](https://d33wubrfki0l68.cloudfront.net/7a545699ff7069a98329fcfbe6e42b734507eb16/211a5/diagrams/functionals/map2-arg.png)
@@ -650,9 +650,9 @@ imap_chr(iris, ~ paste0("The first value of ", .y, " is ", .x[[1]]))
 ``` r
 x <- map(1:6, ~ sample(1000, 10))
 imap_chr(x, ~ paste0("The highest value of ", .y, " is ", max(.x)))
-## [1] "The highest value of 1 is 842" "The highest value of 2 is 905"
-## [3] "The highest value of 3 is 984" "The highest value of 4 is 930"
-## [5] "The highest value of 5 is 885" "The highest value of 6 is 954"
+## [1] "The highest value of 1 is 967" "The highest value of 2 is 974"
+## [3] "The highest value of 3 is 993" "The highest value of 4 is 978"
+## [5] "The highest value of 5 is 986" "The highest value of 6 is 871"
 ```
 
 `imap()`은, 벡터안에 있는 값들을, 포지션에 따라서 작업하고 싶을 때 유용한 helper이다. <br /> `imap()` is a useful helper if you want to work with the values in a vector / along with their positions.
@@ -667,16 +667,16 @@ imap_chr(x, ~ paste0("The highest value of ", .y, " is ", max(.x)))
 
 ``` r
 pmap_dbl(list(xs, ws), weighted.mean)
-## [1]        NA 0.4350005 0.5827378 0.5381789 0.4914782 0.6555599 0.4726504
-## [8] 0.6105837
+## [1]        NA 0.6252098 0.4845407 0.5860316 0.6884781 0.4439670 0.4699220
+## [8] 0.6104214
 ```
 
 이전과 마찬가지로, varying arguments는 `.f` 이전에 나와야 하고(이제는 리스트 안에 넣어줘야함), <br />     constant arguments는 `.f` 이후에 나와야 한다.
 
 ``` r
 pmap_dbl(list(xs, ws), weighted.mean, na.rm = TRUE)
-## [1] 0.6283057 0.4350005 0.5827378 0.5381789 0.4914782 0.6555599 0.4726504
-## [8] 0.6105837
+## [1] 0.5122003 0.6252098 0.4845407 0.5860316 0.6884781 0.4439670 0.4699220
+## [8] 0.6104214
 ```
 
 ![그림12](https://d33wubrfki0l68.cloudfront.net/2eb2eefe34ad6d114da2a22df42deac8511b4788/5a538/diagrams/functionals/pmap-arg.png)
@@ -687,7 +687,7 @@ pmap_dbl(list(xs, ws), weighted.mean, na.rm = TRUE)
 trim <- c(0, 0.1, 0.2, 0.5)
 x <- rcauchy(1000)
 pmap_dbl(list(trim = trims), mean, x = x)
-## [1] 0.21128284 0.01957171 0.05792318 0.10018180
+## [1]  5.682279139  0.024384245  0.009937322 -0.022592951
 ```
 
 리스트의 components에다가 이름을 붙이는 건 매우 좋은 습관이라고 생각을 한다. <br /> 왜냐하면 어떻게 함수가 호출되는지가how the function will be called 매우 명확해지기 때문.
@@ -706,13 +706,13 @@ params <- tibble::tribble(
 
 pmap(params, runif)
 ## [[1]]
-## [1] 0.631674
+## [1] 0.7995413
 ## 
 ## [[2]]
-## [1] 66.9655 70.7595
+## [1] 32.74467 79.36074
 ## 
 ## [[3]]
-## [1] 541.5582 639.2679 716.1808
+## [1] 834.7434 734.1085 709.9542
 ```
 
 ![그림13](https://d33wubrfki0l68.cloudfront.net/e698354d802ce16f83546db63c45a19b8d51f45e/43de7/diagrams/functionals/pmap-3.png)
@@ -724,3 +724,358 @@ pmap(params, runif)
 </p>
 9.5 Reduce family
 -----------------
+
+map family 다음으로, 가장 중요한 함수 family는 reduce family다. <br /> 이 family는 훨씬 작고, 2개의 main variants뿐이고, 훨씬 덜 사용되지만, powerful idea다. <br /> 이걸로 useful algebra를 효과적으로 다룰 수도 있고, <br />     매우 큰 데이터셋을 처리할 때 자주 쓰는, map-reduce 프레임워크를 할 수 있다.
+
+### 9.5.1 Basics
+
+reduce()는 길이 n짜리 벡터를 받고, 한 번에 한 쌍의 값들을 함수 호출해서, 길이 1짜리 벡터를 생산한다. <br /> produces a vector of length 1 / by calling a function / with a pair of values / at a time. <br /> 즉, reduce(1:4, f)라고 하면, 이건 f(f(f(1, 2) ,3), 4) 와 같은 것임. <br /> ![그림14](https://d33wubrfki0l68.cloudfront.net/9c239e1227c69b7a2c9c2df234c21f3e1c74dd57/eec0e/diagrams/functionals/reduce.png)
+
+`reduce()`는, 2개의 inputs로 작동하는 함수를 generalise해서, <br />     inputs의 개수가 any number이 될 수 있도록 하기에 좋은 방법.
+
+하나의 리스트에 여러 개의 numeric vector들이 있고, <br /> 모든 벡터들에 공통으로 있는 값을 찾고 싶다고 하자. <br /> 예를 가지고 해보면,
+
+``` r
+l <- map(1:4, ~ sample(1:10, 15, replace = T))
+str(l)
+## List of 4
+##  $ : int [1:15] 6 8 2 3 5 9 9 7 6 1 ...
+##  $ : int [1:15] 10 2 3 5 4 6 10 10 8 5 ...
+##  $ : int [1:15] 2 10 3 9 1 1 3 2 4 3 ...
+##  $ : int [1:15] 8 7 8 4 6 9 8 2 10 9 ...
+```
+
+이 문제를 해결하기 위해서는, `intersect()`가 반복적으로 필요하다.
+
+``` r
+out <- l[[1]]
+out <- intersect(out, l[[2]])
+out <- intersect(out, l[[3]])
+out <- intersect(out, l[[4]])
+out
+## [1]  8  2  5  9 10
+```
+
+근데 이걸 `reduce()`를 쓰면 한 번에 해낼 수 있다.
+
+``` r
+reduce(l, intersect)
+## [1]  8  2  5  9 10
+```
+
+그럼 리스트의 각 element에 한 번이라도 나타나는 값들을 알고 싶다면? <br /> 즉, 모든 벡터에 한 번이라도 나타나는 값들을 알고 싶다면?
+
+`intersect()` 대신에 `union()`을 쓰면 됨.
+
+``` r
+reduce(l, union)
+##  [1]  6  8  2  3  5  9  7  1 10  4
+```
+
+map family와 같이, additional arguments를 패스해줄 수도 있다. <br /> `intersect()`, `union()`은 extra arguments를 받지 않기 때문에 여기서 보여줄 수는 없지만, <br /> 원리는 단순하고 그림과 같이 나타내줄 수 있다. ![그림15](https://d33wubrfki0l68.cloudfront.net/3f81c662fd1b426d7ce21e9369a10adcaa776272/f4809/diagrams/functionals/reduce-arg.png)
+
+`reduce()`의 에센스는 for loop문에다가 simple wrapper을 한 것이다.
+
+``` r
+simple_reduce <- function(x, f) {
+    out <- x[[1]]
+    for (i in seq(2, length(x))) {
+        out <- f(out, x[[i]])
+    }
+    out
+}
+```
+
+<p class="comment">
+<strong>base R에서는</strong> <br /> <code>Reduce()</code>가 있는데, argument 순서를 다르게 받는다. <br /> 여기서는 함수 먼저 받고, 그 다음에 벡터를 받고. <br /> 그리고 이 함수는 additional arguments를 공급해줄 방법이 없다.
+</p>
+### 9.5.2 Accumulate
+
+`reduce()`의 첫 번째 변형variant은 `accumulate()`다. <br /> 어떻게 reduce가 작동하는지 이해하기에 유용한 것. <br /> 왜냐하면 단순히 최종 결과물final result를 돌려주는 대신, 중간중간 결과물들 또한 반환해주기 때문.
+
+``` r
+accumulate(l, intersect)
+## [[1]]
+##  [1]  6  8  2  3  5  9  9  7  6  1  3  8  2  7 10
+## 
+## [[2]]
+## [1]  6  8  2  3  5  9 10
+## 
+## [[3]]
+## [1]  8  2  3  5  9 10
+## 
+## [[4]]
+## [1]  8  2  5  9 10
+```
+
+sum()을 예로도 생각해보자면,
+
+``` r
+x <- c(4, 3, 10)
+reduce(x, `+`)
+## [1] 17
+
+accumulate(x, `+`)
+## [1]  4  7 17
+```
+
+### 9.5.3 Output types
+
+위의 `+`를 사용한 예에서, x가 길이 1이거나 0이면 `reduce()`는 무엇을 return 해야할까? <br /> additional arguments가 없다면, reduce()는 그냥 길이 1짜리 input을 그대로 return한다.
+
+``` r
+reduce(1, `+`)
+## [1] 1
+```
+
+이 말인즉슨, input이 유효한지 따질 방법이 없다는 것이기도 하다.
+
+``` r
+reduce("a", `+`)
+## [1] "a"
+```
+
+그럼 길이가 0이라면? `.init` argument를 이용하라는 에러를 얻게 된다.
+
+``` r
+reduce(integer(), `+`)
+```
+
+    ## Error: `.x` is empty, and no `.init` supplied
+
+`.init`이 여기서는 무엇이 되야하는가? <br /> 알아보기 위해서, `.init`이 주어졌을 때 무슨 일이 일어나는지 확인해보아야. ![그림16](https://d33wubrfki0l68.cloudfront.net/b5835b80325b22f9460992f7bc9de5e0cf56de2c/27994/diagrams/functionals/reduce-init.png) 그래서, `reduce(1,`+`, init)`이라고 하면, 결과물은 `1 + init`이 된다. <br /> result는 1이어야하니깐, `.init`은 0이어야만 한다.
+
+``` r
+reduce(integer(), `+`, .init = 0)
+## [1] 0
+```
+
+그리고 이걸로써 유효하지 않은 형식의 input을 넣었는지도 체크할 수가 있다.
+
+``` r
+reduce("a", `+`, .init = 0)
+```
+
+    ## Error in .x + .y: 이항연산자에 수치가 아닌 인수입니다
+
+0이 **identity** of the real numbers under the operation of addition. 항등원의 개념. <br /> R은 summary 함수들이, zero length input에 대해서, 어떤 값을 return해야되는지에 대해, 위와 같은 원리를 적용해줌
+
+``` r
+sum(integer()) # sum의 항등원은 0
+## [1] 0
+prod(integer()) # 곱의 항등원은 1
+## [1] 1
+min(integer()) # min의 항등원은 Inf
+## [1] Inf
+max(integer()) # max의 항등원은 -Inf
+## [1] -Inf
+```
+
+`reduce()`를, 함수 안에다가 쓸 때면, `.init`을 항상 supply해줘야한다. <br /> input으로 넣는 vector 길이가 0이나 1일 때는, 항상 결과물이 무엇이 되어야 하는지를 생각잘하고, 니 implementation을 테스트해봐라.
+
+### 9.5.4 Multiple inputs
+
+매우 가끔씩, 한 번에 2개의 arguments를 reducing하는 함수에다가 pass해줄 필요가 있다. <br /> 예를 들어, join together하고 싶은 데이터 프레임들의 리스트가 있다고 치자. <br /> 그리고 element의 변수 이름은 다 다르다고 치자.
+
+굉장히 특수한 케이스라서 너무 시간을 쓰게하고 싶지는 않은데, `reduce2()`가 있다는건 알아두자.
+
+`.init`이 supply되냐 아니냐에 따라 second argument의 길이가 달라진다. <br /> 만약 `x`의 elements가 4개면, `f`는 3번만 불러질 것이다. <br /> `init`을 supply했다면, `f`는 4번 불러질 것이다.
+
+![그림17](https://d33wubrfki0l68.cloudfront.net/53bacd82334446922156f4d326faf4eb1e24cf52/43d72/diagrams/functionals/reduce2.png) ![그림18](https://d33wubrfki0l68.cloudfront.net/4ceabb280177b4e143d94670b8ef018f66a106ed/2fdc7/diagrams/functionals/reduce2-init.png)
+
+도대체 뭘 할 때 쓸모있을지조차 예상이 안 가서 이해가 안 된다. 와닿지가 않는듯.
+
+### 9.5.5 Map-reduce
+
+Hadoop과 같은 기술을 만든 map-reduce에 대해 들어본 적이 있을 것이다. <br /> 이제 이 아이디어가 얼마나 간단하고 강력한지 알 수 있다. <br /> map-reduce는 reduce와 map을 결합시킨 것. <br /> 큰 데이터가 갖는 차이점은, 데이터가 여러 개의 컴퓨터에 걸쳐있다는 것이다. <br /> 각 컴퓨터가 데이터에 map을 실행하고, coordinator에게 결과물을 return. <br /> 그래서 각 결과물이 하나의 결과물로 reduce.
+
+간단한 예로, 엄청나게 큰 벡터의 평균을 계산하는 걸 상상해보자. <br /> 너무 커서 여러 개의 컴퓨터에 나누어서 저장되어 있음. <br /> 그럼 각 컴퓨터에게 sum과 length를 계산하게 한 다음, coordinator에게 return해주고, <br /> coordinator가 overall mean을 계산하게끔 할 수 있다.
+
+9.6 Predicate functionals
+-------------------------
+
+**predicate**라는 건 함수다. `TRUE`나 `FALSE`를 return하는 함수. `is.character()`, `is.null()`, `all()`과 같이. <br /> 그리고 predicate가 `TRUE`를 return하면, 벡터와 매치가 된다고 말을 한다.
+
+### 9.6.1 Basics
+
+**predicate functional**은 벡터의 각 element에다가 predicate를 적용한다. <br /> A predicate functional / applies a predicate / to each element of a vector.
+
+purrr은 3개의 쌍을 이루는, 총 6개의 유용한 함수들을 제공한다. <br /> purrr provides six useful functions / which come in three pairs.
+
+-   `some(.x, .p)`는 만약 하나의 element 매치가 있으면 `TRUE`, `every(.x, .p)`는 모든 elements 매치면 `TRUE` <br /> `some(.x, .p)` returns `TRUE` if any element matches; `every(.x, .p)` returns `TRUE` if all elements match.
+
+이것들은 `any(map_lgl(.x, .p))`와 `all(map_lgl(.x, .p))`과 비슷하다. 하지만 더 빨리 끝남. 계산이 더 빠름. <br /> `some()`은 처음 `TRUE`가 발견된 순간 `TRUE`를 return, `every()`는 처음 FALSE가 발견된 순간 FALSE를 return
+
+-   `detect(.x, .p)`은 첫 번째 매치의 **값value**를 return, `detect_index(.x, .p)`은 첫 번째 매치의 **location**을 return.
+
+-   `keep(.x, .p)`는 모든 matching elements를 **보존keep**함, `discard(.x, .p)`은 모든 matching elements를 **버림drops**.
+
+다음의 예는 위의 functionals를 데이터 프레임에 어떻게 이용할 수 있는지 보여준다.
+
+``` r
+df <- data.frame(x = 1:3, y = c("a", "b", "c"))
+detect(df, is.factor)
+## [1] a b c
+## Levels: a b c
+detect_index(df, is.factor)
+## [1] 2
+keep(df, is.factor)
+##   y
+## 1 a
+## 2 b
+## 3 c
+str(keep(df, is.factor))
+## 'data.frame':    3 obs. of  1 variable:
+##  $ y: Factor w/ 3 levels "a","b","c": 1 2 3
+discard(df, is.factor)
+##   x
+## 1 1
+## 2 2
+## 3 3
+str(discard(df, is.factor))
+## 'data.frame':    3 obs. of  1 variable:
+##  $ x: int  1 2 3
+```
+
+이렇게 keep이랑 discard는 원래의 데이터 구조, 데이터 프레임이라는 것도 남겨준다.
+
+### 9.6.2 Map variants
+
+map()과 modify()는 predicate functions를 받을 수 있는 변형variants들이 있다. <br /> .x의 elements를, .p가 TRUE일 때만, transforming하는 것임.
+
+``` r
+df <- data.frame(
+    num1 = c(0, 10, 20),
+    num2 = c(5, 6, 7),
+    chr1 = c("a", "b", "c"),
+    stringsAsFactors = FALSE
+)
+
+map_if(df, is.numeric, mean)
+## $num1
+## [1] 10
+## 
+## $num2
+## [1] 6
+## 
+## $chr1
+## [1] "a" "b" "c"
+
+modify_if(df, is.numeric, mean)
+##   num1 num2 chr1
+## 1   10    6    a
+## 2   10    6    b
+## 3   10    6    c
+
+map(keep(df, is.numeric), mean)
+## $num1
+## [1] 10
+## 
+## $num2
+## [1] 6
+```
+
+9.7 Base functionals
+--------------------
+
+이 chapter를 끝내기 전에, 중요한 base functionals의 survey를 소개해겠다. <br /> To finish up the chapter, here I provide a survey of important base functionals <br /> 얘네들은 map, reduce, predicate families가 아니고, purrr에 동등한 그런 것equivalent도 없다. <br /> 하지만 이게 중요하지 않다는 건 아니고, 수학적 혹은 통계학적 맛flavour이 있다. <br /> 그래서 data analysis에서는 덜 중요하다.
+
+### 9.7.1 Matrices and arrays
+
+`map()`과 그 friends는, 1차원 벡터를 다루는데 특화specialized되어 있다. <br /> `base::apply()`는 2차원 혹은 다차원 벡터들(matrices, arrays)을 다루는데 특화specialized되어 있다. <br /> `apply()`를 matrix나 array를, 각 row나 칼럼을 하나의 값으로 요약하는 operation이라고 생각할 수 있다. <br /> 이 것은 4개의 arguments를 가지고 있다. <br /> 1. `x`, 요약할 matrix나 array <br /> 2. `MARGIN`, integer vector, 어떤 dimension으로 요약할 건지, 1이면 rows로, 2이면 columns로. <br /> 3. `FUN`, 요약할 함수summary function <br /> 4. `...`, FUN에 전달할 다른 arguments <br />
+
+`apply()`의 전형적인 예는 다음과 같다.
+
+``` r
+a2d <- matrix(1:20, nrow = 5)
+a2d
+##      [,1] [,2] [,3] [,4]
+## [1,]    1    6   11   16
+## [2,]    2    7   12   17
+## [3,]    3    8   13   18
+## [4,]    4    9   14   19
+## [5,]    5   10   15   20
+apply(a2d, 1, mean)
+## [1]  8.5  9.5 10.5 11.5 12.5
+apply(a2d, 2, mean)
+## [1]  3  8 13 18
+```
+
+multiple dimensions를 MARGIN으로 특정specify할 수 있다. 다차원 array를 다룰 때 유용하다.
+
+``` r
+a3d <- array(1:24, c(2, 3, 4))
+apply(a3d, 1, mean)
+## [1] 12 13
+apply(a3d, c(1, 2), mean)
+##      [,1] [,2] [,3]
+## [1,]   10   12   14
+## [2,]   11   13   15
+```
+
+`apply()`를 이용하는데 있어 2개의 경고사항caveat이 있다.(3개인데?) <br /> 1. `base::sapply()`와 같이, output type을 control할 수는 없다. <br /> 자동적으로 list, matrix, vector로 단순화된다. <br /> 하지만, 보통 `apply()`를 numeric arrays, numeric summary function이랑 쓰기 때문에, <br />     `sapply()`보다는 이런 문제를 닥치게encounter 될 일은 없다.
+
+1.  `apply()`는 idempotent하지 않다. (idempotent - 몇 번의 계산을 해도 같은 결과가 나오는 것) <br /> identity operator를 summary function으로 써보면 알 수 있다. <br /> output이 input과 항상 같지 않다.
+
+``` r
+a1 <- apply(a2d, 1, identity)
+identical(a2d, a1)
+## [1] FALSE
+```
+
+``` r
+a2 <- apply(a2d, 2, identity)
+identical(a2d, a2)
+## [1] TRUE
+```
+
+1.  절대 `apply()`를 데이터 프레임에다가 쓰지마라. <br /> 항상 matrix로 강제 변환하고, 그래서 데이터 프레임에 숫자가 아닌 다른 것들이 있으면, 원치 않은 결과가 나오게 된다.
+
+``` r
+df <- data.frame(x = 1:3, y = c("a", "b", "c"))
+apply(df, 2, mean)
+## Warning in mean.default(newX[, i], ...): argument is not numeric or
+## logical: returning NA
+
+## Warning in mean.default(newX[, i], ...): argument is not numeric or
+## logical: returning NA
+##  x  y 
+## NA NA
+```
+
+### 9.7.2 Mathematical concerns
+
+수학에서 Functionals는 매우 흔하다. <br /> limit, maximum, roots(f(x) = 0이 되는 값들, solutions), definite integral 모두 functionals다. <br /> 함수가 주어지고, single number나 vector of numbers를 return한다.
+
+처음 딱 보기에는, 루프를 제거하는 주제와는 맞지 않다고 생각할 수 있는데, <br />     더 깊이 들어가보면 iteration을 수반involve한 알고리즘으로 implemented되었다.
+
+base R은 유용한 셋을 제공provide한다. <br /> 1. `integrate()`는 `f()`로 정의된 커브 아래의 area를 찾아준다. <br /> 2. `uniroot()`은 `f()`가 0이 되는 값을 찾아준다. <br /> 3. `optimise()`는 `f()`의 highest 혹은 lowest가 어디에 위치하는지, 그리고 그 값을 찾아준다.
+
+다음의 예는 어떻게 functionals가 단순한 함수`sin()`에 이용될 수 있는지를 보여준다.
+
+``` r
+integrate(sin, 0, pi)
+## 2 with absolute error < 2.2e-14
+```
+
+sin(0)에서 sin(pi)까지의 넓이.
+
+-의 개념도 있는듯. `integrate(sin, 0, 2 * pi)`하면 0이 나옴.
+
+``` r
+str(uniroot(sin, pi * c(1 / 2, 3 / 2)))
+## List of 5
+##  $ root      : num 3.14
+##  $ f.root    : num 1.22e-16
+##  $ iter      : int 2
+##  $ init.it   : int NA
+##  $ estim.prec: num 6.1e-05
+str(optimise(sin, c(0, 2 * pi)))
+## List of 2
+##  $ minimum  : num 4.71
+##  $ objective: num -1
+str(optimise(sin, c(0, pi), maximum = TRUE))
+## List of 2
+##  $ maximum  : num 1.57
+##  $ objective: num 1
+```
