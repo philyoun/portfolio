@@ -13,24 +13,26 @@
 ``` r
 randomise <- function(f) f(runif(1e3))
 randomise(mean)
-## [1] 0.4889273
+## [1] 0.5097569
 randomise(mean)
-## [1] 0.489791
+## [1] 0.4990879
 randomise(sum)
-## [1] 506.9031
+## [1] 510.0957
 ```
 
 이미 functional을 사용해봤을 수 있다. <br /> for 루프문을 대신하기 위해 base R의 `lapply()`, `apply()`나 `tapply()` 혹은 purrr의 `map()`을 써봤을거다. <br /> 혹은 수학적 functional인 `integrate()`나 `optim()`을 써봤을 수도 있다.
 
-functional을 주 용도는 for 루프문 대신해서 쓰는 것이다. <br /> for 루프는 많은 사람들이 느리다고 믿기 때문에, R에서 평판이 안 좋다. <br /> 하지만 for 루프의 진정한 단점은 for 루프가 매우 유연하다는 것이다. <br /> 루프를 사용하면 반복한다는 의도를 전달할 수 있지만, 그 결과물로 무엇을 해야하는지는 알려주지 않는다. <br /> a loop conveys that you’re iterating, but not what should be done with the results.
+functional을 주 용도는 for 루프를 대신해서 쓰는 것이다. <br /> for 루프는 많은 사람들이 느리다고 믿기 때문에, R에서 평판이 안 좋다. <br /> 하지만 for 루프의 진정한 단점은 for 루프가 너무 유연하다는 것이다. <br /> 루프를 사용하면 반복한다는 의도를 전달할 수 있지만, 그 결과물로 무엇을 해야하는지는 알려주지 않는다. <br /> a loop conveys that you’re iterating, but not what should be done with the results.
 
 `repeat` 대신에 `while`이, `while` 대신에는 `for`을 사용하는 것이 낫듯이,(Section 5.3.2) <br /> `for`대신에 functional을 사용하는 것이 낫다. <br /> 각 functional은 특정한 작업에 잘 맞추어져있기 때문에, functional을 보면 왜 쓰는지를 바로 볼 수 있다.
 
-만약에 니가 loop문에 익숙한 유저라면, functionals로 스위칭하는 것은 그냥 패턴 매칭 연습하는 것이다. <br /> for 루프를 보고, 알맞은 기본형 functional을 매치시키면 된다. <br /> 만약에 그런 것이 존재하지 않는다면, 이미 존재하는 functional을 변형해서 찾으려고 노력하지 마라. <br /> 그냥 for 루프로 남겨둬라!(만약에 같은 루프를 두 번 이상 반복해야 한다면, 자신의 functional을 쓸 생각도 해봐야 한다.)
+<details> <summary>Section 5.3.2 내용</summary> 어떠한 <code>for</code> 루프도 <code>while</code>로 쓸 수 있고, 어떠한 <code>while</code>도 <code>repeat</code>을 이용해서 쓸 수 있고. <br /> 하지만 역은 성립하지 않는다. <br /> 이 말은, <code>while</code>은 <code>for</code>보다 flexible하고, <code>repeat</code>은 <code>while</code>보다 flexible하다는 것. <br /> 하지만, 가장 flexible하지 않은 것을 이용하는 것이 좋은 습관이기 때문에, 가능하면 <code>for</code>문을 써야 한다. <br /> <br /> 그리고 더 일반적으로는, for문을 이용할 필요가 없다. <br /> 왜냐하면 map()이랑 apply()가 대부분의 문제들에 있어, 이미 less flexible한 솔루션을 제공하기 때문. <br /> </details>
+
+그래서 만약에 니가 loop에 익숙한 유저라면, functionals로 스위칭하는 것은 그냥 패턴 매칭 연습하는 것에 지나지 않는다. <br /> for 루프를 보고, 알맞은 기본형 functional을 매치시키면 된다. <br /> 만약에 그런 것이 존재하지 않는다면, 이미 존재하는 functional을 변형해서 찾으려고 노력하지 마라. <br /> 그냥 for 루프로 남겨둬라!(하지만, 만약에 같은 루프를 두 번 이상 반복해야 한다면, 자신의 functional을 쓸 생각도 해봐야 한다.)
 
 ### Prerequisites
 
-이 chapter에서는, purrr package에 있는 functional에 집중할 것이다. <br /> 일관적인 인터페이스를 갖고 있어서, base에 있는 것들보다 핵심 아이디어를 더 이해하기 쉽게 한다. <br /> 몇 년에 걸쳐 유기적으로 개발된 것이다. <br /> base R의 동일한 것들과, 앞으로도 비교대조하겠다. <br /> 그리고 purrr에는 없는 base functionals에 대한 논의로 chapter 마무리를 하겠다.
+이 chapter에서는, purrr package에 있는 functional에 집중할 것이다. <br /> 일관적인 인터페이스를 갖고 있어서, base에 있는 것들보다 핵심 아이디어를 더 이해하기 쉽게 한다. <br /> 몇 년에 걸쳐 유기적으로 개발된 것이다. <br /> base R의 동일한 것들equivalents과, 앞으로도 비교대조하겠다. <br /> 그리고 purrr에는 없는 base functionals에 대한 논의로 chapter 마무리를 하겠다.
 
 ``` r
 library(purrr)
@@ -39,7 +41,7 @@ library(purrr)
 9.2 My first functional: `map()`
 --------------------------------
 
-가장 기초적인 functional은 `purrr::map()`이다. <br /> a vector와 a function을 받고, 벡터의 각 element에 대해 함수를 호출한다. <br /> 그리고나서 결과물을 리스트로 return한다. <br /> 즉, `map(1:3, f)`는 `list(f(1), f(2), f(3))`과 같은 것이다.
+가장 기초적인 functional은 `purrr::map()`이다. <br /> ①a vector와 ②a function을 받고, 벡터의 각 element에 대해 함수를 호출한다. <br /> 그리고나서 결과물을 리스트로 return한다. <br /> 즉, `map(1:3, f)`는 `list(f(1), f(2), f(3))`과 같은 것이다.
 
 ``` r
 triple <- function(x) x * 3
@@ -54,7 +56,7 @@ map(1:3, triple)
 ## [1] 9
 ```
 
-시각적으로 나타내면, ![그림1](https://d33wubrfki0l68.cloudfront.net/f0494d020aa517ae7b1011cea4c4a9f21702df8b/2577b/diagrams/functionals/map.png)
+시각적으로 나타내면, ![그림1](https://d33wubrfki0l68.cloudfront.net/f0494d020aa517ae7b1011cea4c4a9f21702df8b/2577b/diagrams/functionals/map.png){: width="100" height="100"}
 
 <style>
 p.comment {
@@ -66,7 +68,7 @@ border-radius: 5px;
 }
 </style>
 <p class="comment">
-왜 이 함수를 <code>map()</code>이라고 할까? <br /> 지도가 아니라 수학적인 map, "given set의 각 element를, 두 번째 set의 하나 혹은 이상의 elements로 association시키는 연산operation"이라는 뜻에서 <code>map()</code>이라고 부르는 것이다. <br /> (그리고 "Map"이라는 단어는 스펠링이 짧아서 기초적인 building block이 되기에 좋다.)
+왜 이 함수를 <code>map()</code>이라고 할까? <br /> 지도가 아니라 수학적인 map, "given set의 각 element를, 두 번째 set의 하나 혹은 이상의 elements로 association시키는 연산operation"이라는 뜻에서 <code>map()</code>이라고 부르는 것이다. <br /> (그리고 "Map"이라는 단어는 스펠링이 짧아서 기초적인 building block이 되기에 좋다.) <br /> 선형대수 이상만 배웠어도 map이라는 단어가 이상할게 전혀 없다...
 </p>
 `map()`의 implementation은 꽤나 간단하다. <br /> input과 같은 길이의 리스트를 만들어놓고, 리스트의 각각을 for 루프를 사용해서 채운다. <br /> implementation의 핵심은 코드 몇 줄 되지 않는다.
 
@@ -83,7 +85,7 @@ simple_map <- function(x, f, ...) {
 실제 `purrr::map()`은 이렇게 만들어지진 않았다. 몇 가지 차이점이 있다. <br /> C언어로 써서 성능을 조금이라도 더 짜냈고, 이름을 보존하고, Section 9.2.2에서 배울 몇 가지 shorcuts들을 지원한다.
 
 <p class="comment">
-<code>map()</code>과 동등한 base 함수는 <code>lapply()</code>다. <br /> 유일한 차이는 <code>lapply()</code>는 밑에서 배우게 될 helpers를 지원하지 않는다는 것이다. <br /> 그래서 만약에 purrr에서 <code>map()</code>만 쓸 것이라면, 추가적인 의존성additional dependency를 스킵하고 <code>lapply()</code>를 쓰면 된다.
+<strong>base R에서는</strong> <br /> <code>map()</code>과 동등한 base 함수는 <code>lapply()</code>다. <br /> 유일한 차이는 <code>lapply()</code>는 밑에서 배우게 될 helpers를 지원하지 않는다는 것이다. <br /> 그래서 만약에 purrr에서 <code>map()</code>만 쓸 것이라면, 추가적인 의존성additional dependency를 스킵하고 <code>lapply()</code>를 쓰면 된다.
 </p>
 ### 9.2.1 Producing atomic vectors
 
@@ -207,9 +209,9 @@ as_mapper(~ length(unique(.x)))
 x <- map(1:3, ~ runif(2))
 str(x)
 ## List of 3
-##  $ : num [1:2] 0.0223 0.7066
-##  $ : num [1:2] 0.495 0.552
-##  $ : num [1:2] 0.969 0.708
+##  $ : num [1:2] 0.476 0.944
+##  $ : num [1:2] 0.297 0.197
+##  $ : num [1:2] 0.861 0.896
 ```
 
 짧고 간단한 함수들에 사용할 걸 대비해 이 사용법을 익혀두자. <br /> 한 줄이 넘어갈 정도로 길어지거나 `{}`을 사용할 정도가 되면, name을 붙여줄 때가 된 것이다.
@@ -277,9 +279,9 @@ plus <- function(x, y) x + y
 
 x <- c(0, 0, 0, 0)
 map_dbl(x, plus, runif(1))
-## [1] 0.8441357 0.8441357 0.8441357 0.8441357
+## [1] 0.4001585 0.4001585 0.4001585 0.4001585
 map_dbl(x, ~ plus(.x, runif(1)))
-## [1] 0.03506259 0.38196867 0.71835723 0.37133646
+## [1] 0.8726152 0.1496057 0.4009096 0.5929702
 ```
 
 ### 9.2.4 Argument names
@@ -323,7 +325,7 @@ purrr 함수들은 이러한 충돌을, 흔히 사용하는 `x`, `f` 대신에 `
 </p>
 ### 9.2.5 Varying another argument
 
-이 때까지, map()의 첫 번째 argument는 항상 function의 첫 번째 argument가 되었다. <br /> 하지만, 만약에 첫 번째 argument는 일정constant하고, different argument가 변하기vary를 바란다면? <br /> 그림으로 따지자면 다음과 같이. ![그림5](https://d33wubrfki0l68.cloudfront.net/6d0b927ba5266f886cc721ae090afcc5e872a748/f8636/diagrams/functionals/map-arg-flipped.png "width:30px")
+이 때까지, map()의 첫 번째 argument는 항상 function의 첫 번째 argument가 되었다. <br /> 하지만, 만약에 첫 번째 argument는 일정constant하고, different argument가 변하기vary를 바란다면? <br /> 그림으로 따지자면 다음과 같이. ![그림5](https://d33wubrfki0l68.cloudfront.net/6d0b927ba5266f886cc721ae090afcc5e872a748/f8636/diagrams/functionals/map-arg-flipped.png){: width="100" height="100"}
 
 직접적으로 하는 방법은 없다. 하지만 대신에, 2가지 트릭을 이용해 할 수 있다. <br /> 이 예를 좀 묘사illustrate해보자면, 좀 일반적이지 않은 그런 값들이 있는 벡터가 있고, <br />     mean을 구하는데 있어, triming에다가 다른 값들을 넣어 탐구를 해보고 싶다치자. <br /> 이 경우에, `mean()`의 first argument는 일정하고constant, `trim`이라는 second argument가 vary하기를 원하는 거다.
 
@@ -336,21 +338,21 @@ x <- rcauchy(1000)
 
 ``` r
 map_dbl(trims, ~ mean(x, trim = .x))
-## [1] -7.24640036  0.05732821  0.05482457  0.03404175
+## [1]  1.131620285 -0.032639775  0.007480817  0.021323040
 ```
 
 그런데 얘는 x와 .x를 둘 다 사용하고 있기 때문에, 헷갈린다. <br /> `~` 사용하는 걸 포기함으로써 좀 더 깔끔하게 만들 수 있다.
 
 ``` r
 map_dbl(trims, function(trim) mean(x, trim = trim))
-## [1] -7.24640036  0.05732821  0.05482457  0.03404175
+## [1]  1.131620285 -0.032639775  0.007480817  0.021323040
 ```
 
 2. 너무 알고 있는게 많아서, R의 flexible argument 매칭 룰을 사용할 수도 있다. <br /> 예를 들어, `mean(x, trim = 0.1)`을 `mean(0.1, x = x)`라고 쓸 수도 있는데, 이렇게 `map_dbl()`을 call할 수 있다.
 
 ``` r
 map_dbl(trims, mean, x = x)
-## [1] -7.24640036  0.05732821  0.05482457  0.03404175
+## [1]  1.131620285 -0.032639775  0.007480817  0.021323040
 ```
 
 그런데 이 방법technique은 추천하지 않는다. <br /> 왜냐하면, 독자가 .f의 argument order와 R의 argument matching rules를 둘 다 이해하고 있다는 가정 하에 하는 것이기 때문.
