@@ -13,11 +13,11 @@
 ``` r
 randomise <- function(f) f(runif(1e3))
 randomise(mean)
-## [1] 0.5097569
+## [1] 0.4968057
 randomise(mean)
-## [1] 0.4990879
+## [1] 0.493616
 randomise(sum)
-## [1] 510.0957
+## [1] 489.5526
 ```
 
 이미 functional을 사용해봤을 수 있다. <br /> for 루프문을 대신하기 위해 base R의 `lapply()`, `apply()`나 `tapply()` 혹은 purrr의 `map()`을 써봤을거다. <br /> 혹은 수학적 functional인 `integrate()`나 `optim()`을 써봤을 수도 있다.
@@ -26,9 +26,7 @@ functional을 주 용도는 for 루프를 대신해서 쓰는 것이다. <br /> 
 
 `repeat` 대신에 `while`이, `while` 대신에는 `for`을 사용하는 것이 낫듯이,(Section 5.3.2) <br /> `for`대신에 functional을 사용하는 것이 낫다. <br /> 각 functional은 특정한 작업에 잘 맞추어져있기 때문에, functional을 보면 왜 쓰는지를 바로 볼 수 있다.
 
-<details> <summary>Section 5.3.2 내용</summary> 어떠한 <code>for</code> 루프도 <code>while</code>로 쓸 수 있고, 어떠한 <code>while</code>도 <code>repeat</code>을 이용해서 쓸 수 있고. <br /> 하지만 역은 성립하지 않는다. <br /> 이 말은, <code>while</code>은 <code>for</code>보다 flexible하고, <code>repeat</code>은 <code>while</code>보다 flexible하다는 것. <br /> 하지만, 가장 flexible하지 않은 것을 이용하는 것이 좋은 습관이기 때문에, 가능하면 <code>for</code>문을 써야 한다. <br /> <br /> 그리고 더 일반적으로는, for문을 이용할 필요가 없다. <br /> 왜냐하면 map()이랑 apply()가 대부분의 문제들에 있어, 이미 less flexible한 솔루션을 제공하기 때문. <br /> </details>
-
-그래서 만약에 니가 loop에 익숙한 유저라면, functionals로 스위칭하는 것은 그냥 패턴 매칭 연습하는 것에 지나지 않는다. <br /> for 루프를 보고, 알맞은 기본형 functional을 매치시키면 된다. <br /> 만약에 그런 것이 존재하지 않는다면, 이미 존재하는 functional을 변형해서 찾으려고 노력하지 마라. <br /> 그냥 for 루프로 남겨둬라!(하지만, 만약에 같은 루프를 두 번 이상 반복해야 한다면, 자신의 functional을 쓸 생각도 해봐야 한다.)
+<details> <summary>Section 5.3.2 내용</summary> 어떠한 <code>for</code> 루프도 <code>while</code>로 쓸 수 있고, 어떠한 <code>while</code>도 <code>repeat</code>을 이용해서 쓸 수 있고. <br /> 하지만 역은 성립하지 않는다. <br /> 이 말은, <code>while</code>은 <code>for</code>보다 flexible하고, <code>repeat</code>은 <code>while</code>보다 flexible하다는 것. <br /> 하지만, 가장 flexible하지 않은 것을 이용하는 것이 좋은 습관이기 때문에, 가능하면 <code>for</code>문을 써야 한다. <br /> <br /> 그리고 더 일반적으로는, for문을 이용할 필요가 없다. <br /> 왜냐하면 map()이랑 apply()가 대부분의 문제들에 있어, 이미 less flexible한 솔루션을 제공하기 때문. <br /> </details> <br /> <br /> 그래서 만약에 니가 loop에 익숙한 유저라면, functionals로 스위칭하는 것은 그냥 패턴 매칭 연습하는 것에 지나지 않는다. <br /> for 루프를 보고, 알맞은 기본형 functional을 매치시키면 된다. <br /> 만약에 그런 것이 존재하지 않는다면, 이미 존재하는 functional을 변형해서 찾으려고 노력하지 마라. <br /> 그냥 for 루프로 남겨둬라!(하지만, 만약에 같은 루프를 두 번 이상 반복해야 한다면, 자신의 functional을 쓸 생각도 해봐야 한다.)
 
 ### Prerequisites
 
@@ -56,7 +54,7 @@ map(1:3, triple)
 ## [1] 9
 ```
 
-시각적으로 나타내면, ![그림1](https://d33wubrfki0l68.cloudfront.net/f0494d020aa517ae7b1011cea4c4a9f21702df8b/2577b/diagrams/functionals/map.png){: width="100" height="100"}
+시각적으로 나타내면, ![그림1](https://d33wubrfki0l68.cloudfront.net/f0494d020aa517ae7b1011cea4c4a9f21702df8b/2577b/diagrams/functionals/map.png){: width="50" height="100"}
 
 <style>
 p.comment {
@@ -68,7 +66,7 @@ border-radius: 5px;
 }
 </style>
 <p class="comment">
-왜 이 함수를 <code>map()</code>이라고 할까? <br /> 지도가 아니라 수학적인 map, "given set의 각 element를, 두 번째 set의 하나 혹은 이상의 elements로 association시키는 연산operation"이라는 뜻에서 <code>map()</code>이라고 부르는 것이다. <br /> (그리고 "Map"이라는 단어는 스펠링이 짧아서 기초적인 building block이 되기에 좋다.) <br /> 선형대수 이상만 배웠어도 map이라는 단어가 이상할게 전혀 없다...
+왜 이 함수를 <code>map()</code>이라고 할까? <br /> 지도가 아니라 수학적인 map, "given set의 각 element를, 두 번째 set의 하나 혹은 이상의 elements로 association시키는 연산operation"이라는 뜻에서 <code>map()</code>이라고 부르는 것이다. <br /> (그리고 "Map"이라는 단어는 스펠링이 짧아서 기초적인 building block이 되기에 좋다.) <br />
 </p>
 `map()`의 implementation은 꽤나 간단하다. <br /> input과 같은 길이의 리스트를 만들어놓고, 리스트의 각각을 for 루프를 사용해서 채운다. <br /> implementation의 핵심은 코드 몇 줄 되지 않는다.
 
@@ -93,7 +91,7 @@ simple_map <- function(x, f, ...) {
 
 그런데 더 간단한 데이터 구조data structure가 가능한데 꼭 리스트를 return하게 하는 것은 불편. <br /> 그렇기 때문에 4가지의 더 특정한 변형들이 있다. `map_lgl()`, `map_int()`, `map_dbl()`, `map_chr()` <br /> 각각은 특정화된specified 타입의 벡터를 return해준다.
 
-1.  `map_chr()`은 항상 character vector를 return한다.
+1. `map_chr()`은 항상 character vector를 return한다.
 
 ``` r
 map_chr(mtcars, typeof)
@@ -132,7 +130,7 @@ map_dbl(mtcars, mean)
 
 purrr은, 접미사suffix만 봐도 output이 무엇이 될지를 알 수 있도록 했다. <br /> `_dbl`이면 double vector가 output이겠구나! 하게끔.
 
-모든 `map_*()`함수들은 어떠한 타입의 벡터든 input으로 받을 수 있다. <br /> `mtcars`는 데이터 프레임이고, 데이터 프레임은 같은 길이의 벡터들을 갖고 있는 리스트들이다. <br /> 벡터 때와 마찬가지로 그림으로 그려서 표현해보면, ![그림2](https://d33wubrfki0l68.cloudfront.net/12f6af8404d9723dff9cc665028a35f07759299d/d0d9a/diagrams/functionals/map-list.png)
+모든 `map_*()`함수들은 어떠한 타입의 벡터든 input으로 받을 수 있다. <br /> `mtcars`는 데이터 프레임이고, 데이터 프레임은 같은 길이의 벡터들을 갖고 있는 리스트들이다. <br /> data frames are lists containing vectors of the same length. <br /> 벡터 때와 마찬가지로 그림으로 그려서 표현해보면, ![그림2](https://d33wubrfki0l68.cloudfront.net/12f6af8404d9723dff9cc665028a35f07759299d/d0d9a/diagrams/functionals/map-list.png)
 
 모든 map 함수들은 input과 같은 길이를 갖는 output 벡터를 return해야한다. <br /> 이 말인즉슨, `.f`의 각 호출call이 single value를 return해야한다는 것이다. <br /> 만약 그렇지 않다면, 에러가 나온다.
 
@@ -209,9 +207,9 @@ as_mapper(~ length(unique(.x)))
 x <- map(1:3, ~ runif(2))
 str(x)
 ## List of 3
-##  $ : num [1:2] 0.476 0.944
-##  $ : num [1:2] 0.297 0.197
-##  $ : num [1:2] 0.861 0.896
+##  $ : num [1:2] 0.74 0.734
+##  $ : num [1:2] 0.248 0.901
+##  $ : num [1:2] 0.295 0.463
 ```
 
 짧고 간단한 함수들에 사용할 걸 대비해 이 사용법을 익혀두자. <br /> 한 줄이 넘어갈 정도로 길어지거나 `{}`을 사용할 정도가 되면, name을 붙여줄 때가 된 것이다.
@@ -279,9 +277,9 @@ plus <- function(x, y) x + y
 
 x <- c(0, 0, 0, 0)
 map_dbl(x, plus, runif(1))
-## [1] 0.4001585 0.4001585 0.4001585 0.4001585
+## [1] 0.5117205 0.5117205 0.5117205 0.5117205
 map_dbl(x, ~ plus(.x, runif(1)))
-## [1] 0.8726152 0.1496057 0.4009096 0.5929702
+## [1] 0.4781154 0.9901910 0.1065084 0.6169206
 ```
 
 ### 9.2.4 Argument names
@@ -338,21 +336,21 @@ x <- rcauchy(1000)
 
 ``` r
 map_dbl(trims, ~ mean(x, trim = .x))
-## [1]  1.131620285 -0.032639775  0.007480817  0.021323040
+## [1] 1.43422386 0.12686480 0.10414932 0.06840608
 ```
 
 그런데 얘는 x와 .x를 둘 다 사용하고 있기 때문에, 헷갈린다. <br /> `~` 사용하는 걸 포기함으로써 좀 더 깔끔하게 만들 수 있다.
 
 ``` r
 map_dbl(trims, function(trim) mean(x, trim = trim))
-## [1]  1.131620285 -0.032639775  0.007480817  0.021323040
+## [1] 1.43422386 0.12686480 0.10414932 0.06840608
 ```
 
 2. 너무 알고 있는게 많아서, R의 flexible argument 매칭 룰을 사용할 수도 있다. <br /> 예를 들어, `mean(x, trim = 0.1)`을 `mean(0.1, x = x)`라고 쓸 수도 있는데, 이렇게 `map_dbl()`을 call할 수 있다.
 
 ``` r
 map_dbl(trims, mean, x = x)
-## [1]  1.131620285 -0.032639775  0.007480817  0.021323040
+## [1] 1.43422386 0.12686480 0.10414932 0.06840608
 ```
 
 그런데 이 방법technique은 추천하지 않는다. <br /> 왜냐하면, 독자가 .f의 argument order와 R의 argument matching rules를 둘 다 이해하고 있다는 가정 하에 하는 것이기 때문.

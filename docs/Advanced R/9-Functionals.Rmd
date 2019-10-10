@@ -53,8 +53,8 @@ a loop conveys that you’re iterating, but not what should be done with the res
  <br />
 그리고 더 일반적으로는, for문을 이용할 필요가 없다. <br />
 왜냐하면 map()이랑 apply()가 대부분의 문제들에 있어, 이미 less flexible한 솔루션을 제공하기 때문. <br />
-</details>
-
+</details> <br />
+ <br />
 그래서 만약에 니가 loop에 익숙한 유저라면, functionals로 스위칭하는 것은 그냥 패턴 매칭 연습하는 것에 지나지 않는다. <br />
 for 루프를 보고, 알맞은 기본형 functional을 매치시키면 된다. <br />
 만약에 그런 것이 존재하지 않는다면, 이미 존재하는 functional을 변형해서 찾으려고 노력하지 마라. <br />
@@ -82,7 +82,7 @@ map(1:3, triple)
 ```
 
 시각적으로 나타내면, 
-![그림1](https://d33wubrfki0l68.cloudfront.net/f0494d020aa517ae7b1011cea4c4a9f21702df8b/2577b/diagrams/functionals/map.png){: width="100" height="100"}
+![그림1](https://d33wubrfki0l68.cloudfront.net/f0494d020aa517ae7b1011cea4c4a9f21702df8b/2577b/diagrams/functionals/map.png){: width="50" height="100"}
 
 <style>
 p.comment {
@@ -98,7 +98,6 @@ border-radius: 5px;
 왜 이 함수를 <code>map()</code>이라고 할까? <br />
 지도가 아니라 수학적인 map, "given set의 각 element를, 두 번째 set의 하나 혹은 이상의 elements로 association시키는 연산operation"이라는 뜻에서 <code>map()</code>이라고 부르는 것이다. <br />
 (그리고 "Map"이라는 단어는 스펠링이 짧아서 기초적인 building block이 되기에 좋다.) <br />
-선형대수 이상만 배웠어도 map이라는 단어가 이상할게 전혀 없다...
 </p>
 
 `map()`의 implementation은 꽤나 간단하다. <br />
@@ -132,7 +131,7 @@ C언어로 써서 성능을 조금이라도 더 짜냈고, 이름을 보존하�
 그렇기 때문에 4가지의 더 특정한 변형들이 있다. `map_lgl()`, `map_int()`, `map_dbl()`, `map_chr()` <br />
 각각은 특정화된specified 타입의 벡터를 return해준다.
 
-1. `map_chr()`은 항상 character vector를 return한다.
+1\. `map_chr()`은 항상 character vector를 return한다.
 ```{r collapse=TRUE}
 map_chr(mtcars, typeof)
 ```
@@ -158,6 +157,7 @@ purrr은, 접미사suffix만 봐도 output이 무엇이 될지를 알 수 있도
 
 모든 `map_*()`함수들은 어떠한 타입의 벡터든 input으로 받을 수 있다. <br />
 `mtcars`는 데이터 프레임이고, 데이터 프레임은 같은 길이의 벡터들을 갖고 있는 리스트들이다. <br />
+data frames are lists containing vectors of the same length. <br />
 벡터 때와 마찬가지로 그림으로 그려서 표현해보면,
 ![그림2](https://d33wubrfki0l68.cloudfront.net/12f6af8404d9723dff9cc665028a35f07759299d/d0d9a/diagrams/functionals/map-list.png)
 
