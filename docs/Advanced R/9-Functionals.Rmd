@@ -82,7 +82,7 @@ map(1:3, triple)
 ```
 
 시각적으로 나타내면, 
-![그림1](https://d33wubrfki0l68.cloudfront.net/f0494d020aa517ae7b1011cea4c4a9f21702df8b/2577b/diagrams/functionals/map.png){: width="50" height="100"}
+![그림1](https://d33wubrfki0l68.cloudfront.net/f0494d020aa517ae7b1011cea4c4a9f21702df8b/2577b/diagrams/functionals/map.png){ width=50% }
 
 <style>
 p.comment {
@@ -479,10 +479,278 @@ column에 있는 아이디어를 이해하고 나면, row에 있는 것과 결�
 
 
 
+### 9.4.1 Same type of output as input: `modify()`
+
+이 때까지 했던 `map()`은 리스트를 return했었음. <br />
+`map_*()`들은 접미사suffix에 따라 output이 어떤 타입일지 예상이 가능했었고. <br />
+그런데 이제는 input과 같은 type의 output을 가지고 싶을 때. 예를 들어보자.
+
+데이터 프레임이 있는데, 모든 칼럼을 2배하고 싶다치자. <br />
+했던대로 `map()`을 쓰면, 얘는 항상 리스트로 return을 한다.
+```{r collapse=TRUE}
+df <- data.frame(
+  x = 1:3,
+  y = 6:4
+)
+
+map(df, ~ .x * 2)
+```
+
+output도 여전히 데이터 프레임으로 유지keep하고 싶다면, `modify()`를 사용하는 것. <br />
+항상 input과 같은 타입의 output을 return한다.
+```{r collapse=TRUE}
+modify(df, ~.x * 2)
+```
+
+이름과는 달리, 데이터를 수정하지는 않음. modified copy를 return한다는 뜻. <br />
+그러니깐 따로 저장해줘야 한다는 것. <br />
+현재 것을 진짜로 modify하고 싶다면 assign해야한다.
+
+이전의 `map()`과 같이, `modify()`의 implementation도 간단하다. <br />
+사실 `map()`보다 쉽다. <br />
+왜냐하면 새로운 output vector를 만들 필요도 없이, input을 replace하면 되기 때문이다. <br />
+(실제 코드는 예외적인 경우들을 우아하게 다루기 위해, 좀 더 복잡하다.)
+```{r collapse=TRUE}
+simple_modify <- function(x, f, ...) {
+	for ( i in seq_along(x)) {
+		x[[i]] <- f(x[[i]], ...)
+	}
+	x
+}
+```
+
+Section 9.6.2에서, `modify()`의 매우 유용한 변형variant인 `modify_if()`를 배울 것이다. <br />
+이건 데이터 프레임의 numeric 칼럼만 정해서 2배 할 수 있게 해준다.
+```{r collapse=TRUE}
+modify_if(df, is.numeric, ~ .x * 2)
+```
+
+### 9.4.2 Two inputs: `map2()` and friends
+`map()`은 single argument인 `.x`에 대해 vectorised over한다. <br />
+즉, `.f`가 호출될 때마다 오직 `.x`만이 달라지고 있고, 다른 pass along되는 arguments들은 바뀌지 않는다. <br />
+그래서 몇몇 문제에 관해서는 별로 잘 안된다. <br />
+예를 들어서, 관측치들의 리스트에 대해서, weights의 리스트가 따로 있어 weighted mean을 구하고 싶으면?
+```{r collapse=TRUE}
+xs <- map(1:8, ~ runif(10))
+xs[[1]][[1]] <- NA
+ws <- map(1:8, ~ rpois(10, 5) + 1)
+```
+
+map_dbl()을 사용해서 unweighted means를 구할 수는 있다.
+```{r collapse=TRUE}
+map_dbl(xs, mean)
+```
+
+ws를 additional arguments로 passing하는 걸로는 안 된다. <br />
+왜냐하면 `.f` 뒤에 나오는 arguments는 transformed되지 않기 때문이다.
+```{r error=TRUE, collapse=TRUE}
+map_dbl(xs, weighted.mean, w = ws)
+```
+그림으로 표현하자면, 이런 식으로.
+![그림6](https://d33wubrfki0l68.cloudfront.net/a468c847ea8aca9a6131492e1e7431f418259eaf/ce4e0/diagrams/functionals/map-arg-recycle.png)
+
+그래서, 이제는 새로운 툴이 필요하다: `map2()` 얘는 two arguments를 vectorised over한다. <br />
+이 말인즉슨, `.x`와 `.y` 둘 다 `.f`의 각 call에서 달라진다varied. <br />
+This means both .x and .y are varied in each call to .f
+
+```{r collapse=TRUE}
+map2_dbl(xs, ws, weighted.mean)
+```
+그림으로 표현하면, 이렇게.
+![그림7](https://d33wubrfki0l68.cloudfront.net/f5cddf51ec9c243a7c13732b0ce46b0868bf8a31/501a8/diagrams/functionals/map2.png)
+
+그리고 additional arguments도 그냥 똑같이 .f 다음에 넣어주면 된다.
+```{r collapse=TRUE}
+map2_dbl(xs, ws, weighted.mean, na.rm = TRUE)
+```
+그림으로 표현하면, 이렇게.
+![그림8](https://d33wubrfki0l68.cloudfront.net/7a545699ff7069a98329fcfbe6e42b734507eb16/211a5/diagrams/functionals/map2-arg.png)
+
+`map2()`의 기본적인 implementation은 간단하고, `map()`의 implementation과 꽤나 비슷하다. <br />
+하나의 벡터로만 iterating over하는 것이 아니라, 2개를 병렬in parallel로 iterate한다.
+```{r}
+simple_map2 <- function(x, y, f, ...) {
+  out <- vector("list", length(x))
+  for(i in seq_along(x)) {
+    out[[i]] <- f(x[[i]], y[[i]], ...)
+  }
+  out
+}
+```
+
+실제 `map2()`와 위의 간단한 함수와의 차이는, `map2()`는 y의 길이가 짧을 경우, inputs를 recycles해서 같은 길이가 되도록 함. <br />
+그래서 경우에 따라, `map2(x, y, f)`는 자동적으로 `map(x, f, y)`와 똑같이 행동하게 된다. <br />
+함수를 쓸 때 도움이 되긴하는데, 최대한 더 간단한 form을 쓰자.
+
+<p class="comment">
+<strong>base R에서는</strong> <br />
+<code>map2()</code>와 가장 비슷한 것은 <code>Map()</code>이다. Section 9.4.5에서 다룰 것이다.
+</p>
+
+
+### 9.4.3 No outputs: `walk()` and friends
+대부분의 함수들은, return되는 값을 얻기 위해서 호출call을 하는데, <br /> 
+그래서 `map()` 함수를 이용해서 값을 캡쳐하고 저장하는건, 말이 된다.
+
+하지만 몇몇 함수들은 side-effects를 위해서 호출된다. (예를 들어, `cat()`, `write.csv()`, `ggsave()`) <br />
+그리고 그 결과를 캡쳐한다는건 말이 안 된다.
+
+`cat()`을 이용해서 웰컴 메세지를 보여주는, 간단한 예를 보자. <br />
+`cat()`은 `NULL`을 return하기 때문에, <br />
+&emsp;&emsp;&emsp;&emsp;`map()`이 작동하는 동안(그러니깐 우리가 원하는 웰컴들을 만드는 동안), `list(NULL, NULL)`도 return하고 있다.
+
+```{r collapse=TRUE}
+welcome <- function(x) {
+	cat("Welcome ", x, "!\n", sep = "")
+}
+names <- c("Hadley", "Jenny")
+
+map(names, welcome)
+```
+이렇게, 웰컴들을 만드는 것 말고도, `cat()`의 return값도 보여준다.
+
+이러한 문제를, `map()`의 결과물result을 절대 사용하지 않을 변수에다가 assign함으로써 회피avoid할 수 있다. <br />
+하지만 이러면 코드의 의도가 지저분해짐. <br />
+
+대신에 purrr에 있는 walk family의 함수들을 사용하면, <br />
+&emsp;&emsp;&emsp;&emsp;`.f`의 return 값들을 무시하고 대신에 `.x`를 invisibly하게 return한다.
+```{r collapse=TRUE}
+walk(names, welcome)
+```
+그림을 보면, `map()`과의 중요한 차이점을 캡쳐하려고 노력해놨다. <br />
+outputs는 ephemeral, input이 invisibly하게 return된다.
+![그림9](https://d33wubrfki0l68.cloudfront.net/d16783978b0d33756af9951ad3fba2596eb8e934/233ba/diagrams/functionals/walk.png)
+
+`walk()`의 가장 유용한 변형variant은 `walk2()`다. <br />
+왜냐하면, 매우 흔한 side-effect는 무언가를 디스크에 저장하는 것. <br />
+그리고 무엇인가 저장할 때 항상 2개의 값이 필요하다. object랑, 저장할 경로. <br />
+![그림10](https://d33wubrfki0l68.cloudfront.net/19d5f7d265107c81dded3e98319d48ec01821308/b8621/diagrams/functionals/walk2.png)
+
+예를 들어, 데이터 프레임들의 리스트를 가지고 있고, (여기서는 `split()`을 이용해서 만들었음) <br />
+&emsp;&emsp;&emsp;&emsp;각각을 separate CSV 파일로 저장하고 싶다고 하자. `walk2()`를 이용하면 쉽다.
+```{r collapse=TRUE}
+temp <- tempfile()
+dir.create(temp)
+
+cyls <- split(mtcars, mtcars$cyl)
+paths <- file.path(temp, paste0("cyl-", names(cyls), ".csv"))
+walk2(cyls, paths, write.csv)
+
+dir(temp)
+```
+
+여기서 `walk2()`를 쓴 것은, `write.csv(cyls[[1]], paths[[1]])`, `write.csv(cyls[[2]], paths[[2]])`, `write.csv(cyls[[3]], paths[[3]])`를 한 것이랑 같다.
+
+<p class="comment">
+<strong>base R에서는</strong> <br />
+<code>walk()</code>랑 비슷한 것은 없다. <code>lapply()</code>의 결과물을 <code>invisible()</code>으로 감싸거나, 사용하지 않을 변수에다가 저장해야 한다. 
+</p>
+
+### 9.4.4 Iterating over values and indices
+for 루프에서 loop over하게 하는데에는 기본적으로 3가지 방법이 있다. <br />
+1) elements들에 대해 loop over: for (x in xs) <br />
+2) numeric indices에 대해 loop over: for (i in seq_along(xs)) <br />
+3) names에 대해 loop over: for (nm in names(xs))
+
+첫 번째 형식은 `map()` family와 유사하다. <br />
+두 번째, 세 번째 형식은 `imap()` family와 유사하다. <br />
+&emsp;&emsp;&emsp;&emsp;값들과 인덱스들을 병렬in parallel로 iterate over할 수 있게끔 해준다는 점에서.
+
+`.f`가 2개의 arguments와 함께 호출된다는 점에서, `imap()`은 `map2()`와 비슷하다. <br />
+하지만 `imap()`은 2개의 arguments가, 하나의 vector에서 나왔다는 점에서 다르다. <br />
+
+만약 x가 names를 갖고 있으면, `imap(x, f)`는 `map2(x, names(x), f)`와 같다. <br />
+만약 x가 names가 없으면, `imap(x, f)`는 `map2(x, seq_along(x), f)`와 같다.
+
+`imap()`은 라벨들labels을 붙일 때도 종종 유용하다.
+```{r collapse=TRUE}
+imap_chr(iris, ~ paste0("The first value of ", .y, " is ", .x[[1]]))
+```
+
+만약 벡터가 unnamed라면, 두 번째 argument는 index가 될 것이다.
+```{r collapse=TRUE}
+x <- map(1:6, ~ sample(1000, 10))
+imap_chr(x, ~ paste0("The highest value of ", .y, " is ", max(.x)))
+```
+
+`imap()`은, 벡터안에 있는 값들을, 포지션에 따라서 작업하고 싶을 때 유용한 helper이다. <br />
+`imap()` is a useful helper if you want to work with the values in a vector / along with their positions.
 
 
 
+### 9.4.5 Any number of inputs: `pmap()` and friends
+`map()`, `map2()`이 있으니깐, `map3()`, `map4()`, `map5()`도 있을 것. 하지만 이런 식으로 가면 안 끝남. <br />
+`map2()`를 arguments 수가 arbitrary한 것으로 일반화시키기보다는, purrr은 `pmap()`을 이용해 접근. <br />
+&emsp;&emsp;&emsp;&emsp;arguments가 몇 개이던간에, single list만 input으로 supply해주면 된다. <br />
+대부분의 케이스에, 같은 길이를 갖는 벡터들의 리스트. 즉, 데이터 프레임과 매우 유사할 것이다. <br />
+다음의 그림에 그 관계를 최대한 강조해보았다.
+![그림11](https://d33wubrfki0l68.cloudfront.net/e426c5755e2e65bdcc073d387775db79791f32fd/92902/diagrams/functionals/pmap.png)
 
+그래서, `map2()`와 `pmap()`간의 간단한 equivalence가 성립한다. <br />
+`map2(x, y, f)`는 `pmap(list(x, y), f)`와 같은 것이다. 
+
+위에서 `map2_dbl(xs, ws, weighted.mean)`과 동등한 구조가 되도록 `pmap()`으로 써보면, 
+```{r collapse=TRUE}
+pmap_dbl(list(xs, ws), weighted.mean)
+```
+
+이전과 마찬가지로, varying arguments는 `.f` 이전에 나와야 하고(이제는 리스트 안에 넣어줘야함), <br />
+&emsp;&emsp;&emsp;&emsp;constant arguments는 `.f` 이후에 나와야 한다.
+```{r collapse=TRUE}
+pmap_dbl(list(xs, ws), weighted.mean, na.rm = TRUE)
+```
+![그림12](https://d33wubrfki0l68.cloudfront.net/2eb2eefe34ad6d114da2a22df42deac8511b4788/5a538/diagrams/functionals/pmap-arg.png)
+
+
+`pmap()`과 다른 map 함수들과의 가장 큰 차이점은, <br />
+&emsp;&emsp;&emsp;&emsp;`pmap()`은 argument matching에 있어 더 쉬운 컨트롤이 가능하다는 것. <br />
+왜냐하면 리스트의 components에다가 이름을 붙일 수 있기 때문. <br />
+Section 9.2.5에서 했던, `trim`을 다르게 줘서 mean 구하던 예로 따지면, x에다가 varying argument인 `trim`을 주고 싶었다. <br />
+이걸 pmap()으로 해보면,
+```{r collapse=TRUE}
+trim <- c(0, 0.1, 0.2, 0.5)
+x <- rcauchy(1000)
+pmap_dbl(list(trim = trims), mean, x = x)
+```
+
+리스트의 components에다가 이름을 붙이는 건 매우 좋은 습관이라고 생각을 한다. <br />
+왜냐하면 어떻게 함수가 호출되는지가how the function will be called 매우 명확해지기 때문.
+
+`pmap()`을 (리스트가 아닌)데이터 프레임과 함께 호출하는 것도 편리하다. <br />
+데이터 프레임을 만드는 편리한 방법 중 하나는, `tibble::tribble()`을 사용하는 것. <br />
+&emsp;&emsp;&emsp;&emsp;이걸 사용하면 기존의 column-by-column이 아닌 row-by-row로 묘사describe가 가능. <br />
+함수에 대한 parameters를 데이터 프레임으로 생각해보는 건, 매우 강력한 패턴이다. <br />
+thinking about the parameters to a function as a data frame is a very powerful pattern.
+
+다음의 예는, varying parameters에 대해 random uniform numbers를 뽑는 걸 보여주고 있음.
+```{r collapse=TRUE}
+params <- tibble::tribble(
+	~ n, ~ min, ~ max,
+	1L,	0, 	1,
+	2L, 	10,	100,
+	3L,	100,	1000
+)
+
+pmap(params, runif)
+```
+![그림13](https://d33wubrfki0l68.cloudfront.net/e698354d802ce16f83546db63c45a19b8d51f45e/43de7/diagrams/functionals/pmap-3.png)
+
+여기서, column names가 중요하다. `runif()`의 arguments를 맞춰주기 위해 신중하게 정했다. <br />
+그래서 `pmap(params, runif)`는, `runif(n = 1L, min = 0, max =1)`, `runif(n = 2L, min = 10, max =100)`, `runif(n = 3L, min = 100, max =1000)`와 같은 것임. <br />
+만약에 데이터 프레임은 가지고 있는데, 이름들names이 매치가 안 된다면, `dplyr::rename()`이나 비슷한걸 써라.
+
+
+<p class="comment">
+<strong>base R에서는</strong> <br />
+<code>pmap()</code> 패밀리와 비슷한 것으로, <code>Map()</code>과 <code>mapply()</code>가 있다. 둘 다 심각한 단점이 있다. <br />
+1) <code>Map()</code>은 모든 arguments들에 대해 vectorise over하기 때문에, vary하지 않는 argument는 넣어줄 수 없다. <br />
+2) <code>mapply()</code>는 <code>sapply()</code>의 다차원 버전multidimensional version이다. <br />
+&emsp;&emsp;&emsp;&emsp;개념적으로 이건 <code>Map()</code>의 output을 받은 다음, 가능하면 간단하게simplifies 한다. <br />
+&emsp;&emsp;&emsp;&emsp;<code>sapply()</code>와 비슷한 문제가 생긴다. <code>vapply()</code>는 가능한 multi-input이 가능하지 않다.
+</p>
+
+
+## 9.5 Reduce family
 
 
 
