@@ -1,0 +1,32 @@
+11 Function Operators
+=====================
+
+11.1 Introduction
+-----------------
+
+이번 Chatper에서는 function operators에 대해서 배울 것이다. **function operator**는, **하나 이상의 functions를 input**으로 받아서, **function을 output**으로 return하는 function.
+
+(기억을 복기해보면, functionals는 function을 input으로, vector를 output으로. function factories는 vector를 input으로, function을 output으로.)
+
+다음의 예는, chatty()라는 간단한 function operator를 보여준다. function을 wrap해서, 첫 번째 argument를 print하는 새로운 function을 만든다. 이러면 map\_int()와 같은 functionals가 어떻게 작동하는지 볼 수 있는 창window를 만들어준다.
+
+``` r
+chatty <- function(f) {
+  force(f)
+  
+  function(x, ...) {
+    res <- f(x, ...)
+    cat("Processing ", x, "\n", sep = "")
+    res
+  }
+}
+
+f <- function(x) x ^ 2
+s <- c(3, 2, 1)
+
+purrr::map_dbl(s, chatty(f))
+## Processing 3
+## Processing 2
+## Processing 1
+## [1] 9 4 1
+```
