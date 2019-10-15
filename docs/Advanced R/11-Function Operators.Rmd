@@ -276,6 +276,8 @@ function을 memoising하기 전에, 신중하게 생각해라. <br />
 보통 available 패키지는 자주 바뀌지 않는데, R 프로세스가 몇일 동안 돌아가게 하면, 그 변화가 중요해질 수 있었다. <br />
 그 버그는 찾기가 힘들었다.고 자신이 실수했던 썰을 풀어줌.
 
+### 11.2.3 Exercises
+
 ## 11.3 Case study: Creating your own function operators
 `memoise()`와 `safely()`는 매우 유용하지만 또한 꽤나 복잡했다. <br />
 여기서 좀 간단한, 너만의 function operator를 만드는 법에 대해서 배울 것이다. <br />
@@ -411,7 +413,7 @@ walk2(
 이게 11.3.1 Exercises의 첫 번째 문제인 것으로 보아, 저자도 인지하고 있는 것 같다.)
 
 
-
+### 11.3.1 Exercises
 
 
 

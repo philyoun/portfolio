@@ -97,8 +97,8 @@ safe_sum <- safely(sum)
 safe_sum
 ## function (...) 
 ## capture_error(.f(...), otherwise, quiet)
-## <bytecode: 0x00000000125c6ca8>
-## <environment: 0x00000000125c6810>
+## <bytecode: 0x00000000181cf028>
+## <environment: 0x00000000181ceb90>
 ```
 
 다른 function operators와 마찬가지로, safely()는 function을 받고, wrapped function을 return한다. <br /> 이렇게 얻은 wrapped function도, 평소와 같이 호출하면 된다.
@@ -244,11 +244,11 @@ slow_function <- function(x) {
 }
 
 system.time(print(slow_function(1)))
-## [1] 3.009071
+## [1] 8.508138
 ##    user  system elapsed 
 ##       0       0       1
 system.time(print(slow_function(1)))
-## [1] 6.623314
+## [1] 7.063588
 ##    user  system elapsed 
 ##    0.00    0.00    1.02
 ```
@@ -258,17 +258,17 @@ system.time(print(slow_function(1)))
 ``` r
 fast_function <- memoise::memoise(slow_function)
 system.time(print(fast_function(1)))
-## [1] 2.587635
+## [1] 1.009648
 ##    user  system elapsed 
 ##       0       0       1
 
 system.time(print(fast_function(1))) # 해봤던 arguments니깐 즉시 나옴.
-## [1] 2.587635
+## [1] 1.009648
 ##    user  system elapsed 
 ##    0.02    0.00    0.01
 
 system.time(print(fast_function(2))) # 이러면 새로운 argument니깐 다시 느려지고.
-## [1] 4.809496
+## [1] 3.108843
 ##    user  system elapsed 
 ##       0       0       1
 ```
@@ -287,7 +287,7 @@ fib <- function(n) {
 ``` r
 system.time(fib(23))
 ##    user  system elapsed 
-##    0.05    0.00    0.05
+##    0.03    0.00    0.03
 system.time(fib(23))
 ##    user  system elapsed 
 ##    0.03    0.00    0.03
@@ -308,7 +308,7 @@ fib2 <- memoise::memoise(function(n) {
 ``` r
 system.time(fib2(23))
 ##    user  system elapsed 
-##    0.02    0.00    0.02
+##    0.03    0.00    0.04
 system.time(fib2(23))
 ##    user  system elapsed 
 ##       0       0       0
@@ -327,6 +327,8 @@ system.time(fib2(24))
 function을 memoising하기 전에, 신중하게 생각해라. <br /> 만약에 function이 pure하지 않다면, 그러니깐 output이 input에 의해서만 바뀌지 않는다면, <br />     헷갈리거나 잘못된 결과를 얻게 될 것이다.
 
 저자가 이것 때문에 devtools에서 미묘한 버그를 만든 적이 있다. <br /> 왜냐하면 CRAN에서 큰 파일을 다운로드해야되었기 때문에, available.packages의 결과물을 memoise했다. <br /> 보통 available 패키지는 자주 바뀌지 않는데, R 프로세스가 몇일 동안 돌아가게 하면, 그 변화가 중요해질 수 있었다. <br /> 그 버그는 찾기가 힘들었다.고 자신이 실수했던 썰을 풀어줌.
+
+### 11.2.3 Exercises
 
 11.3 Case study: Creating your own function operators
 -----------------------------------------------------
@@ -389,7 +391,7 @@ system.time(runif(100))
 ##       0       0       0
 system.time(delay_by(runif, 0.1)(100))
 ##    user  system elapsed 
-##    0.00    0.00    0.09
+##    0.00    0.00    0.11
 ```
 
 원래의 `walk2()`에도 적용을 할 수 있다.
@@ -455,3 +457,5 @@ walk2(
 (사견: [원래 사이트](https://adv-r.hadley.nz/function-operators.html#fo-case-study)를 보면, `dot_every()`와 `delay_by()`의 순서가 다르게 되어있다. <br /> 그러면 의미가 10개마다 점을 찍고, 그 때에만 delay를 넣으라는 것 아닌가?
 
 위처럼 써야 매 다운마다 delay를 넣고, 10개마다 점을 찍으라는 뜻이 되는데... <br /> 이게 11.3.1 Exercises의 첫 번째 문제인 것으로 보아, 저자도 인지하고 있는 것 같다.)
+
+### 11.3.1 Exercises
