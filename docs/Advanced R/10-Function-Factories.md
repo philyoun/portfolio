@@ -1,6 +1,9 @@
 10 Function Factories
 =====================
 
+10.1 Introduction
+-----------------
+
 Function Factory는 functions를 만드는 function이다. <br /> 매우 간단한 예를 봐보자. <br /> `power1()`이라는 function factory를 이용해서, `square()`, `cube()`라는 2개의 child 함수들을 만들어보자. <br />
 
 ``` r
@@ -18,19 +21,14 @@ cube <- power1(3)
 
 ``` r
 square(3)
-```
-
-    ## [1] 9
-
-``` r
+## [1] 9
 cube(3)
+## [1] 27
 ```
-
-    ## [1] 27
 
 Function factories를 가능케하는 개별적인 구성요소components들에 대해선 이미 다 배웠다. <br />
 
--   Section 6.2.3에서, R's first-class functions에 대해 배웠다. <br />소 R에서는 `<-`를 이용해서, 오브젝트에 이름을 bind하는 것과 같은 방식으로, 함수function에 이름을 bind할 수 있다.
+-   Section 6.2.3에서, R's first-class functions에 대해 배웠다. <br /> R에서는 `<-`를 이용해서, 오브젝트에 이름을 bind하는 것과 같은 방식으로, 함수function에 이름을 bind할 수 있다.
 
 -   Section 7.4.2에서, 함수는 그 함수가 만들어질 때, 함수를 갖고 있는 env를 캡쳐(enclose)한다는 걸 배웠다. <br /> In Section 7.4.2, you learned that a function captures(encloses) the environment / in which it is created.
 
@@ -38,17 +36,14 @@ Function factories를 가능케하는 개별적인 구성요소components들에 
 
 이 Chapter에서는, 위 3개의 불분명한 조합이 function factory로 이어진다는 것을 배울 것이다. <br /> 그리고 visualisation과 statistics에서, function factory의 사용 예제들을 볼 것이다.
 
-3개의 주요 functional programming tools(functional, function factories and function operators)중에서, function factories를 제일 덜 쓴다. <br /> 보통, function factories가 전체 코드의 복잡성을 줄여주지는 않는다.<br /> 하지만 대신에, 좀 더 소화하기 쉬운 chunks로 복잡성을 줄여준다. <br /> Generally, they don't tend to reduce overall code complexity but instead partition complexity into more easily digested chunks. <br /> 또한 Function factories는, 11장에서 배울, 매우 유용한 function operators의 중요한 구성 요소다.
+3개의 주요 functional programming tools(functional, function factories, function operators)중에서, function factories를 제일 덜 쓴다. <br /> 보통, function factories가 전체 코드의 복잡성을 줄여주지는 않는다.<br /> 하지만 대신에, 좀 더 소화하기 쉬운 chunks로 복잡성을 줄여준다. <br /> Generally, they don't tend to reduce overall code complexity but instead partition complexity into more easily digested chunks. <br /> 또한 Function factories는, 11장에서 배울, 매우 유용한 function operators의 중요한 구성 요소다.
 
 Outline
 -------
 
--   Section 10.2에서는, scoping과 env에서 아이디어를 뽑아내서, 어떻게 function factories가 작동하는지를 설명한다. <br /> 또한, 어떻게 function factories를 사용해, 함수에 대한 메모리를 implement해서, 호출간에 데이터를 유지할 수 있는지도 살펴본다. <br /> You'll also see how function factories can be used to implement a memory for functions, allowing data to persist across calls.
-
--   Section 10.3에서는, ggplot2에서 function factories의 사용예제들을 illustrate할 것. <br /> ggplot2가 user supplied function factories랑 작동하는 것과, function factory를 internally하게 사용하는 것, 총 2가지의 예를 보게 될 것이다.
-
--   Section 10.4에서는, statistics의 3가지 challenges를 해결하는데 function factories를 사용한다. <br /> Box-Cox transform을 이해하는 것, Maximum Likelihood 문제를 해결하는 것 그리고 bootstrap resample을 뽑는 것.
-
+-   Section 10.2에서는, scoping과 env에서 아이디어를 뽑아내서, 어떻게 function factories가 작동하는지를 설명한다. <br /> 또한, 어떻게 function factories를 사용해, 함수에 대한 메모리를 implement해서, 호출간에 데이터를 유지할 수 있는지도 살펴본다. <br /> You'll also see how function factories can be used to implement a memory for functions, allowing data to persist across calls. <br />
+-   Section 10.3에서는, ggplot2에서 function factories의 사용예제들을 illustrate할 것. <br /> ggplot2가 user supplied function factories랑 작동하는 것과, function factory를 internally하게 사용하는 것, 총 2가지의 예를 보게 될 것이다. <br />
+-   Section 10.4에서는, statistics의 3가지 challenges를 해결하는데 function factories를 사용한다. <br /> Box-Cox transform을 이해하는 것, Maximum Likelihood 문제를 해결하는 것 그리고 bootstrap resample을 뽑는 것. <br />
 -   Section 10.5에서는, 데이터에서 function families를 빠르게 생성하는데 있어, 어떻게 function factories랑 functionals를 조합할 수 있는지.
 
 Prerequisites
@@ -60,17 +55,7 @@ Function factories는 base R만 필요하긴 한데, rlang을 이용해서 좀 �
 
 ``` r
 library(rlang)
-```
-
-    ## Warning: package 'rlang' was built under R version 3.5.3
-
-``` r
 library(ggplot2)
-```
-
-    ## Warning: package 'ggplot2' was built under R version 3.5.2
-
-``` r
 library(scales)
 ```
 
@@ -85,64 +70,52 @@ Function factories가 작동가능한 핵심 아이디어를, 매우 간결하�
 
 ``` r
 square
-```
-
-    ## function(x){
-    ##     x ^ exp
-    ##   }
-    ## <environment: 0x0000000014136278>
-
-``` r
+## function(x){
+##     x ^ exp
+##   }
+## <environment: 0x0000000013e238c8>
 cube
+## function(x){
+##     x ^ exp
+##   }
+## <bytecode: 0x0000000013cdeff0>
+## <environment: 0x0000000013aa9940>
 ```
 
-    ## function(x){
-    ##     x ^ exp
-    ##   }
-    ## <bytecode: 0x0000000012b7a370>
-    ## <environment: 0x0000000013b9b200>
-
-x가 어디서 오는건지는 명확한데, R은 어떻게 exp와 관련되어 있는 값을 찾는거지? <br /> bodies가 똑같기 때문에, manufactured function을 print out해보는건 별 도움이 안된다. <br /> 대신에 enclosing env의 내용물이 중요한 factors다. <br /> rlang::env\_print()를 이용해서 좀 더 인사이트를 얻을 수 있다.
+x가 어디서 오는건지는 명확한데, R은 어떻게 exp와 관련되어 있는 값을 찾는거지? <br /> bodies가 똑같기 때문에, manufactured function을 print out해보는건 별 도움이 안된다. <br /> 대신에 enclosing env의 내용물이 중요한 factors다. <br /> `rlang::env_print()`를 이용해서 좀 더 인사이트를 얻을 수 있다.
 
 ``` r
 env_print(square)
+## <environment: 0000000013E238C8>
+## parent: <environment: global>
+## bindings:
+##  * exp: <dbl>
 ```
-
-    ## <environment: 0000000014136278>
-    ## parent: <environment: global>
-    ## bindings:
-    ##  * exp: <dbl>
 
 ``` r
 env_print(cube)
+## <environment: 0000000013AA9940>
+## parent: <environment: global>
+## bindings:
+##  * exp: <dbl>
 ```
 
-    ## <environment: 0000000013B9B200>
-    ## parent: <environment: global>
-    ## bindings:
-    ##  * exp: <dbl>
-
-위를 보면, 각각의 manufactured function이 서로 다른 env를 가지고 있다는 걸 보여주는데, 원래 각각은 power1()의 execution env였다. <br /> env들은 같은 parent를 갖고 있는데, power1()의 enclosing env인, global env다.
+위를 보면, 각각의 manufactured function이 서로 다른 env를 가지고 있다는 걸 보여주는데, 원래 각각은 `power1()`의 execution env였다. <br /> env들은 같은 parent를 갖고 있는데, `power1()`의 enclosing env인, global env다.
 
 위를 보면, 2개의 env 다 `exp`라는 binding을 갖고 있는 것을 볼 수 있는데, 우리는 그 값을 보고 싶다. <br /> 이럴 때는 function env를 가져와서 값을 추출하면 된다.
 
 ``` r
 fn_env(square)$env
-```
-
-    ## NULL
-
-``` r
+## NULL
 fn_env(cube)$env
+## NULL
 ```
-
-    ## NULL
 
 이게 각 manufactured function이 서로 다르게 작동하는 이유이다. <br /> enclosing env에 있는 names가 서로 다른 값에 bound되어 있다.
 
 ### 10.2.2 Diagram conventions
 
-이 관계를 다이어그램으로도 나타내 볼 수 있다. ![그림1](https://d33wubrfki0l68.cloudfront.net/66b438e96694794ea48f2acc27d43cd4d5998336/a401d/diagrams/function-factories/power-full.png)
+이 관계를 다이어그램으로도 나타내 볼 수 있다. <img src="https://d33wubrfki0l68.cloudfront.net/66b438e96694794ea48f2acc27d43cd4d5998336/a401d/diagrams/function-factories/power-full.png" alt="그림1" style="width:50.0%" />
 
 이 다이어그램에는 뭐가 많지만, 몇몇 디테일은 중요하지 않다. <br /> 2개의 conventions를 이용해 상당히 단순화할 수 있다. <br />
 
@@ -150,7 +123,7 @@ fn_env(cube)$env
 
 -   분명한 parent가 없는 env라면, global env로부터 inherit한다.
 
-env에만 집중한 이 다이어그램을 보면, `cube()`와 `square()`간의 아무런 직접적인 링크가 없다는걸 볼 수 있다. <br /> ![그림2](https://d33wubrfki0l68.cloudfront.net/80c8c044530ad592a173a20ae51ac9479e918888/8b4f9/diagrams/function-factories/power-simple.png)
+env에만 집중한 이 다이어그램을 보면, `cube()`와 `square()`간의 아무런 직접적인 링크가 없다는걸 볼 수 있다. <br /> <img src="https://d33wubrfki0l68.cloudfront.net/80c8c044530ad592a173a20ae51ac9479e918888/8b4f9/diagrams/function-factories/power-simple.png" alt="그림2" style="width:50.0%" />
 
 왜냐하면 링크는 둘 다 같은 함수의 body를 통해서만 존재하는데, 이 다이어그램에는 존재하지 않는다.
 
@@ -162,7 +135,7 @@ square(10)
 
     ## [1] 100
 
-![그림3](https://d33wubrfki0l68.cloudfront.net/8b2d86da6125bf4e651d24d7a713114d2bad1ae0/bffac/diagrams/function-factories/power-exec.png)
+<img src="https://d33wubrfki0l68.cloudfront.net/8b2d86da6125bf4e651d24d7a713114d2bad1ae0/bffac/diagrams/function-factories/power-exec.png" alt="그림3" style="width:50.0%" />
 
 `square()`이, `x ^ exp` 를 실행할 때, `x`는 execution env에서 찾고, `exp`는 enclosing env에서 찾는다.
 
@@ -230,7 +203,7 @@ counter_one <- new_counter()
 counter_two <- new_counter()
 ```
 
-![그림4](https://d33wubrfki0l68.cloudfront.net/31a150f8919ec8b8f8145f3fbd0f7f98705accb6/6d9cc/diagrams/function-factories/counter-1.png)
+<img src="https://d33wubrfki0l68.cloudfront.net/31a150f8919ec8b8f8145f3fbd0f7f98705accb6/6d9cc/diagrams/function-factories/counter-1.png" alt="그림4" style="width:50.0%" />
 
 manufactured function이 실행될 때, enclosing env에 있는 `i`를 `i <<- i + 1`이 수정한다. <br /> 각 manufactured function은 독립적인 enclosing env를 가지고 있기 때문에, 독립적인 counts를 갖는다.
 
@@ -252,7 +225,7 @@ counter_one()
 
     ## [1] 2
 
-![그림5](https://d33wubrfki0l68.cloudfront.net/d9f1e3946594c6b857427fdb51248eac957ab841/308f2/diagrams/function-factories/counter-2.png)
+<img src="https://d33wubrfki0l68.cloudfront.net/d9f1e3946594c6b857427fdb51248eac957ab841/308f2/diagrams/function-factories/counter-2.png" alt="그림5" style="width:50.0%" />
 
 상태를 저장하는 함수, stateful functions는 적당히 사용하는게 좋다. <br /> 함수가 여러 변수의 state를 managing하는 단계가 되면, 14장의 주제인 R6로 바꾸는게 좋다. <br /> As soon as your function starts managing the state of multiple variables, it's better to switch to R6, the topic of Chapter 14.
 
@@ -299,7 +272,7 @@ force
 
     ## function (x) 
     ## x
-    ## <bytecode: 0x0000000012db16d0>
+    ## <bytecode: 0x0000000012db2750>
     ## <environment: namespace:base>
 
 `force(x)`가 x보다 나은 이유는 무엇일까?
@@ -347,7 +320,7 @@ core <- ggplot(df, aes(x, y)) +
 core
 ```
 
-![](10-Function-Factories_files/figure-markdown_github/unnamed-chunk-16-1.png)
+![](10-Function-Factories_files/figure-markdown_github/unnamed-chunk-17-1.png)
 
 ``` r
 core + scale_y_continuous(
@@ -355,7 +328,7 @@ core + scale_y_continuous(
 )
 ```
 
-![](10-Function-Factories_files/figure-markdown_github/unnamed-chunk-16-2.png)
+![](10-Function-Factories_files/figure-markdown_github/unnamed-chunk-17-2.png)
 
 ``` r
 core + scale_y_continuous(
@@ -363,7 +336,7 @@ core + scale_y_continuous(
 )
 ```
 
-![](10-Function-Factories_files/figure-markdown_github/unnamed-chunk-16-3.png)
+![](10-Function-Factories_files/figure-markdown_github/unnamed-chunk-17-3.png)
 
 ``` r
 core + scale_y_continuous(
@@ -371,7 +344,7 @@ core + scale_y_continuous(
 )
 ```
 
-![](10-Function-Factories_files/figure-markdown_github/unnamed-chunk-16-4.png)
+![](10-Function-Factories_files/figure-markdown_github/unnamed-chunk-17-4.png)
 
 ### 10.3.2 Histogram bins
 
@@ -391,6 +364,6 @@ ggplot(df, aes(x)) +
   labs(x = NULL)
 ```
 
-![](10-Function-Factories_files/figure-markdown_github/unnamed-chunk-17-1.png)
+![](10-Function-Factories_files/figure-markdown_github/unnamed-chunk-18-1.png)
 
 여기서 각 facet는 같은 수의 observations를 갖고 있는데, 여기서 variability가 매우 다르다. <br /> binwidths가 달라지게 해서,
