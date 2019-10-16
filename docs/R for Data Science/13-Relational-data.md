@@ -34,179 +34,174 @@ relational data를 배우기 위해서 nycflights13 패키지를 사용할 것�
 
 ``` r
 airlines
+## # A tibble: 16 x 2
+##    carrier name                       
+##    <chr>   <chr>                      
+##  1 9E      Endeavor Air Inc.          
+##  2 AA      American Airlines Inc.     
+##  3 AS      Alaska Airlines Inc.       
+##  4 B6      JetBlue Airways            
+##  5 DL      Delta Air Lines Inc.       
+##  6 EV      ExpressJet Airlines Inc.   
+##  7 F9      Frontier Airlines Inc.     
+##  8 FL      AirTran Airways Corporation
+##  9 HA      Hawaiian Airlines Inc.     
+## 10 MQ      Envoy Air                  
+## 11 OO      SkyWest Airlines Inc.      
+## 12 UA      United Air Lines Inc.      
+## 13 US      US Airways Inc.            
+## 14 VX      Virgin America             
+## 15 WN      Southwest Airlines Co.     
+## 16 YV      Mesa Airlines Inc.
 ```
-
-    ## # A tibble: 16 x 2
-    ##    carrier name                       
-    ##    <chr>   <chr>                      
-    ##  1 9E      Endeavor Air Inc.          
-    ##  2 AA      American Airlines Inc.     
-    ##  3 AS      Alaska Airlines Inc.       
-    ##  4 B6      JetBlue Airways            
-    ##  5 DL      Delta Air Lines Inc.       
-    ##  6 EV      ExpressJet Airlines Inc.   
-    ##  7 F9      Frontier Airlines Inc.     
-    ##  8 FL      AirTran Airways Corporation
-    ##  9 HA      Hawaiian Airlines Inc.     
-    ## 10 MQ      Envoy Air                  
-    ## 11 OO      SkyWest Airlines Inc.      
-    ## 12 UA      United Air Lines Inc.      
-    ## 13 US      US Airways Inc.            
-    ## 14 VX      Virgin America             
-    ## 15 WN      Southwest Airlines Co.     
-    ## 16 YV      Mesa Airlines Inc.
 
 `airports`: 각 공항에 대한 정보를 준다. `faa`라는 airport code로 identify가능.
 
 ``` r
 airports
+## # A tibble: 1,458 x 8
+##    faa   name                    lat    lon   alt    tz dst   tzone        
+##    <chr> <chr>                 <dbl>  <dbl> <int> <dbl> <chr> <chr>        
+##  1 04G   Lansdowne Airport      41.1  -80.6  1044    -5 A     America/New_~
+##  2 06A   Moton Field Municipa~  32.5  -85.7   264    -6 A     America/Chic~
+##  3 06C   Schaumburg Regional    42.0  -88.1   801    -6 A     America/Chic~
+##  4 06N   Randall Airport        41.4  -74.4   523    -5 A     America/New_~
+##  5 09J   Jekyll Island Airport  31.1  -81.4    11    -5 A     America/New_~
+##  6 0A9   Elizabethton Municip~  36.4  -82.2  1593    -5 A     America/New_~
+##  7 0G6   Williams County Airp~  41.5  -84.5   730    -5 A     America/New_~
+##  8 0G7   Finger Lakes Regiona~  42.9  -76.8   492    -5 A     America/New_~
+##  9 0P2   Shoestring Aviation ~  39.8  -76.6  1000    -5 U     America/New_~
+## 10 0S9   Jefferson County Intl  48.1 -123.    108    -8 A     America/Los_~
+## # ... with 1,448 more rows
 ```
-
-    ## # A tibble: 1,458 x 8
-    ##    faa   name                    lat    lon   alt    tz dst   tzone        
-    ##    <chr> <chr>                 <dbl>  <dbl> <int> <dbl> <chr> <chr>        
-    ##  1 04G   Lansdowne Airport      41.1  -80.6  1044    -5 A     America/New_~
-    ##  2 06A   Moton Field Municipa~  32.5  -85.7   264    -6 A     America/Chic~
-    ##  3 06C   Schaumburg Regional    42.0  -88.1   801    -6 A     America/Chic~
-    ##  4 06N   Randall Airport        41.4  -74.4   523    -5 A     America/New_~
-    ##  5 09J   Jekyll Island Airport  31.1  -81.4    11    -5 A     America/New_~
-    ##  6 0A9   Elizabethton Municip~  36.4  -82.2  1593    -5 A     America/New_~
-    ##  7 0G6   Williams County Airp~  41.5  -84.5   730    -5 A     America/New_~
-    ##  8 0G7   Finger Lakes Regiona~  42.9  -76.8   492    -5 A     America/New_~
-    ##  9 0P2   Shoestring Aviation ~  39.8  -76.6  1000    -5 U     America/New_~
-    ## 10 0S9   Jefferson County Intl  48.1 -123.    108    -8 A     America/Los_~
-    ## # ... with 1,448 more rows
 
 `planes`: 각 비행기 정보를 준다. `tailnum`로 identify가능.
 
 ``` r
 planes
+## # A tibble: 3,322 x 9
+##    tailnum  year type       manufacturer  model  engines seats speed engine
+##    <chr>   <int> <chr>      <chr>         <chr>    <int> <int> <int> <chr> 
+##  1 N10156   2004 Fixed win~ EMBRAER       EMB-1~       2    55    NA Turbo~
+##  2 N102UW   1998 Fixed win~ AIRBUS INDUS~ A320-~       2   182    NA Turbo~
+##  3 N103US   1999 Fixed win~ AIRBUS INDUS~ A320-~       2   182    NA Turbo~
+##  4 N104UW   1999 Fixed win~ AIRBUS INDUS~ A320-~       2   182    NA Turbo~
+##  5 N10575   2002 Fixed win~ EMBRAER       EMB-1~       2    55    NA Turbo~
+##  6 N105UW   1999 Fixed win~ AIRBUS INDUS~ A320-~       2   182    NA Turbo~
+##  7 N107US   1999 Fixed win~ AIRBUS INDUS~ A320-~       2   182    NA Turbo~
+##  8 N108UW   1999 Fixed win~ AIRBUS INDUS~ A320-~       2   182    NA Turbo~
+##  9 N109UW   1999 Fixed win~ AIRBUS INDUS~ A320-~       2   182    NA Turbo~
+## 10 N110UW   1999 Fixed win~ AIRBUS INDUS~ A320-~       2   182    NA Turbo~
+## # ... with 3,312 more rows
 ```
-
-    ## # A tibble: 3,322 x 9
-    ##    tailnum  year type       manufacturer  model  engines seats speed engine
-    ##    <chr>   <int> <chr>      <chr>         <chr>    <int> <int> <int> <chr> 
-    ##  1 N10156   2004 Fixed win~ EMBRAER       EMB-1~       2    55    NA Turbo~
-    ##  2 N102UW   1998 Fixed win~ AIRBUS INDUS~ A320-~       2   182    NA Turbo~
-    ##  3 N103US   1999 Fixed win~ AIRBUS INDUS~ A320-~       2   182    NA Turbo~
-    ##  4 N104UW   1999 Fixed win~ AIRBUS INDUS~ A320-~       2   182    NA Turbo~
-    ##  5 N10575   2002 Fixed win~ EMBRAER       EMB-1~       2    55    NA Turbo~
-    ##  6 N105UW   1999 Fixed win~ AIRBUS INDUS~ A320-~       2   182    NA Turbo~
-    ##  7 N107US   1999 Fixed win~ AIRBUS INDUS~ A320-~       2   182    NA Turbo~
-    ##  8 N108UW   1999 Fixed win~ AIRBUS INDUS~ A320-~       2   182    NA Turbo~
-    ##  9 N109UW   1999 Fixed win~ AIRBUS INDUS~ A320-~       2   182    NA Turbo~
-    ## 10 N110UW   1999 Fixed win~ AIRBUS INDUS~ A320-~       2   182    NA Turbo~
-    ## # ... with 3,312 more rows
 
 `weather`: NYC 공항에서의 시간별 날씨를 준다.
 
 ``` r
 weather
+## # A tibble: 26,115 x 15
+##    origin  year month   day  hour  temp  dewp humid wind_dir wind_speed
+##    <chr>  <dbl> <dbl> <int> <int> <dbl> <dbl> <dbl>    <dbl>      <dbl>
+##  1 EWR     2013     1     1     1  39.0  26.1  59.4      270      10.4 
+##  2 EWR     2013     1     1     2  39.0  27.0  61.6      250       8.06
+##  3 EWR     2013     1     1     3  39.0  28.0  64.4      240      11.5 
+##  4 EWR     2013     1     1     4  39.9  28.0  62.2      250      12.7 
+##  5 EWR     2013     1     1     5  39.0  28.0  64.4      260      12.7 
+##  6 EWR     2013     1     1     6  37.9  28.0  67.2      240      11.5 
+##  7 EWR     2013     1     1     7  39.0  28.0  64.4      240      15.0 
+##  8 EWR     2013     1     1     8  39.9  28.0  62.2      250      10.4 
+##  9 EWR     2013     1     1     9  39.9  28.0  62.2      260      15.0 
+## 10 EWR     2013     1     1    10  41    28.0  59.6      260      13.8 
+## # ... with 26,105 more rows, and 5 more variables: wind_gust <dbl>,
+## #   precip <dbl>, pressure <dbl>, visib <dbl>, time_hour <dttm>
 ```
 
-    ## # A tibble: 26,115 x 15
-    ##    origin  year month   day  hour  temp  dewp humid wind_dir wind_speed
-    ##    <chr>  <dbl> <dbl> <int> <int> <dbl> <dbl> <dbl>    <dbl>      <dbl>
-    ##  1 EWR     2013     1     1     1  39.0  26.1  59.4      270      10.4 
-    ##  2 EWR     2013     1     1     2  39.0  27.0  61.6      250       8.06
-    ##  3 EWR     2013     1     1     3  39.0  28.0  64.4      240      11.5 
-    ##  4 EWR     2013     1     1     4  39.9  28.0  62.2      250      12.7 
-    ##  5 EWR     2013     1     1     5  39.0  28.0  64.4      260      12.7 
-    ##  6 EWR     2013     1     1     6  37.9  28.0  67.2      240      11.5 
-    ##  7 EWR     2013     1     1     7  39.0  28.0  64.4      240      15.0 
-    ##  8 EWR     2013     1     1     8  39.9  28.0  62.2      250      10.4 
-    ##  9 EWR     2013     1     1     9  39.9  28.0  62.2      260      15.0 
-    ## 10 EWR     2013     1     1    10  41    28.0  59.6      260      13.8 
-    ## # ... with 26,105 more rows, and 5 more variables: wind_gust <dbl>,
-    ## #   precip <dbl>, pressure <dbl>, visib <dbl>, time_hour <dttm>
-
-다이어그램으로 이 테이블들 간의 관계를 표시했는데, ![그림1](https://d33wubrfki0l68.cloudfront.net/245292d1ea724f6c3fd8a92063dcd7bfb9758d02/5751b/diagrams/relational-nycflights.png)
+다이어그램으로 이 테이블들 간의 관계를 표시해봤다. <img src="https://d33wubrfki0l68.cloudfront.net/245292d1ea724f6c3fd8a92063dcd7bfb9758d02/5751b/diagrams/relational-nycflights.png" alt="그림1" style="width:50.0%" />{ center }
 
 다이어그램은 좀 복잡하긴한데, 필드에 나가서 보게 될 것에 비하면 간단한 편! <br /> 이러한 다이어그램을 이해하는 것의 key는, 각 relation은 한 쌍의 테이블만을 고려한다는 것. <br /> The key to understanding diagrams like this / is to remember / each relation always concerns a pair of tables. <br /> 다 이해할 필요는 없고, 테이블 간의 (니가 관심있는)chain of relations만 이해해라.
 
-이 nycflights13에 관해선, <br /> `flights`는 `planes`와 하나의 변수인, `tailnum`을 통해 연결된다. <br /> `flights`는 `airlines`와 `carrier` 변수를 통해 연결된다. <br /> `flights`는 `airports`와 두 가지 방법, `origin`과 `dest` 변수들을 통해 연결된다. <br /> `flights`는 `weather`와, `origin`(출발지), `year`, `month`, `day` 그리고 `hour`를 통해 연결된다.
+이 nycflights13에 관해선, <br /> `flights`는 `planes`와 하나의 변수인, `tailnum`을 통해 연결된다. <br /> `flights`는 `airlines`와, `carrier` 변수를 통해 연결된다. <br /> `flights`는 `airports`와 두 가지 방법, `origin`과 `dest` 변수들을 통해 연결된다. <br /> `flights`는 `weather`와, `origin`(출발지)와 `year`와 `month`와 `day` 그리고 `hour`를 통해 연결된다.
 
 13.3 Keys
 ---------
 
-2개의 tables를 연결시켜주는 변수들을, **keys**라고 부른다. <br /> keys는 관측치를 unique하게 identify해주는 변수(혹은 변수들). <br /> 간단한 케이스들에서는, 하나의 변수가 관측치를 identify하기에 충분하다. <br />     예를 들어, 각 비행기는 `tailnum`으로 unique하게 identify된다. <br /> 다른 케이스에서는 여러 개의 변수가 필요할 수 있다. <br />     예를 들어, `weather` 자료에서, 관측치를 unique하게 identify하기 위해선, 다섯 개의 변수들이 필요하다. `year`, `month`, `day`, `hour` 그리고 `origin`.
+2개의 tables를 연결시켜주는 변수들을, **keys**라고 부른다. <br /> keys는 관측치를 unique하게 identify해주는 변수(혹은 변수들). <br /> 간단한 케이스에서는, 하나의 변수가 관측치를 identify하기에 충분하다. <br />     예를 들어, 각 비행기는 `tailnum`으로 unique하게 identify된다. <br /> 다른 케이스에서는, 여러 개의 변수들이 필요할 수 있다. <br />     예를 들어, `weather` 자료에서, 관측치를 unique하게 identify하기 위해선, 다섯 개의 변수들이 필요하다. `year`, `month`, `day`, `hour` 그리고 `origin`.
 
-2가지 타입의 key가 있다. <br /> - **primary key**는 자기 자신의 테이블에서 관측치를 unique하게 identify해주는 것. <br />     예를 들어, `planes` 테이블에서, `tailnum`은 각 plane을 unique하게 identify해주니깐 primary key다.
+2가지 타입의 key가 있다. <br />
 
--   **foreign key**는 다른 테이블의 관측치를 unique하게 identify해주는 것. <br />     예를 들어, `flights`에서 `tailnum`은, `planes`에서 관측치를 unique하게 identify해주니깐 foreign key다.
+-   **primary key**는 자기 자신의 테이블에서 관측치를 unique하게 identify해주는 것. <br /> 예를 들어, `planes` 테이블에서, `tailnum`은 각 plane을 unique하게 identify해주니깐 primary key다.
+
+-   **foreign key**는 다른 테이블의 관측치를 unique하게 identify해주는 것. <br /> 예를 들어, `flights`에서 `tailnum`은, `planes`에서 관측치를 unique하게 identify해주니깐 foreign key다.
 
 하나의 변수는, primary key와 foreign key 둘 다 될 수 있다. <br /> 예를 들어, `origin`은 `weather` 테이블의 primary key 중 일부지만, `airport` 테이블의 foreign key이기도 하다.
 
-너의 테이블에서, primary keys를 identify하고 났으면, 진짜로 unique하게 각 관측치를 identify하는지 확인해보는건 좋은 습관이다. <br /> 하나의 방법은 primary key별로 `count()`를 해서, `n` 1보다 큰지를 확인해보는 것.
+너의 테이블에서, primary keys를 identify하고 났으면, 진짜로 unique하게 각 관측치를 identify하는지 확인해보는건 좋은 습관이다. <br /> 하나의 방법은 primary key별로 `count()`를 해서, `n` 이 1보다 큰지를 확인해보는 것.
 
 ``` r
 planes %>% 
   count(tailnum) %>% 
   filter(n > 1)
+## Warning: The `printer` argument is deprecated as of rlang 0.3.0.
+## This warning is displayed once per session.
+## # A tibble: 0 x 2
+## # ... with 2 variables: tailnum <chr>, n <int>
 ```
-
-    ## Warning: The `printer` argument is deprecated as of rlang 0.3.0.
-    ## This warning is displayed once per session.
-
-    ## # A tibble: 0 x 2
-    ## # ... with 2 variables: tailnum <chr>, n <int>
 
 ``` r
 weather %>% 
   count(year, month, day, hour, origin) %>% 
   filter(n > 1)
+## # A tibble: 3 x 6
+##    year month   day  hour origin     n
+##   <dbl> <dbl> <int> <int> <chr>  <int>
+## 1  2013    11     3     1 EWR        2
+## 2  2013    11     3     1 JFK        2
+## 3  2013    11     3     1 LGA        2
 ```
 
-    ## # A tibble: 3 x 6
-    ##    year month   day  hour origin     n
-    ##   <dbl> <dbl> <int> <int> <chr>  <int>
-    ## 1  2013    11     3     1 EWR        2
-    ## 2  2013    11     3     1 JFK        2
-    ## 3  2013    11     3     1 LGA        2
+가끔, 명백한 primary key가 없는 테이블이 있을 수도 있다. <br /> 그 어떠한 변수 조합들도 관측치 하나만을 identify해주지 못하는 것임.
 
-가끔, 명백한 primary key가 없는 테이블이 있을 수도 있다. <br /> 그 어떠한 변수 조합들도 관측치 하나만을 identify해주지 못하는 것임. <br /> 예를 들어, `flights` 테이블에서 primary key는 무엇일까? <br /> 특정한 날짜에다가 flight나 tailnum를 추가하면 unique하게 identify해주지 않을까? 하지만 확인해보면 아니다.
+예를 들어, `flights` 테이블에서 primary key는 무엇일까? <br /> 특정한 날짜에다가 flight 혹은 tailnum를 추가하면 unique하게 identify해주지 않을까? 하지만 확인해보면 아니다.
 
 ``` r
 flights %>% 
   count(year, month, day, flight) %>% 
   filter(n > 1)
+## # A tibble: 29,768 x 5
+##     year month   day flight     n
+##    <int> <int> <int>  <int> <int>
+##  1  2013     1     1      1     2
+##  2  2013     1     1      3     2
+##  3  2013     1     1      4     2
+##  4  2013     1     1     11     3
+##  5  2013     1     1     15     2
+##  6  2013     1     1     21     2
+##  7  2013     1     1     27     4
+##  8  2013     1     1     31     2
+##  9  2013     1     1     32     2
+## 10  2013     1     1     35     2
+## # ... with 29,758 more rows
 ```
-
-    ## # A tibble: 29,768 x 5
-    ##     year month   day flight     n
-    ##    <int> <int> <int>  <int> <int>
-    ##  1  2013     1     1      1     2
-    ##  2  2013     1     1      3     2
-    ##  3  2013     1     1      4     2
-    ##  4  2013     1     1     11     3
-    ##  5  2013     1     1     15     2
-    ##  6  2013     1     1     21     2
-    ##  7  2013     1     1     27     4
-    ##  8  2013     1     1     31     2
-    ##  9  2013     1     1     32     2
-    ## 10  2013     1     1     35     2
-    ## # ... with 29,758 more rows
 
 ``` r
 flights %>% 
   count(year, month, day, tailnum) %>% 
   filter(n > 1)
+## # A tibble: 64,928 x 5
+##     year month   day tailnum     n
+##    <int> <int> <int> <chr>   <int>
+##  1  2013     1     1 N0EGMQ      2
+##  2  2013     1     1 N11189      2
+##  3  2013     1     1 N11536      2
+##  4  2013     1     1 N11544      3
+##  5  2013     1     1 N11551      2
+##  6  2013     1     1 N12540      2
+##  7  2013     1     1 N12567      2
+##  8  2013     1     1 N13123      2
+##  9  2013     1     1 N13538      3
+## 10  2013     1     1 N13566      3
+## # ... with 64,918 more rows
 ```
-
-    ## # A tibble: 64,928 x 5
-    ##     year month   day tailnum     n
-    ##    <int> <int> <int> <chr>   <int>
-    ##  1  2013     1     1 N0EGMQ      2
-    ##  2  2013     1     1 N11189      2
-    ##  3  2013     1     1 N11536      2
-    ##  4  2013     1     1 N11544      3
-    ##  5  2013     1     1 N11551      2
-    ##  6  2013     1     1 N12540      2
-    ##  7  2013     1     1 N12567      2
-    ##  8  2013     1     1 N13123      2
-    ##  9  2013     1     1 N13538      3
-    ## 10  2013     1     1 N13566      3
-    ## # ... with 64,918 more rows
 
 맨 처음 이 데이터를 다룰 때, 각 flight number는 하루에 한 번만 쓰일 거라고 순진하게 생각했다. <br /> 그럼 이제 특정한 비행specific flight에 대해 소통하기가 쉬웠을텐데, 불운하게도 안 그랬다. <br /> 가끔 이렇게 테이블에 primary key가 없으면, `mutate()`나 `row_number()`을 통해서 하나 만들어주는게 유용하다. <br /> 이러고나면 어떤 필터링을 하고 난 후, original data로 다시 한번 체크할 때, 관측치를 매치하기 쉽게 해준다. <br /> 이런 key를 **surrogate key**라고 부른다.
 
@@ -214,10 +209,12 @@ primary key랑, 다른 테이블에서 상응하는 foreign key는 **relation**�
 
 다대다many-to-many 관계를, 다대일many-to-one에다 일대다one-to-many를 합쳐서 만들수도 있다. <br /> 예를 들어, `airlines`와 `airports`간의 다대다many-to-many 관계를 볼 수 있다. <br /> 각 airline은 여러 개의 airports로 비행을 하고, 각 airport는 여러 개의 airlines를 호스트host하고.
 
+### 13.3.1 Exercises
+
 13.4 Mutating joins
 -------------------
 
-한 쌍의 테이블을 결합combining할 첫 번째 도구는 mutating join을 하는 것. <br /> 두 개의 테이블들에서 변수를 결합할 수 있도록 도와준다. <br /> 먼저 keys를 통해서 관측치observation를 매치하고, 하나의 테이블에서 다른 테이블로 변수를 통해 복사를 하는 것이다. <br /> 말로 하는게 더 어렵다. 예를 보면 간단하다.
+한 쌍의 테이블을 결합combining할 첫 번째 도구는 **mutating join**을 하는 것. <br /> mutating join은 두 개의 테이블들에서 변수를 결합할 수 있도록 도와준다. <br /> 먼저 keys를 통해서 관측치observation들을 매치하고, 하나의 테이블에서 다른 테이블로 변수를 통해 복사를 하는 것이다. <br /> 말로 하는게 더 어렵다. 예를 보면 간단하다.
 
 `flights`데이터에 칼럼이 너무 많기 때문에, 몇 개의 칼럼만 따로 뽑은 `flights2`를 쓰겠다.
 
@@ -225,22 +222,21 @@ primary key랑, 다른 테이블에서 상응하는 foreign key는 **relation**�
 flights2 <- flights %>% 
   select(year:day, hour, origin, dest, tailnum, carrier)
 flights2
+## # A tibble: 336,776 x 8
+##     year month   day  hour origin dest  tailnum carrier
+##    <int> <int> <int> <dbl> <chr>  <chr> <chr>   <chr>  
+##  1  2013     1     1     5 EWR    IAH   N14228  UA     
+##  2  2013     1     1     5 LGA    IAH   N24211  UA     
+##  3  2013     1     1     5 JFK    MIA   N619AA  AA     
+##  4  2013     1     1     5 JFK    BQN   N804JB  B6     
+##  5  2013     1     1     6 LGA    ATL   N668DN  DL     
+##  6  2013     1     1     5 EWR    ORD   N39463  UA     
+##  7  2013     1     1     6 EWR    FLL   N516JB  B6     
+##  8  2013     1     1     6 LGA    IAD   N829AS  EV     
+##  9  2013     1     1     6 JFK    MCO   N593JB  B6     
+## 10  2013     1     1     6 LGA    ORD   N3ALAA  AA     
+## # ... with 336,766 more rows
 ```
-
-    ## # A tibble: 336,776 x 8
-    ##     year month   day  hour origin dest  tailnum carrier
-    ##    <int> <int> <int> <dbl> <chr>  <chr> <chr>   <chr>  
-    ##  1  2013     1     1     5 EWR    IAH   N14228  UA     
-    ##  2  2013     1     1     5 LGA    IAH   N24211  UA     
-    ##  3  2013     1     1     5 JFK    MIA   N619AA  AA     
-    ##  4  2013     1     1     5 JFK    BQN   N804JB  B6     
-    ##  5  2013     1     1     6 LGA    ATL   N668DN  DL     
-    ##  6  2013     1     1     5 EWR    ORD   N39463  UA     
-    ##  7  2013     1     1     6 EWR    FLL   N516JB  B6     
-    ##  8  2013     1     1     6 LGA    IAD   N829AS  EV     
-    ##  9  2013     1     1     6 JFK    MCO   N593JB  B6     
-    ## 10  2013     1     1     6 LGA    ORD   N3ALAA  AA     
-    ## # ... with 336,766 more rows
 
 이 `flights2`의 데이터에다가 새로운 칼럼을 추가하고, 항공사 풀네임을 넣고 싶다고 치자. <br /> `left_join()`을 이용해서 `airlines`와 `flights2`를 결합할 수 있다.
 
@@ -248,51 +244,49 @@ flights2
 flights2 %>% 
   select(-origin, -dest) %>% 
   left_join(airlines, by = "carrier")
+## # A tibble: 336,776 x 7
+##     year month   day  hour tailnum carrier name                    
+##    <int> <int> <int> <dbl> <chr>   <chr>   <chr>                   
+##  1  2013     1     1     5 N14228  UA      United Air Lines Inc.   
+##  2  2013     1     1     5 N24211  UA      United Air Lines Inc.   
+##  3  2013     1     1     5 N619AA  AA      American Airlines Inc.  
+##  4  2013     1     1     5 N804JB  B6      JetBlue Airways         
+##  5  2013     1     1     6 N668DN  DL      Delta Air Lines Inc.    
+##  6  2013     1     1     5 N39463  UA      United Air Lines Inc.   
+##  7  2013     1     1     6 N516JB  B6      JetBlue Airways         
+##  8  2013     1     1     6 N829AS  EV      ExpressJet Airlines Inc.
+##  9  2013     1     1     6 N593JB  B6      JetBlue Airways         
+## 10  2013     1     1     6 N3ALAA  AA      American Airlines Inc.  
+## # ... with 336,766 more rows
 ```
-
-    ## # A tibble: 336,776 x 7
-    ##     year month   day  hour tailnum carrier name                    
-    ##    <int> <int> <int> <dbl> <chr>   <chr>   <chr>                   
-    ##  1  2013     1     1     5 N14228  UA      United Air Lines Inc.   
-    ##  2  2013     1     1     5 N24211  UA      United Air Lines Inc.   
-    ##  3  2013     1     1     5 N619AA  AA      American Airlines Inc.  
-    ##  4  2013     1     1     5 N804JB  B6      JetBlue Airways         
-    ##  5  2013     1     1     6 N668DN  DL      Delta Air Lines Inc.    
-    ##  6  2013     1     1     5 N39463  UA      United Air Lines Inc.   
-    ##  7  2013     1     1     6 N516JB  B6      JetBlue Airways         
-    ##  8  2013     1     1     6 N829AS  EV      ExpressJet Airlines Inc.
-    ##  9  2013     1     1     6 N593JB  B6      JetBlue Airways         
-    ## 10  2013     1     1     6 N3ALAA  AA      American Airlines Inc.  
-    ## # ... with 336,766 more rows
 
 `airlines`랑 겹치는 key인 `carrier`로 결합한걸 볼 수 있음.
 
-`name`이라는 변수가 `flights2`에 추가된 걸 볼 수 있다. <br /> 그래서 이런 타입의 join을 mutating join이라고 부른다. <br /> 이 케이스는, `mutate()`랑 R의 base subsetting을 이용해서 똑같이 할 수 있긴하다.
+`name`이라는 변수가 `flights2`에 추가된 걸 볼 수 있다. <br /> 그래서 이런 타입의 join을 mutating join이라고 부른다. <br /> 이 케이스는, R의 base subsetting을 이용해서도 똑같이 할 수 있긴하다.
 
 ``` r
 flights2 %>% 
   select(-origin, -dest) %>% 
   mutate(name = airlines$name[match(carrier, airlines$carrier)])
+## # A tibble: 336,776 x 7
+##     year month   day  hour tailnum carrier name                    
+##    <int> <int> <int> <dbl> <chr>   <chr>   <chr>                   
+##  1  2013     1     1     5 N14228  UA      United Air Lines Inc.   
+##  2  2013     1     1     5 N24211  UA      United Air Lines Inc.   
+##  3  2013     1     1     5 N619AA  AA      American Airlines Inc.  
+##  4  2013     1     1     5 N804JB  B6      JetBlue Airways         
+##  5  2013     1     1     6 N668DN  DL      Delta Air Lines Inc.    
+##  6  2013     1     1     5 N39463  UA      United Air Lines Inc.   
+##  7  2013     1     1     6 N516JB  B6      JetBlue Airways         
+##  8  2013     1     1     6 N829AS  EV      ExpressJet Airlines Inc.
+##  9  2013     1     1     6 N593JB  B6      JetBlue Airways         
+## 10  2013     1     1     6 N3ALAA  AA      American Airlines Inc.  
+## # ... with 336,766 more rows
 ```
 
-    ## # A tibble: 336,776 x 7
-    ##     year month   day  hour tailnum carrier name                    
-    ##    <int> <int> <int> <dbl> <chr>   <chr>   <chr>                   
-    ##  1  2013     1     1     5 N14228  UA      United Air Lines Inc.   
-    ##  2  2013     1     1     5 N24211  UA      United Air Lines Inc.   
-    ##  3  2013     1     1     5 N619AA  AA      American Airlines Inc.  
-    ##  4  2013     1     1     5 N804JB  B6      JetBlue Airways         
-    ##  5  2013     1     1     6 N668DN  DL      Delta Air Lines Inc.    
-    ##  6  2013     1     1     5 N39463  UA      United Air Lines Inc.   
-    ##  7  2013     1     1     6 N516JB  B6      JetBlue Airways         
-    ##  8  2013     1     1     6 N829AS  EV      ExpressJet Airlines Inc.
-    ##  9  2013     1     1     6 N593JB  B6      JetBlue Airways         
-    ## 10  2013     1     1     6 N3ALAA  AA      American Airlines Inc.  
-    ## # ... with 336,766 more rows
+하지만 이렇게 하면, 여러 개 변수들로 매치를 시켜야할 때는, 일반화하기가 힘들다. <br /> 그리고 전반적인 의도를 이해하기 위해선 잘 읽어봐야한다.
 
-하지만 이렇게 하면 여러 개 변수들로 매치를 시켜야할 때는, 일반화하기가 힘들고, 전반적인 의도를 이해하기 위해선 잘 읽어봐야한다.
-
-이 다음의 section들은, mutating join이 어떻게 작동하는지 디테일하게 설명해준다. <br /> joins의 유용한 시각적 표현을 통해서 하나씩 배워보자. 4개의 mutating join들. <br /> the inner join, 3개의 outer joins. <br /> 리얼 데이터들로 작업할 때는, keys가 항상 unique하게 관측치를 identify하는 건 아니기 때문에, 만약에 unique match가 없을 때는 어떻게 해야할지에 대해서도 다룬다.
+이 다음의 section들은, mutating join이 어떻게 작동하는지 디테일하게 설명해준다. <br /> joins의 유용한 시각적 표현을 통해서 하나씩 배워보자. 4개의 mutating join들. <br /> the inner join, 3개의 outer joins. <br /> 리얼 데이터들로 작업할 때는, keys가 항상 unique하게 관측치를 identify하는 건 아니기 때문에, 만약에 unique match가 없을 때는 어떻게 해야할지에 대해서도 다룬다. <br /> 마지막으로, 주어진 join에 대해, dplyr에게 어떤 변수가 key인지 전달하는 방법에 대해 배울 것.
 
 ### 13.4.1 Understanding joins
 
@@ -324,44 +318,221 @@ join이라는 건 `x`의 각 행을, `y`의 몇 개의 행이 되든 상관없�
 
 ### 13.4.2 Inner join
 
-가장 단순한 타입의 join은 **inner join**이다. <br /> keys가 같은 관측치들을 매치시키는 것. An inner join / matches pairs of observations / whenever their keys are equal. ![그림4](https://d33wubrfki0l68.cloudfront.net/3abea0b730526c3f053a3838953c35a0ccbe8980/7f29b/diagrams/join-inner.png)
+가장 단순한 타입의 join은 **inner join**이다. <br /> key값이 같은 관측치들을 매치시키는 것. <br /> An inner join / matches pairs of observations / whenever their keys are equal. <img src="https://d33wubrfki0l68.cloudfront.net/3abea0b730526c3f053a3838953c35a0ccbe8980/7f29b/diagrams/join-inner.png" alt="그림4" style="width:50.0%" />
 
 (정확하게 말하자면, keys가 equality 연산자operator를 사용해 매치하기 때문에, **inner equijoin**이라고 부른다. 그런데 대부분의 join이 equijoin이라 그냥 간단하게 inner join이라고 부름)
 
-inner join의 output은, 새로운 데이터 프레임. key값, x값, y값이 칼럼으로 있는. <br /> 어떤 변수가 key인지는 `by`를 사용해서 dplyr에 알려줄 수 있다.
+inner join의 output은, 새로운 데이터 프레임. <br /> key값, x값, y값이 칼럼으로 있는. <br /> 어떤 변수가 key인지는, `by`를 사용해서 dplyr에 알려줄 수 있다.
 
 ``` r
 x %>% 
   inner_join(y, by = "key")
+## # A tibble: 2 x 3
+##     key val_x val_y
+##   <dbl> <chr> <chr>
+## 1     1 x1    y1   
+## 2     2 x2    y2
 ```
 
-    ## # A tibble: 2 x 3
-    ##     key val_x val_y
-    ##   <dbl> <chr> <chr>
-    ## 1     1 x1    y1   
-    ## 2     2 x2    y2
-
-inner join의 가장 중요한 특징으로는, 매치되지 않은 행들은 결과에 포함되지 않는다는 것이다. <br /> 이 말인즉슨, 관측치를 잃기가 너무 쉽기 때문에, inner join은 data analysis에 일반적으로 적합하지 않다는 것.
+inner join의 가장 중요한 특징으로는, 매치되지 않은 행들은 결과에 포함되지 않는다는 것이다. <br /> 이 말인즉슨, 관측치를 잃기가 너무 쉬워서, inner join은 data analysis에 일반적으로 적합하지 않다.
 
 ### 13.4.3 Outer joins
 
-inner join은, 두 테이블 모두에 등장하는 관측치만을 keep했다. <br /> **outer join**은 둘 중 하나의 테이블에만 존재해도, 관측치를 keep한다. <br /> 3가지 타입의 outer join이 있다.
+inner join은, 두 테이블 모두에 등장하는 관측치만을 keep했다. <br /> **outer join**은 둘 중 하나의 테이블에만 존재해도, 관측치를 keep한다. <br /> 3가지 타입의 outer joins가 있다.
 
 -   **left join**은, `x`에 있는 관측치들을 모두 keep. <br />
 -   **right join**은, `y`에 있는 관측치들을 모두 keep. <br />
 -   **full join**은, `x`와 `y`에 있는 모든 관측치들을 keep.
 
-이 join들은, 각 테이블에 "가상의" 관측치들을 추가함으로써 작동하는 것. <br /> key값에 맞는 관측치가 없다면, `NA`로 채워서 만든다. 무슨 말인지 그림을 보면 쉽다. ![그림5](https://d33wubrfki0l68.cloudfront.net/9c12ca9e12ed26a7c5d2aa08e36d2ac4fb593f1e/79980/diagrams/join-outer.png)
+이 join들은, 각 테이블에 "가상의" 관측치들을 추가함으로써 작동하는 것. <br /> key값에 맞는 관측치가 없다면, `NA`로 채워서 만든다. 무슨 말인지 그림을 보면 쉽다. <img src="https://d33wubrfki0l68.cloudfront.net/9c12ca9e12ed26a7c5d2aa08e36d2ac4fb593f1e/79980/diagrams/join-outer.png" alt="그림5" style="width:50.0%" />
 
-가장 흔하게 이용되는 join은, left join이다. <br /> 기존의 테이블에다가, 추가적인 데이터를 추가하고자 할 때. <br /> 기존의 관측치들은, 매치가 없더라고 그대로 유지하고자 하는 것. <br /> left join이 디폴트가 되야 한다. 다른 걸 써야하는게 아니라면 이걸 써라.
+가장 흔하게 이용되는 join은, left join이다. <br /> 기존의 테이블에다가, 추가적인 데이터를 추가하고자 할 때 쓰는 것이다. <br /> 매치가 없더라도, 기존의 관측치들은 그대로 유지한다. <br /> left join이 디폴트가 되야 한다. 다른 걸 써야하는게 아니라면 이걸 써라.
 
 벤 다이어그램을 통해서도 이 join들을 표현할 수 있는데, <br /> ![그림6](https://d33wubrfki0l68.cloudfront.net/aeab386461820b029b7e7606ccff1286f623bae1/ef0d4/diagrams/join-venn.png)
 
-그런데 훌륭한 표현representation은 아니다. <br /> 어떤 테이블의 관측치들을 유지시켜주는지는 기억을 되살려줄지는 몰라도, 큰 한계가 있다. <br /> 벤 다이어그램은 keys가 관측치를 unique하게 identify하지 못할 때 어떤 일이 일어나는지 보여주지 못한다. <br /> 앞으로 살펴볼 그림들은, 그런 경우에 있어서도 어떻게 하는지 표현해줌.
+그런데 훌륭한 표현representation은 아니다. <br /> 어떤 테이블의 관측치들을 유지시켜주는지는 기억을 되살려줄지는 몰라도, 큰 한계가 있다. <br /> 왜냐하면 벤 다이어그램은 keys가 관측치를 unique하게 identify하지 못할 때 어떤 일이 일어나는지 보여주지 못한다. <br /> 앞으로 살펴볼 그림들은, 그런 경우에 있어서 어떻게 하는지 표현해줌.
 
 ### 13.4.4 Duplicate Keys
 
 이 때까지 모든 다이어그램들은, keys가 unique하다고 가정했다. 하지만 항상 그런 것은 아니다. <br /> 이 섹션에서는, keys가 unique하지 않을 때는 어떻게 하는지에 대해 설명한다. <br /> 2가지의 가능성이 있다.
 
-내가 알아보기 쉽게 좀 딱 정리하고 싶은데 흠..
-=============================================
+1.  하나의 테이블만 중복된 keys를 가지고 있을 때 이게 전형적인 일대다one-to-many 관계다.
+
+``` r
+x <- tribble(
+  ~key, ~val_x,
+     1, "x1",
+     2, "x2",
+     2, "x3",
+     1, "x4"
+)
+y <- tribble(
+  ~key, ~val_y,
+     1, "y1",
+     2, "y2"
+)
+```
+
+``` r
+left_join(x, y, by = "key")
+## # A tibble: 4 x 3
+##     key val_x val_y
+##   <dbl> <chr> <chr>
+## 1     1 x1    y1   
+## 2     2 x2    y2   
+## 3     2 x3    y2   
+## 4     1 x4    y1
+```
+
+![그림7](https://d33wubrfki0l68.cloudfront.net/6faac3e996263827cb57fc5803df6192541a9a4b/c7d74/diagrams/join-one-to-many.png)
+
+이 다이어그램을 보면, y에서는 primary key인게, x에서는 foreign key라는 걸 볼 수 있다.
+
+1.  두 테이블 모두 중복된 keys를 가지고 있을 때 이건 보통 에러다. 왜냐하면 key값이 어떠한 테이블에서도 관측치를 unique하게 identify하지 못하고 있으니깐. 그래서 이 중복된 key들을 가지고 join을 했을 때에는, 모든 가능한 combinations들을 갖게 된다. 이걸 Cartesian product라고 부른다.
+
+``` r
+x <- tribble(
+  ~key, ~val_x,
+     1, "x1",
+     2, "x2",
+     2, "x3",
+     3, "x4"
+)
+y <- tribble(
+  ~key, ~val_y,
+     1, "y1",
+     2, "y2",
+     2, "y3",
+     3, "y4"
+)
+```
+
+``` r
+left_join(x, y, by = "key")
+## # A tibble: 6 x 3
+##     key val_x val_y
+##   <dbl> <chr> <chr>
+## 1     1 x1    y1   
+## 2     2 x2    y2   
+## 3     2 x2    y3   
+## 4     2 x3    y2   
+## 5     2 x3    y3   
+## 6     3 x4    y4
+```
+
+![그림8](https://d33wubrfki0l68.cloudfront.net/d37530bbf7749f48c02684013ae72b2996b07e25/37510/diagrams/join-many-to-many.png)
+
+### 13.4.5 Defining the key columns
+
+이 때까지, 한 쌍의 테이블들은 하나의 변수로 join이 되었다. 그리고 두 테이블 다 그 변수를 같은 name으로 갖고 있었다. 이걸 그냥 `by = "key"`라는 constraint로 encode했었고. 하지만 `by`에 다른 값들을 넣어서 두 테이블을 연결하는 걸 해보자.
+
+-   디폴트는, `by = NULL`이다. 양 쪽에 나오는 모든 변수들을 다 씀. 그래서 **natural** join이라고 부른다. 예를 들어서, `flights`와 `weather` 두 테이블에는 5개의 공통 변수들이 존재한다. `year`, `month`, `day`, `hour`, `origin`
+
+``` r
+flights2 %>% 
+  left_join(weather)
+## Joining, by = c("year", "month", "day", "hour", "origin")
+## # A tibble: 336,776 x 18
+##     year month   day  hour origin dest  tailnum carrier  temp  dewp humid
+##    <dbl> <dbl> <int> <dbl> <chr>  <chr> <chr>   <chr>   <dbl> <dbl> <dbl>
+##  1  2013     1     1     5 EWR    IAH   N14228  UA       39.0  28.0  64.4
+##  2  2013     1     1     5 LGA    IAH   N24211  UA       39.9  25.0  54.8
+##  3  2013     1     1     5 JFK    MIA   N619AA  AA       39.0  27.0  61.6
+##  4  2013     1     1     5 JFK    BQN   N804JB  B6       39.0  27.0  61.6
+##  5  2013     1     1     6 LGA    ATL   N668DN  DL       39.9  25.0  54.8
+##  6  2013     1     1     5 EWR    ORD   N39463  UA       39.0  28.0  64.4
+##  7  2013     1     1     6 EWR    FLL   N516JB  B6       37.9  28.0  67.2
+##  8  2013     1     1     6 LGA    IAD   N829AS  EV       39.9  25.0  54.8
+##  9  2013     1     1     6 JFK    MCO   N593JB  B6       37.9  27.0  64.3
+## 10  2013     1     1     6 LGA    ORD   N3ALAA  AA       39.9  25.0  54.8
+## # ... with 336,766 more rows, and 7 more variables: wind_dir <dbl>,
+## #   wind_speed <dbl>, wind_gust <dbl>, precip <dbl>, pressure <dbl>,
+## #   visib <dbl>, time_hour <dttm>
+```
+
+-   `by`에 캐릭터 벡터를 넣을 수도 있다. `by = "x"`이렇게. nautral join과 비슷하다고 생각할 수 있지만, 이건 공통 변수의 일부만을 사용하는 것이다. 예를 들어, `flights`와 `planes`는 `year`와 `tailnum`이라는 공통 변수를 갖고 있다. 그런데, `planes`에서 `year`는 비행기제조년도이고, `flights`에서 `year`은 운항년도이다.
+
+그래서 `tailnum`이라는 변수만 쓰고싶다. 그럼,
+
+``` r
+flights2 %>% 
+  left_join(planes, by = "tailnum")
+## # A tibble: 336,776 x 16
+##    year.x month   day  hour origin dest  tailnum carrier year.y type 
+##     <int> <int> <int> <dbl> <chr>  <chr> <chr>   <chr>    <int> <chr>
+##  1   2013     1     1     5 EWR    IAH   N14228  UA        1999 Fixe~
+##  2   2013     1     1     5 LGA    IAH   N24211  UA        1998 Fixe~
+##  3   2013     1     1     5 JFK    MIA   N619AA  AA        1990 Fixe~
+##  4   2013     1     1     5 JFK    BQN   N804JB  B6        2012 Fixe~
+##  5   2013     1     1     6 LGA    ATL   N668DN  DL        1991 Fixe~
+##  6   2013     1     1     5 EWR    ORD   N39463  UA        2012 Fixe~
+##  7   2013     1     1     6 EWR    FLL   N516JB  B6        2000 Fixe~
+##  8   2013     1     1     6 LGA    IAD   N829AS  EV        1998 Fixe~
+##  9   2013     1     1     6 JFK    MCO   N593JB  B6        2004 Fixe~
+## 10   2013     1     1     6 LGA    ORD   N3ALAA  AA          NA <NA> 
+## # ... with 336,766 more rows, and 6 more variables: manufacturer <chr>,
+## #   model <chr>, engines <int>, seats <int>, speed <int>, engine <chr>
+```
+
+`year` 변수에 접미사suffix가 붙은 걸 인지하자.
+
+-   `by`에 named vector를 넣어주는 거다. `by = c("a" = "b")` 이러면 `x` 테이블의 `a` 변수를 `y` 테이블의 `b` 변수랑 매치시켜준다. 그리고 변수 이름은 `x` 테이블의 `a`를 쓰고. 예를 들어보자.
+
+`flights2` 자료에는 `origin`과 `dest`가 있다. 여기에다가 `airports`의 `faa`라는 변수에 맞춰서 자료를 덧붙이고 싶다고 치자.
+
+``` r
+flights2 %>% 
+  left_join(airports, c("dest" = "faa"))
+## # A tibble: 336,776 x 15
+##     year month   day  hour origin dest  tailnum carrier name    lat   lon
+##    <int> <int> <int> <dbl> <chr>  <chr> <chr>   <chr>   <chr> <dbl> <dbl>
+##  1  2013     1     1     5 EWR    IAH   N14228  UA      Geor~  30.0 -95.3
+##  2  2013     1     1     5 LGA    IAH   N24211  UA      Geor~  30.0 -95.3
+##  3  2013     1     1     5 JFK    MIA   N619AA  AA      Miam~  25.8 -80.3
+##  4  2013     1     1     5 JFK    BQN   N804JB  B6      <NA>   NA    NA  
+##  5  2013     1     1     6 LGA    ATL   N668DN  DL      Hart~  33.6 -84.4
+##  6  2013     1     1     5 EWR    ORD   N39463  UA      Chic~  42.0 -87.9
+##  7  2013     1     1     6 EWR    FLL   N516JB  B6      Fort~  26.1 -80.2
+##  8  2013     1     1     6 LGA    IAD   N829AS  EV      Wash~  38.9 -77.5
+##  9  2013     1     1     6 JFK    MCO   N593JB  B6      Orla~  28.4 -81.3
+## 10  2013     1     1     6 LGA    ORD   N3ALAA  AA      Chic~  42.0 -87.9
+## # ... with 336,766 more rows, and 4 more variables: alt <int>, tz <dbl>,
+## #   dst <chr>, tzone <chr>
+```
+
+``` r
+flights2 %>% 
+  left_join(airports, c("origin" = "faa"))
+## # A tibble: 336,776 x 15
+##     year month   day  hour origin dest  tailnum carrier name    lat   lon
+##    <int> <int> <int> <dbl> <chr>  <chr> <chr>   <chr>   <chr> <dbl> <dbl>
+##  1  2013     1     1     5 EWR    IAH   N14228  UA      Newa~  40.7 -74.2
+##  2  2013     1     1     5 LGA    IAH   N24211  UA      La G~  40.8 -73.9
+##  3  2013     1     1     5 JFK    MIA   N619AA  AA      John~  40.6 -73.8
+##  4  2013     1     1     5 JFK    BQN   N804JB  B6      John~  40.6 -73.8
+##  5  2013     1     1     6 LGA    ATL   N668DN  DL      La G~  40.8 -73.9
+##  6  2013     1     1     5 EWR    ORD   N39463  UA      Newa~  40.7 -74.2
+##  7  2013     1     1     6 EWR    FLL   N516JB  B6      Newa~  40.7 -74.2
+##  8  2013     1     1     6 LGA    IAD   N829AS  EV      La G~  40.8 -73.9
+##  9  2013     1     1     6 JFK    MCO   N593JB  B6      John~  40.6 -73.8
+## 10  2013     1     1     6 LGA    ORD   N3ALAA  AA      La G~  40.8 -73.9
+## # ... with 336,766 more rows, and 4 more variables: alt <int>, tz <dbl>,
+## #   dst <chr>, tzone <chr>
+```
+
+### 13.4.6 Exercises
+
+### 13.4.7 Other implementations
+
+`base::merge()`를 통해서 4가지의 mutating joins를 다 할 수 있다. 근데 dplyr의 verbs가 더 깔끔하게 코드 의도를 전달한다.
+
+SQL이 dplyr 고안convention의 영감이었기 때문에, 그대로 해석하면 된다. 하지만 SQL이 좀 더 넓은 join types를 제공해주나보다. non-equijoins라고 불리는거
+
+13.5 Filtering joins
+--------------------
+
+13.6 Join problems
+------------------
+
+13.7 Set operations
+-------------------
