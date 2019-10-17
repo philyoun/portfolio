@@ -356,7 +356,7 @@ inner join은, 두 테이블 모두에 등장하는 관측치만을 keep했다. 
 
 이 때까지 모든 다이어그램들은, keys가 unique하다고 가정했다. 하지만 항상 그런 것은 아니다. <br /> 이 섹션에서는, keys가 unique하지 않을 때는 어떻게 하는지에 대해 설명한다. <br /> 2가지의 가능성이 있다.
 
-1.  하나의 테이블만 중복된 keys를 가지고 있을 때 이게 전형적인 일대다one-to-many 관계다.
+1.  하나의 테이블만 중복된 keys를 가지고 있을 때 <br /> 이게 전형적인 일대다one-to-many 관계다.
 
 ``` r
 x <- tribble(
@@ -388,7 +388,7 @@ left_join(x, y, by = "key")
 
 이 다이어그램을 보면, y에서는 primary key인게, x에서는 foreign key라는 걸 볼 수 있다.
 
-1.  두 테이블 모두 중복된 keys를 가지고 있을 때 이건 보통 에러다. 왜냐하면 key값이 어떠한 테이블에서도 관측치를 unique하게 identify하지 못하고 있으니깐. 그래서 이 중복된 key들을 가지고 join을 했을 때에는, 모든 가능한 combinations들을 갖게 된다. 이걸 Cartesian product라고 부른다.
+1.  두 테이블 모두 중복된 keys를 가지고 있을 때 <br /> 이건 보통 에러다. <br /> 왜냐하면 key값이 어떠한 테이블에서도 관측치를 unique하게 identify하지 못하고 있으니깐. <br /> 그래서 이 중복된 key들을 가지고 join을 했을 때에는, 모든 가능한 combinations들을 갖게 된다. <br /> 이걸 Cartesian product라고 부른다.
 
 ``` r
 x <- tribble(
@@ -424,9 +424,9 @@ left_join(x, y, by = "key")
 
 ### 13.4.5 Defining the key columns
 
-이 때까지, 한 쌍의 테이블들은 하나의 변수로 join이 되었다. 그리고 두 테이블 다 그 변수를 같은 name으로 갖고 있었다. 이걸 그냥 `by = "key"`라는 constraint로 encode했었고. 하지만 `by`에 다른 값들을 넣어서 두 테이블을 연결하는 걸 해보자.
+이 때까지, 한 쌍의 테이블들은 하나의 변수로 join이 되었다. <br /> 그리고 두 테이블 다 그 변수를 같은 name으로 갖고 있었다. <br /> 이걸 그냥 `by = "key"`라는 constraint로 encode했었고. <br /> 하지만 `by`에 다른 값들을 넣어서 두 테이블을 연결하는 걸 해보자.
 
--   디폴트는, `by = NULL`이다. 양 쪽에 나오는 모든 변수들을 다 씀. 그래서 **natural** join이라고 부른다. 예를 들어서, `flights`와 `weather` 두 테이블에는 5개의 공통 변수들이 존재한다. `year`, `month`, `day`, `hour`, `origin`
+-   디폴트는, `by = NULL`이다. 양 쪽에 나오는 모든 변수들을 다 씀. <br /> 그래서 **natural** join이라고 부른다. <br /> 예를 들어서, `flights`와 `weather` 두 테이블에는 5개의 공통 변수들이 존재한다. <br /> `year`, `month`, `day`, `hour`, `origin`
 
 ``` r
 flights2 %>% 
@@ -450,7 +450,7 @@ flights2 %>%
 ## #   visib <dbl>, time_hour <dttm>
 ```
 
--   `by`에 캐릭터 벡터를 넣을 수도 있다. `by = "x"`이렇게. nautral join과 비슷하다고 생각할 수 있지만, 이건 공통 변수의 일부만을 사용하는 것이다. 예를 들어, `flights`와 `planes`는 `year`와 `tailnum`이라는 공통 변수를 갖고 있다. 그런데, `planes`에서 `year`는 비행기제조년도이고, `flights`에서 `year`은 운항년도이다.
+-   `by`에 캐릭터 벡터를 넣을 수도 있다. `by = "x"`이렇게. <br /> nautral join과 비슷하다고 생각할 수 있지만, 이건 공통 변수의 일부만을 사용하는 것이다. <br /> 예를 들어, `flights`와 `planes`는 `year`와 `tailnum`이라는 공통 변수를 갖고 있다. <br /> 그런데, `planes`에서 `year`는 비행기제조년도이고, `flights`에서 `year`은 운항년도이다.
 
 그래서 `tailnum`이라는 변수만 쓰고싶다. 그럼,
 
@@ -476,9 +476,9 @@ flights2 %>%
 
 `year` 변수에 접미사suffix가 붙은 걸 인지하자.
 
--   `by`에 named vector를 넣어주는 거다. `by = c("a" = "b")` 이러면 `x` 테이블의 `a` 변수를 `y` 테이블의 `b` 변수랑 매치시켜준다. 그리고 변수 이름은 `x` 테이블의 `a`를 쓰고. 예를 들어보자.
+-   `by`에 named vector를 넣어주는 거다. `by = c("a" = "b")` <br /> 이러면 `x` 테이블의 `a` 변수를 `y` 테이블의 `b` 변수랑 매치시켜준다. <br /> 그리고 변수 이름은 `x` 테이블의 `a`를 쓰고. 예를 들어보자.
 
-`flights2` 자료에는 `origin`과 `dest`가 있다. 여기에다가 `airports`의 `faa`라는 변수에 맞춰서 자료를 덧붙이고 싶다고 치자.
+`flights2` 자료에는 `origin`과 `dest`가 있다. <br /> 여기에다가 `airports`의 `faa`라는 변수에 맞춰서 자료를 덧붙이고 싶다고 치자.
 
 ``` r
 flights2 %>% 
@@ -524,15 +524,204 @@ flights2 %>%
 
 ### 13.4.7 Other implementations
 
-`base::merge()`를 통해서 4가지의 mutating joins를 다 할 수 있다. 근데 dplyr의 verbs가 더 깔끔하게 코드 의도를 전달한다.
+`base::merge()`를 통해서 4가지의 mutating joins를 다 할 수 있다. <br /> 근데 dplyr의 verbs가 더 깔끔하게 코드 의도를 전달한다.
 
-SQL이 dplyr 고안convention의 영감이었기 때문에, 그대로 해석하면 된다. 하지만 SQL이 좀 더 넓은 join types를 제공해주나보다. non-equijoins라고 불리는거
+SQL이 dplyr 고안convention의 영감이었기 때문에, 그대로 해석하면 된다. <br /> 하지만 SQL이 좀 더 넓은 join types를 제공해주나보다. non-equijoins라고 불리는거
 
 13.5 Filtering joins
 --------------------
 
+filtering joins는, mutating joins와 마찬가지 방법으로 관측치obs를 match한다. <br /> 그런데 차이점이 있다면, 이제는 관측치에 영향을 주는 것. 변수가 아니라. <br /> affect the observations, not the variables. <br /> 2가지 타입들이 있다.
+
+-   `semi_join()`은 `y`와 매치가 되는 모든 `x`들을 keep함.
+
+-   `anti_join()`은 `y`와 매치가 되는 모든 `x`들을 drop함.
+
+semi\_join은, 필터링한 summary tables를 원래의 테이블에 매칭할 때 매우 유용하다. <br /> Semi\_joins are useful for matching filtered summary tables back to the original rows. <br /> 예를 보면 그냥 쉽게 이해된다. 10개의 가장 유명한 목적지들을 찾았다고 치자.
+
+``` r
+top_dest <- flights %>% 
+  count(dest, sort = TRUE) %>% 
+  head(10)
+top_dest
+## # A tibble: 10 x 2
+##    dest      n
+##    <chr> <int>
+##  1 ORD   17283
+##  2 ATL   17215
+##  3 LAX   16174
+##  4 BOS   15508
+##  5 MCO   14082
+##  6 CLT   14064
+##  7 SFO   13331
+##  8 FLL   12055
+##  9 MIA   11728
+## 10 DCA    9705
+```
+
+그리고 이 목적지들에 갔던 flights들을 다 찾고 싶다고 치자. <br /> 그럼 다음과 같이 필터를 만들어볼 수 있다.
+
+``` r
+flights %>% 
+  filter(dest %in% top_dest$dest)
+## # A tibble: 141,145 x 19
+##     year month   day dep_time sched_dep_time dep_delay arr_time
+##    <int> <int> <int>    <int>          <int>     <dbl>    <int>
+##  1  2013     1     1      542            540         2      923
+##  2  2013     1     1      554            600        -6      812
+##  3  2013     1     1      554            558        -4      740
+##  4  2013     1     1      555            600        -5      913
+##  5  2013     1     1      557            600        -3      838
+##  6  2013     1     1      558            600        -2      753
+##  7  2013     1     1      558            600        -2      924
+##  8  2013     1     1      558            600        -2      923
+##  9  2013     1     1      559            559         0      702
+## 10  2013     1     1      600            600         0      851
+## # ... with 141,135 more rows, and 12 more variables: sched_arr_time <int>,
+## #   arr_delay <dbl>, carrier <chr>, flight <int>, tailnum <chr>,
+## #   origin <chr>, dest <chr>, air_time <dbl>, distance <dbl>, hour <dbl>,
+## #   minute <dbl>, time_hour <dttm>
+```
+
+하지만, 변수가 많아지면 이러한 접근법을 사용할 수가 없다. <br /> 예를 들어, 평균 딜레이가 많았던 10일을 찾았다치자. <br /> 그럼 이 자료로 `flights`에 어떻게 필터문filter statement를 작성할건지? <br /> `year`, `month`, `day`를 다 이용해서 어떻게?
+
+이럴 땐 그냥 대신에 `semi_join()`을 사용하면 된다. <br /> mutating join과 같이 2개의 테이블을 연결하지만, 새로운 칼럼을 추가하는 대신에, <br /> `y`와 매치가 되는 `x`만 keep한다.
+
+``` r
+flights %>% 
+  semi_join(top_dest)
+## Joining, by = "dest"
+## # A tibble: 141,145 x 19
+##     year month   day dep_time sched_dep_time dep_delay arr_time
+##    <int> <int> <int>    <int>          <int>     <dbl>    <int>
+##  1  2013     1     1      542            540         2      923
+##  2  2013     1     1      554            600        -6      812
+##  3  2013     1     1      554            558        -4      740
+##  4  2013     1     1      555            600        -5      913
+##  5  2013     1     1      557            600        -3      838
+##  6  2013     1     1      558            600        -2      753
+##  7  2013     1     1      558            600        -2      924
+##  8  2013     1     1      558            600        -2      923
+##  9  2013     1     1      559            559         0      702
+## 10  2013     1     1      600            600         0      851
+## # ... with 141,135 more rows, and 12 more variables: sched_arr_time <int>,
+## #   arr_delay <dbl>, carrier <chr>, flight <int>, tailnum <chr>,
+## #   origin <chr>, dest <chr>, air_time <dbl>, distance <dbl>, hour <dbl>,
+## #   minute <dbl>, time_hour <dttm>
+```
+
+그림으로 표현해보면, semi-join은 다음과 같이 생겼다. ![그림9](https://d33wubrfki0l68.cloudfront.net/028065a7f353a932d70d2dfc82bc5c5966f768ad/85a30/diagrams/join-semi.png)
+
+매치가 존재하는 것만이 중요하다. 어떤 관측치obs가 매치되었는지는 중요치 않다. <br /> 그래서, mutating joins와는 다르게, filtering join은 절대 rows를 중복하지 않는다. ![그림10](https://d33wubrfki0l68.cloudfront.net/e1d0283160251afaeca35cba216736eb995fee00/1b3cd/diagrams/join-semi-many.png)
+
+semi-join의 반대는 anti-join이다. anti-join은 매치가 **없는** rows만을 남긴다. ![그림11](https://d33wubrfki0l68.cloudfront.net/f29a85efd53a079cc84c14ba4ba6894e238c3759/c1408/diagrams/join-anti.png)
+
+anti-join은 join mismatch를 진단하는데 유용하다. <br /> 예를 들어서, `flights`와 `planes`를 연결하는데 있어, `planes`에 없는 `flights`가 있는지를 확인해보고 싶을 수 있다.
+
+``` r
+flights %>% 
+  anti_join(planes, by = "tailnum") %>% 
+  count(tailnum, sort = TRUE)
+## # A tibble: 722 x 2
+##    tailnum     n
+##    <chr>   <int>
+##  1 <NA>     2512
+##  2 N725MQ    575
+##  3 N722MQ    513
+##  4 N723MQ    507
+##  5 N713MQ    483
+##  6 N735MQ    396
+##  7 N0EGMQ    371
+##  8 N534MQ    364
+##  9 N542MQ    363
+## 10 N531MQ    349
+## # ... with 712 more rows
+```
+
+꽤나 많네 생각보다. 너무 많아서 그걸 `tailnum`별로 내림차순 정렬까지 해놨음.
+
+### 13.5.1 Exercises
+
 13.6 Join problems
 ------------------
 
+이 chapter에서 다루는 데이터는, clean up이 다 되어있는 데이터라서 별 문제가 없다. <br /> 너의 데이터는 그렇지 않을 것이기에, 너가 join을 스무스하게 하기 위해 필요한 것들을 알려주겠다. <br />
+
+1.  각 테이블에서 primary key를 identifying하는 것으로 시작을 해라. <br /> 이건 데이터에 대한 이해가 필요하다. <br /> 이것저것해보면서 끼워맞추지말고, 어떤 의미를 갖는지 이해하면서 찾아라. <br /> 그딴 식으로 찾으면 찾아도 별로 의미가 없을 것이다. <br /> 예를 들어, `airports`에서 `alt`, `lon` 가지고 unique하게 identify할 수 있지만, 좋은게 아니다.
+
+``` r
+airports %>% 
+  count(alt, lon) %>% 
+  filter(n > 1)
+## # A tibble: 0 x 3
+## # ... with 3 variables: alt <int>, lon <dbl>, n <int>
+```
+
+1.  primary key의 어떠한 변수도 missing이 아니라는 걸 체크해라. <br /> 만약에 missing이 있다면, 이건 관측치를 identify할 수 없는거다.
+
+2.  한 테이블에서 primary key인게 다른 테이블에서 foreign key와 match된다는 걸 확인해라. <br /> `anti_join()`을 이용해서 하는게 제일 좋은 방법이다. <br /> 무슨 소리인지 잘 이해가 안 되어서 없는 예를 만들어보겠다. <br /> 위에서 봤듯이, `flights`에 나와 있는 비행기가, `planes`에 다 있는 건 아니다. <br /> 그러니깐, `planes`에 없는 비행기로도 운항이 이루어진 적이 있다. <br /> 배운 용어로 해보면, `flights`의 `tailnum`은, `planes`의 primary key가 되는 foreign key다. <br /> 이걸 확인해볼 때 `anti_join()`을 쓸 수 있다는 것이다.
+
+``` r
+planes %>% 
+  anti_join(flights, by = "tailnum")
+## # A tibble: 0 x 9
+## # ... with 9 variables: tailnum <chr>, year <int>, type <chr>,
+## #   manufacturer <chr>, model <chr>, engines <int>, seats <int>,
+## #   speed <int>, engine <chr>
+```
+
+이러면 아무것도 안 나오므로, <br />     `flights`의 `tailnum`은, `planes`의 primary key가 되는 foreign key라는 것을 확인할 수 있다.
+
+또한, join 전후의 rows를 체크하는 것으로는, join이 잘 되었는지 아닌지를 판단할 수 없다. <br /> 왜냐하면 양 테이블에 중복된 keys가 있을 때 inner join을 했다가, <br /> drop된 rows가 duplicated rows랑 기가 막히게 일치해버릴 수가 있기 때문.
+
 13.7 Set operations
 -------------------
+
+마지막 type은 set operations다. <br /> 이건 쉽다. <br /> 자주 이용하지는 않지만, single complex filter를 simpler pieces로 쪼갤 때 유용. <br /> 관측치의 모든 값들을 다 비교한다. <br /> `x`랑 `y`가 같은 변수를 가져야하며, 관측치를 set과 같이 다룬다. <br />
+
+1.  `intersect(x, y)` : `x`와 `y` 둘 다에서 나타나는 관측지만을 반환
+2.  `union(x, y)` : `x`와 `y` 둘 중 하나에서만 나타나도 모든 관측지를 반환
+3.  `setdiff(x, y)` : `x`에는 있지만 `y`에는 없는 관측지를 반환
+
+그럼 다음과 같은 간단한 데이터에 대해서,
+
+``` r
+df1 <- tribble(
+  ~x, ~y,
+  1, 1,
+  2, 1,
+)
+
+df2 <- tribble(
+  ~x, ~y,
+  1, 1,
+  1, 2
+)
+```
+
+총 4가지를 해볼 수 있겠다.
+
+``` r
+intersect(df1, df2)
+## # A tibble: 1 x 2
+##       x     y
+##   <dbl> <dbl>
+## 1     1     1
+union(df1, df2)
+## # A tibble: 3 x 2
+##       x     y
+##   <dbl> <dbl>
+## 1     1     2
+## 2     2     1
+## 3     1     1
+setdiff(df1, df2) # df1에는 있지만 df2에는 없는 것
+## # A tibble: 1 x 2
+##       x     y
+##   <dbl> <dbl>
+## 1     2     1
+setdiff(df2, df1) # df2에는 있지만 df1에는 없는 것
+## # A tibble: 1 x 2
+##       x     y
+##   <dbl> <dbl>
+## 1     1     2
+```
