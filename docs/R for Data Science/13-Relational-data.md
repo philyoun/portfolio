@@ -6,15 +6,15 @@
 
 데이터 분석을 하는데 있어, 단 하나의 table을 쓰는 경우는 거의 없다. <br /> 보통 여러 개의 테이블들이 있고, 니가 궁금한 것에 대해 대답을 하기 위해선, 이것들을 잘 결합combine해야됨. <br /> 종합해서, 이 multiple tables of data를 relational data라고 부른다. <br /> 단순히 개별적인 데이터셋들이 아니라, relations가 중요하기 때문이다.
 
-Relations라는건, 항상 2개의 테이블에서 정의되는거다. <br /> 모든 relations들은 이 간단한 아이디어에서 만들어진 것. <br /> 3개 이상의 테이블에서의 relations라는건 항상 2개씩의 relations의 특성. 확장의 개념으로 생각하자. <br /> the relations of three or more tables / are always a property of the relations between each pair.
+Relations라는건, 항상 2개의 테이블에서 정의되는거다. <br /> 모든 relations들은 이 간단한 아이디어에서 만들어진 것. <br /> 3개 이상의 테이블에서의 relations라는건 항상 2개씩의 relations의 특성. <br /> the relations of three or more tables / are always a property of the relations between each pair. <br /> 확장의 개념으로 생각하자.
 
 Relational data에 대해 다루기 위해서는, pairs of tables에 사용되는 verbs를 알아야됨. <br /> 3가지의 families of verbs가 있음.
 
 -   Mutating joins: 하나의 데이터 프레임에 새로운 변수들을 추가하는 것. <br />     어떤 새로운 변수? 다른 데이터 프레임에서, 매칭이 되는 관측치에 대한 변수 <br />     which add new variables to one data frame / from matching observations in another. <br />
--   Filtering joins: 하나의 데이터 프레임에서 관측치를 필터링 하는 것임. <br />     어떤 기준으로? 다른 데이터 프레임에, 그 관측치에 대한 정보가 있냐없냐에 따라 <br />     which filter observations from one data frame / based on whether or not they match an observation in the other table.
--   Set Operations: 관측치를 set elements였던 것처럼 다루는 것. <br />     which treat observations as if they were set elements.
+-   Filtering joins: 하나의 데이터 프레임에서 관측치를 필터링 하는 것임. <br />     어떤 기준으로? 다른 데이터 프레임에, 그 관측치에 대한 정보가 있냐없냐에 따라 <br />
+-   Set Operations: 관측치를 set elements인 것처럼 다루는 것. <br />     which treat observations as if they were set elements.
 
-Relational data를 찾을 수 있는 가장 흔한 장소는 relational database management system(RDBMS)이다. <br /> 거의 모든 현대 데이터베이스들을 관통하는 단어. <br /> 만약에 데이터베이스를 다루어본 적이 있다면, 아마 분명히 SQL을 썼을 것이다. <br /> 그렇다면, 이 챕터에서 비슷한 개념을 찾을 수 있을 것이다. 물론 표현은 dplyr에선 좀 다르겠지만. <br /> 일반적으로, dplyr은 SQL보다 좀 더 사용하기 쉽다. 왜냐하면 데이터 분석에 특화되어있기 때문에. <br /> 보통의 데이터 분석 작업을 쉽게 만들어 주는데, 데이터 분석에 잘 이용되지 않는 다른 것들은 하기가 좀 힘들어지긴 한다. <br /> it makes common data analysis operations easier, at the expense of making it more difficult to do other things to do other things that aren't commonly needed for data analysis.
+Relational data를 찾을 수 있는 가장 흔한 장소는 relational database management system(RDBMS)이다. <br /> 거의 모든 현대 데이터베이스들을 관통하는 단어. <br /> 만약에 데이터베이스를 다루어본 적이 있다면, 아마 분명히 SQL을 썼을 것이다. <br /> 그렇다면, 이 chapter에서 비슷한 개념을 찾을 수 있을 것이다. 물론 표현은 dplyr에선 조금 다르겠지만. <br /> 일반적으로, dplyr은 SQL보다 좀 더 사용하기 쉽다. 왜냐하면 데이터 분석에 특화되어있기 때문에. <br /> 일반적인 데이터 분석 작업을 쉽게 만들어 주는데, 데이터 분석에 잘 이용되지 않는 다른 것들은 하기가 좀 힘들어지긴 한다. <br /> it makes common data analysis operations easier, at the expense of making it more difficult to do other things to do other things that aren't commonly needed for data analysis.
 
 ### 13.1.1 Prerequisites
 
@@ -28,7 +28,7 @@ library(nycflights13)
 13.2 nycflights13
 -----------------
 
-relational data를 배우기 위해서 nycflights13 패키지를 사용할 것이다. <br /> 이 패키지는 4개의 tibbles를 갖고 있다. <br /> 이 tibbles는, data transformation을 할 때 썼던, `flights`라는 테이블과 연관이 있는 tibble들.
+relational data를 배우기 위해서 nycflights13 패키지를 사용할 것이다. <br /> 이 패키지는 4개의 tibbles를 갖고 있다. <br /> 이 tibble들은, data transformation을 할 때 썼던, `flights`라는 테이블과 연관이 있는 tibble들.
 
 `airlines`: 항공사 이름을 단축된 코드로 볼 수 있도록 해준다.
 
@@ -116,16 +116,16 @@ weather
 ## #   precip <dbl>, pressure <dbl>, visib <dbl>, time_hour <dttm>
 ```
 
-다이어그램으로 이 테이블들 간의 관계를 표시해봤다. <img src="https://d33wubrfki0l68.cloudfront.net/245292d1ea724f6c3fd8a92063dcd7bfb9758d02/5751b/diagrams/relational-nycflights.png" alt="그림1" style="width:50.0%" />{ center }
+다이어그램으로 이 테이블들 간의 관계를 표시해봤다. <img src="https://d33wubrfki0l68.cloudfront.net/245292d1ea724f6c3fd8a92063dcd7bfb9758d02/5751b/diagrams/relational-nycflights.png" alt="그림1" style="width:50.0%" />
 
-다이어그램은 좀 복잡하긴한데, 필드에 나가서 보게 될 것에 비하면 간단한 편! <br /> 이러한 다이어그램을 이해하는 것의 key는, 각 relation은 한 쌍의 테이블만을 고려한다는 것. <br /> The key to understanding diagrams like this / is to remember / each relation always concerns a pair of tables. <br /> 다 이해할 필요는 없고, 테이블 간의 (니가 관심있는)chain of relations만 이해해라.
+다이어그램은 좀 복잡하긴한데, 필드에 나가서 보게 될 것에 비하면 간단한 편이다(...) <br /> 이러한 다이어그램을 이해하는 것의 key는, 각 relation은 한 쌍의 테이블만을 고려한다는 걸 기억하는 것. <br /> The key to understanding diagrams like this / is to remember / each relation always concerns a pair of tables. <br /> 다 이해할 필요 없이, 테이블 간의 (니가 관심있는)chain of relations만 이해해라.
 
 이 nycflights13에 관해선, <br /> `flights`는 `planes`와 하나의 변수인, `tailnum`을 통해 연결된다. <br /> `flights`는 `airlines`와, `carrier` 변수를 통해 연결된다. <br /> `flights`는 `airports`와 두 가지 방법, `origin`과 `dest` 변수들을 통해 연결된다. <br /> `flights`는 `weather`와, `origin`(출발지)와 `year`와 `month`와 `day` 그리고 `hour`를 통해 연결된다.
 
 13.3 Keys
 ---------
 
-2개의 tables를 연결시켜주는 변수들을, **keys**라고 부른다. <br /> keys는 관측치를 unique하게 identify해주는 변수(혹은 변수들). <br /> 간단한 케이스에서는, 하나의 변수가 관측치를 identify하기에 충분하다. <br />     예를 들어, 각 비행기는 `tailnum`으로 unique하게 identify된다. <br /> 다른 케이스에서는, 여러 개의 변수들이 필요할 수 있다. <br />     예를 들어, `weather` 자료에서, 관측치를 unique하게 identify하기 위해선, 다섯 개의 변수들이 필요하다. `year`, `month`, `day`, `hour` 그리고 `origin`.
+2개의 tables를 연결시켜주는 변수들을, **keys**라고 부른다. <br /> keys는 관측치를 unique하게 identify해주는 변수(혹은 변수들). <br /> 간단한 케이스에서는, 하나의 변수가 관측치를 identify하기에 충분하다. <br />     예를 들어, `planes`에서, 각 비행기는 `tailnum`으로 unique하게 identify된다. <br /> 다른 케이스에서는, 여러 개의 변수들이 필요할 수 있다. <br />     예를 들어, `weather` 자료에서, 관측치를 unique하게 identify하기 위해선, 다섯 개의 변수들이 필요하다. `year`, `month`, `day`, `hour` 그리고 `origin`.
 
 2가지 타입의 key가 있다. <br />
 
@@ -141,8 +141,6 @@ weather
 planes %>% 
   count(tailnum) %>% 
   filter(n > 1)
-## Warning: The `printer` argument is deprecated as of rlang 0.3.0.
-## This warning is displayed once per session.
 ## # A tibble: 0 x 2
 ## # ... with 2 variables: tailnum <chr>, n <int>
 ```
@@ -203,7 +201,9 @@ flights %>%
 ## # ... with 64,918 more rows
 ```
 
-맨 처음 이 데이터를 다룰 때, 각 flight number는 하루에 한 번만 쓰일 거라고 순진하게 생각했다. <br /> 그럼 이제 특정한 비행specific flight에 대해 소통하기가 쉬웠을텐데, 불운하게도 안 그랬다. <br /> 가끔 이렇게 테이블에 primary key가 없으면, `mutate()`나 `row_number()`을 통해서 하나 만들어주는게 유용하다. <br /> 이러고나면 어떤 필터링을 하고 난 후, original data로 다시 한번 체크할 때, 관측치를 매치하기 쉽게 해준다. <br /> 이런 key를 **surrogate key**라고 부른다.
+맨 처음 이 데이터를 다룰 때, 각 flight number는 하루에 한 번만 쓰일 거라고 순진하게 생각했다. <br /> 그럼 이제 특정한 비행specific flight에 대해 소통하기가 쉬웠을텐데, 불운하게도 안 그랬다.
+
+이렇게, 테이블에 primary key가 없으면, `mutate()`나 `row_number()`을 통해서 하나 만들어주는게 유용하다. <br /> 이러고나면 어떤 필터링을 하고 난 후, original data로 다시 한번 체크할 때, 관측치를 매치하기 쉽게 해준다. <br /> 이런 key를 **surrogate key**라고 부른다.
 
 primary key랑, 다른 테이블에서 상응하는 foreign key는 **relation**을 형성한다. <br /> A primary key and the corresponding foreign key in another table form a **relation**. <br /> Relations이란건 기본적으로 일대다one-to-many다. <br /> 예를 들어, 각 비행flight은 하나의 비행기를 가지고 있는데, 각 비행기는 여러 개의 비행flight을 가지고 있다. <br /> 다른 데이터에선 가끔씩 일대일one-to-one 관계를 볼 수 있다. <br /> 이건 일대다one-to-many의 특별한 케이스라고 볼 수 있다.
 
@@ -214,7 +214,7 @@ primary key랑, 다른 테이블에서 상응하는 foreign key는 **relation**�
 13.4 Mutating joins
 -------------------
 
-한 쌍의 테이블을 결합combining할 첫 번째 도구는 **mutating join**을 하는 것. <br /> mutating join은 두 개의 테이블들에서 변수를 결합할 수 있도록 도와준다. <br /> 먼저 keys를 통해서 관측치observation들을 매치하고, 하나의 테이블에서 다른 테이블로 변수를 통해 복사를 하는 것이다. <br /> 말로 하는게 더 어렵다. 예를 보면 간단하다.
+한 쌍의 테이블을 결합combining할 첫 번째 도구는 **mutating join**. <br /> mutating join은 두 개의 테이블들에서 변수를 결합할 수 있도록 도와준다. <br /> 먼저 keys를 통해서 관측치observation들을 매치하고, 하나의 테이블에서 다른 테이블로 변수를 통해 복사를 하는 것이다. <br /> 말로 하는게 더 어렵다. 예를 보면 간단하다.
 
 `flights`데이터에 칼럼이 너무 많기 때문에, 몇 개의 칼럼만 따로 뽑은 `flights2`를 쓰겠다.
 
@@ -238,7 +238,7 @@ flights2
 ## # ... with 336,766 more rows
 ```
 
-이 `flights2`의 데이터에다가 새로운 칼럼을 추가하고, 항공사 풀네임을 넣고 싶다고 치자. <br /> `left_join()`을 이용해서 `airlines`와 `flights2`를 결합할 수 있다.
+이 `flights2`의 데이터에다가, 항공사 풀네임이라는 새로운 칼럼을 추가하고 싶다고 치자. <br /> `left_join()`을 이용해서 `airlines`와 `flights2`를 결합할 수 있다.
 
 ``` r
 flights2 %>% 
@@ -284,9 +284,9 @@ flights2 %>%
 ## # ... with 336,766 more rows
 ```
 
-하지만 이렇게 하면, 여러 개 변수들로 매치를 시켜야할 때는, 일반화하기가 힘들다. <br /> 그리고 전반적인 의도를 이해하기 위해선 잘 읽어봐야한다.
+하지만 이렇게 하면, 여러 개 변수들로 매치를 시켜야할 때는, 일반화하기가 힘들다. <br /> 그리고 전반적인 의도를 이해하기 위해선 잘 읽어봐야한다. <br /> 그러니깐 그냥 dplyr를 쓰자.
 
-이 다음의 section들은, mutating join이 어떻게 작동하는지 디테일하게 설명해준다. <br /> joins의 유용한 시각적 표현을 통해서 하나씩 배워보자. 4개의 mutating join들. <br /> the inner join, 3개의 outer joins. <br /> 리얼 데이터들로 작업할 때는, keys가 항상 unique하게 관측치를 identify하는 건 아니기 때문에, 만약에 unique match가 없을 때는 어떻게 해야할지에 대해서도 다룬다. <br /> 마지막으로, 주어진 join에 대해, dplyr에게 어떤 변수가 key인지 전달하는 방법에 대해 배울 것.
+이 다음의 section들은, mutating join이 어떻게 작동하는지 디테일하게 설명해준다. <br /> joins의 시각적 표현을 통해서 하나씩 배워보자. 4개의 mutating join들. <br /> the inner join 그리고 3개의 outer joins. <br /> 리얼 데이터들로 작업할 때는, keys가 항상 unique한 관측치를 identify하는 건 아니기 때문에, 만약에 unique match가 없을 때는 어떻게 해야할지에 대해서도 다룬다. <br /> 마지막으로, 주어진 join에 대해, dplyr에게 어떤 변수가 key인지 전달하는 방법에 대해 배울 것.
 
 ### 13.4.1 Understanding joins
 
@@ -350,13 +350,13 @@ inner join은, 두 테이블 모두에 등장하는 관측치만을 keep했다. 
 
 벤 다이어그램을 통해서도 이 join들을 표현할 수 있는데, <br /> ![그림6](https://d33wubrfki0l68.cloudfront.net/aeab386461820b029b7e7606ccff1286f623bae1/ef0d4/diagrams/join-venn.png)
 
-그런데 훌륭한 표현representation은 아니다. <br /> 어떤 테이블의 관측치들을 유지시켜주는지는 기억을 되살려줄지는 몰라도, 큰 한계가 있다. <br /> 왜냐하면 벤 다이어그램은 keys가 관측치를 unique하게 identify하지 못할 때 어떤 일이 일어나는지 보여주지 못한다. <br /> 앞으로 살펴볼 그림들은, 그런 경우에 있어서 어떻게 하는지 표현해줌.
+그런데 훌륭한 표현representation은 아니다. <br /> 어떤 테이블의 관측치들을 유지시켜주는지는 기억을 되살려줄수는 있어도, 큰 한계가 있다. <br /> 왜냐하면 벤 다이어그램은 keys가 관측치를 unique하게 identify하지 못할 때, 어떤 일이 일어나는지 보여주지 못하기 때문. <br /> 앞으로 살펴볼 그림들은, 그런 경우에 있어서 어떻게 하는지 표현해줌.
 
 ### 13.4.4 Duplicate Keys
 
 이 때까지 모든 다이어그램들은, keys가 unique하다고 가정했다. 하지만 항상 그런 것은 아니다. <br /> 이 섹션에서는, keys가 unique하지 않을 때는 어떻게 하는지에 대해 설명한다. <br /> 2가지의 가능성이 있다.
 
-1.  하나의 테이블만 중복된 keys를 가지고 있을 때 <br /> 이게 전형적인 일대다one-to-many 관계다.
+1. 하나의 테이블만 중복된 keys를 가지고 있을 때 <br /> 이게 전형적인 일대다one-to-many 관계다.
 
 ``` r
 x <- tribble(
@@ -388,7 +388,7 @@ left_join(x, y, by = "key")
 
 이 다이어그램을 보면, y에서는 primary key인게, x에서는 foreign key라는 걸 볼 수 있다.
 
-1.  두 테이블 모두 중복된 keys를 가지고 있을 때 <br /> 이건 보통 에러다. <br /> 왜냐하면 key값이 어떠한 테이블에서도 관측치를 unique하게 identify하지 못하고 있으니깐. <br /> 그래서 이 중복된 key들을 가지고 join을 했을 때에는, 모든 가능한 combinations들을 갖게 된다. <br /> 이걸 Cartesian product라고 부른다.
+2. 두 테이블 모두 중복된 keys를 가지고 있을 때 <br /> 이건 보통 에러다. <br /> 왜냐하면 key값이 어떠한 테이블에서도 관측치를 unique하게 identify하지 못하고 있으니깐. <br /> 그래서 이 중복된 key들을 가지고 join을 했을 때에는, 모든 가능한 combinations들을 갖게 된다. <br /> 이걸 Cartesian product라고 부른다.
 
 ``` r
 x <- tribble(
@@ -426,7 +426,7 @@ left_join(x, y, by = "key")
 
 이 때까지, 한 쌍의 테이블들은 하나의 변수로 join이 되었다. <br /> 그리고 두 테이블 다 그 변수를 같은 name으로 갖고 있었다. <br /> 이걸 그냥 `by = "key"`라는 constraint로 encode했었고. <br /> 하지만 `by`에 다른 값들을 넣어서 두 테이블을 연결하는 걸 해보자.
 
--   디폴트는, `by = NULL`이다. 양 쪽에 나오는 모든 변수들을 다 씀. <br /> 그래서 **natural** join이라고 부른다. <br /> 예를 들어서, `flights`와 `weather` 두 테이블에는 5개의 공통 변수들이 존재한다. <br /> `year`, `month`, `day`, `hour`, `origin`
+-   디폴트는, `by = NULL`이다. 양 쪽에 나오는 모든 변수들을 다 씀. <br /> 그래서 **natural** join이라고 부른다. <br /> 예를 들어서, `flights2`와 `weather` 두 테이블에는 5개의 공통 변수들이 존재한다. <br /> `year`, `month`, `day`, `hour`, `origin`
 
 ``` r
 flights2 %>% 
@@ -450,9 +450,9 @@ flights2 %>%
 ## #   visib <dbl>, time_hour <dttm>
 ```
 
--   `by`에 캐릭터 벡터를 넣을 수도 있다. `by = "x"`이렇게. <br /> nautral join과 비슷하다고 생각할 수 있지만, 이건 공통 변수의 일부만을 사용하는 것이다. <br /> 예를 들어, `flights`와 `planes`는 `year`와 `tailnum`이라는 공통 변수를 갖고 있다. <br /> 그런데, `planes`에서 `year`는 비행기제조년도이고, `flights`에서 `year`은 운항년도이다.
+-   `by`에 캐릭터 벡터를 넣을 수도 있다. `by = "x"`이렇게. <br /> nautral join과 비슷하다고 생각할 수 있지만, 이건 공통 변수의 일부만을 사용하는 것이다. <br /> 예를 들어, `flights`와 `planes`는, `year`와 `tailnum`이라는 공통 변수를 갖고 있다. <br /> 그런데, `planes`에서 `year`은 비행기제조년도이고, `flights`에서 `year`은 운항년도이다.
 
-그래서 `tailnum`이라는 변수만 쓰고싶다. 그럼,
+그래서 `tailnum`이라는 변수만 쓰고싶다. <br /> 그럼,
 
 ``` r
 flights2 %>% 
@@ -526,7 +526,7 @@ flights2 %>%
 
 `base::merge()`를 통해서 4가지의 mutating joins를 다 할 수 있다. <br /> 근데 dplyr의 verbs가 더 깔끔하게 코드 의도를 전달한다.
 
-SQL이 dplyr 고안convention의 영감이었기 때문에, 그대로 해석하면 된다. <br /> 하지만 SQL이 좀 더 넓은 join types를 제공해주나보다. non-equijoins라고 불리는거
+SQL이 dplyr 고안convention의 영감이었기 때문에, 그대로 해석하면 된다. <br /> 하지만 SQL이 좀 더 넓은 join types를 제공해주나보다. non-equijoins라고 불리는거 이게 이 Section의 핵심이다. SQL과 dplyr의 정리된 표를 보고 싶다면 \[원문\]([https://r4ds.had.co.nz/relational-data.html\#keys을](https://r4ds.had.co.nz/relational-data.html#keys을) 참고하자.
 
 13.5 Filtering joins
 --------------------
@@ -537,7 +537,7 @@ filtering joins는, mutating joins와 마찬가지 방법으로 관측치obs를 
 
 -   `anti_join()`은 `y`와 매치가 되는 모든 `x`들을 drop함.
 
-semi\_join은, 필터링한 summary tables를 원래의 테이블에 매칭할 때 매우 유용하다. <br /> Semi\_joins are useful for matching filtered summary tables back to the original rows. <br /> 예를 보면 그냥 쉽게 이해된다. 10개의 가장 유명한 목적지들을 찾았다고 치자.
+semi\_join은, 필터링한 summary tables를 원래의 테이블에 매칭할 때 매우 유용하다. <br /> Semi\_joins are useful for matching filtered summary tables back to the original rows. <br /> 또 말이 어렵다. 예를 보면 그냥 쉽게 이해된다. <br /> `flights`에서 10개의 가장 유명한 목적지들을 찾았다고 치자.
 
 ``` r
 top_dest <- flights %>% 
@@ -585,7 +585,7 @@ flights %>%
 
 하지만, 변수가 많아지면 이러한 접근법을 사용할 수가 없다. <br /> 예를 들어, 평균 딜레이가 많았던 10일을 찾았다치자. <br /> 그럼 이 자료로 `flights`에 어떻게 필터문filter statement를 작성할건지? <br /> `year`, `month`, `day`를 다 이용해서 어떻게?
 
-이럴 땐 그냥 대신에 `semi_join()`을 사용하면 된다. <br /> mutating join과 같이 2개의 테이블을 연결하지만, 새로운 칼럼을 추가하는 대신에, <br /> `y`와 매치가 되는 `x`만 keep한다.
+이럴 땐 그냥 대신에 `semi_join()`을 사용하면 된다. <br /> mutating join과 같이 2개의 테이블을 연결하지만, 새로운 칼럼을 추가하는게 아니고, <br /> `y`와 매치가 되는 `x`만 keep한다.
 
 ``` r
 flights %>% 
@@ -610,13 +610,13 @@ flights %>%
 ## #   minute <dbl>, time_hour <dttm>
 ```
 
-그림으로 표현해보면, semi-join은 다음과 같이 생겼다. ![그림9](https://d33wubrfki0l68.cloudfront.net/028065a7f353a932d70d2dfc82bc5c5966f768ad/85a30/diagrams/join-semi.png)
+그림으로 표현해보면, semi-join은 다음과 같이 생겼다. <img src="https://d33wubrfki0l68.cloudfront.net/028065a7f353a932d70d2dfc82bc5c5966f768ad/85a30/diagrams/join-semi.png" alt="그림9" style="width:50.0%" />
 
-매치가 존재하는 것만이 중요하다. 어떤 관측치obs가 매치되었는지는 중요치 않다. <br /> 그래서, mutating joins와는 다르게, filtering join은 절대 rows를 중복하지 않는다. ![그림10](https://d33wubrfki0l68.cloudfront.net/e1d0283160251afaeca35cba216736eb995fee00/1b3cd/diagrams/join-semi-many.png)
+매치가 존재하는 것만이 중요하다. 어떤 관측치obs가 매치되었는지는 중요치 않다. <br /> 그래서, mutating joins와는 다르게, filtering join은 절대 rows를 중복하지 않는다. <img src="https://d33wubrfki0l68.cloudfront.net/e1d0283160251afaeca35cba216736eb995fee00/1b3cd/diagrams/join-semi-many.png" alt="그림10" style="width:50.0%" />
 
-semi-join의 반대는 anti-join이다. anti-join은 매치가 **없는** rows만을 남긴다. ![그림11](https://d33wubrfki0l68.cloudfront.net/f29a85efd53a079cc84c14ba4ba6894e238c3759/c1408/diagrams/join-anti.png)
+semi-join의 반대는 anti-join이다. anti-join은 매치가 **없는** rows만을 남긴다. <img src="https://d33wubrfki0l68.cloudfront.net/f29a85efd53a079cc84c14ba4ba6894e238c3759/c1408/diagrams/join-anti.png" alt="그림11" style="width:50.0%" />
 
-anti-join은 join mismatch를 진단하는데 유용하다. <br /> 예를 들어서, `flights`와 `planes`를 연결하는데 있어, `planes`에 없는 `flights`가 있는지를 확인해보고 싶을 수 있다.
+anti-join은 join mismatch를 진단하는데 유용하다. <br /> 예를 들어서, `flights`와 `planes`를 연결하는데 있어, `planes`에는 없는 비행기로 운항이 된 적이 있는지를 알아보고 싶다치자.
 
 ``` r
 flights %>% 
@@ -638,7 +638,17 @@ flights %>%
 ## # ... with 712 more rows
 ```
 
-꽤나 많네 생각보다. 너무 많아서 그걸 `tailnum`별로 내림차순 정렬까지 해놨음.
+꽤나 많네 생각보다. 너무 많아서 그걸 `tailnum`별로 내림차순 정렬까지 해봤다.
+
+이 `anti_join()`은 상당히 유용한게, cross validation을 할 때, 데이터의 80%는 train으로 쓰고, 나머지 20%는 test로 쓸 때가 있다. 이걸 되게 쉽게 해준다.
+
+``` r
+set.seed(1234)
+train <- data %>% 
+  sample_frac(0.8) # 80%를 train으로
+test <- data %>% 
+  anti_join(train) # 나머지 20%를 test로
+```
 
 ### 13.5.1 Exercises
 
@@ -647,7 +657,7 @@ flights %>%
 
 이 chapter에서 다루는 데이터는, clean up이 다 되어있는 데이터라서 별 문제가 없다. <br /> 너의 데이터는 그렇지 않을 것이기에, 너가 join을 스무스하게 하기 위해 필요한 것들을 알려주겠다. <br />
 
-1.  각 테이블에서 primary key를 identifying하는 것으로 시작을 해라. <br /> 이건 데이터에 대한 이해가 필요하다. <br /> 이것저것해보면서 끼워맞추지말고, 어떤 의미를 갖는지 이해하면서 찾아라. <br /> 그딴 식으로 찾으면 찾아도 별로 의미가 없을 것이다. <br /> 예를 들어, `airports`에서 `alt`, `lon` 가지고 unique하게 identify할 수 있지만, 좋은게 아니다.
+1. 각 테이블에서 primary key를 identifying하는 것으로 시작을 해라. <br /> 이건 데이터에 대한 이해가 필요하다. <br /> 이것저것해보면서 끼워맞추지말고, 어떤 의미를 갖는지 이해하면서 찾아라. <br /> 그딴 식으로 찾으면 찾아도 별로 의미가 없을 것이다. <br /> 예를 들어, `airports`에서 `alt`, `lon` 가지고 unique하게 identify할 수 있지만, 좋은게 아니다.
 
 ``` r
 airports %>% 
@@ -657,9 +667,9 @@ airports %>%
 ## # ... with 3 variables: alt <int>, lon <dbl>, n <int>
 ```
 
-1.  primary key의 어떠한 변수도 missing이 아니라는 걸 체크해라. <br /> 만약에 missing이 있다면, 이건 관측치를 identify할 수 없는거다.
+2. primary key의 어떠한 변수도 missing이 아니라는 걸 체크해라. <br /> 만약에 missing이 있다면, 이건 관측치를 identify할 수 없는거다.
 
-2.  한 테이블에서 primary key인게 다른 테이블에서 foreign key와 match된다는 걸 확인해라. <br /> `anti_join()`을 이용해서 하는게 제일 좋은 방법이다. <br /> 무슨 소리인지 잘 이해가 안 되어서 없는 예를 만들어보겠다. <br /> 위에서 봤듯이, `flights`에 나와 있는 비행기가, `planes`에 다 있는 건 아니다. <br /> 그러니깐, `planes`에 없는 비행기로도 운항이 이루어진 적이 있다. <br /> 배운 용어로 해보면, `flights`의 `tailnum`은, `planes`의 primary key가 되는 foreign key다. <br /> 이걸 확인해볼 때 `anti_join()`을 쓸 수 있다는 것이다.
+3. 한 테이블에서 primary key인게 다른 테이블에서 foreign key와 match된다는 걸 확인해라. <br /> `anti_join()`을 이용해서 하는게 제일 좋은 방법이다. <br /> 무슨 소리인지 잘 이해가 안 되어서 없는 예를 만들어보겠다. <br /> 위에서 봤듯이, `flights`에 나와 있는 비행기가, `planes`에 다 있는 건 아니다. <br /> 그러니깐, `planes`에 없는 비행기로도 운항이 이루어진 적이 있다. <br /> 배운 용어로 해보면, `flights`의 `tailnum`은, `planes`의 primary key가 되는 foreign key다. <br /> 이걸 확인해볼 때 `anti_join()`을 쓸 수 있다는 것이다.
 
 ``` r
 planes %>% 
@@ -677,7 +687,9 @@ planes %>%
 13.7 Set operations
 -------------------
 
-마지막 type은 set operations다. <br /> 이건 쉽다. <br /> 자주 이용하지는 않지만, single complex filter를 simpler pieces로 쪼갤 때 유용. <br /> 관측치의 모든 값들을 다 비교한다. <br /> `x`랑 `y`가 같은 변수를 가져야하며, 관측치를 set과 같이 다룬다. <br />
+mutating joins, filtering joins에 대해 배웠고, 마지막으로 배워야할 verb는, set operations다. <br /> 이건 쉽다.
+
+자주 이용하지는 않지만, single complex filter를 simpler pieces로 쪼갤 때 유용. <br /> 관측치의 모든 값들을 다 비교한다. <br /> `x`랑 `y`가 같은 변수를 가져야하며, 관측치를 set과 같이 다룬다. <br />
 
 1.  `intersect(x, y)` : `x`와 `y` 둘 다에서 나타나는 관측지만을 반환
 2.  `union(x, y)` : `x`와 `y` 둘 중 하나에서만 나타나도 모든 관측지를 반환
