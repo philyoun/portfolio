@@ -1,0 +1,13 @@
+---
+title: "13 S3"
+output:
+  md_document:
+    variant: markdown_github
+---
+
+하 이 길고 긴 얘기를 어디서부터 해야할까...
+
+
+
+
+
