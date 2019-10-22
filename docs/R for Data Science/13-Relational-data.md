@@ -524,11 +524,11 @@ flights2 %>%
 
 ### 13.4.7 Other implementations
 
-`base::merge()`를 통해서 4가지의 mutating joins를 다 할 수 있다. <br /> | dplyr | base::merge() | |-------------------------|:-------------------------------------------:| | `inner_join(x, y)` | `merge(x, y)` | | `left_join(x, y)` | `merge(x, y, all.x = TRUE)` | | `right_join(x, y)` | `merge(x, y, all.y = TRUE)` | | `full_join(x, y)` | `merge(x, y, all.x = TRUE, all.y = TRUE)`|
+`base::merge()`를 통해서 4가지의 mutating joins를 다 할 수 있다. <br /> | dplyr | base::merge() | |:-----------------------:|---------------------------------------------| | `inner_join(x, y)` | `merge(x, y)` | | `left_join(x, y)` | `merge(x, y, all.x = TRUE)` | | `right_join(x, y)` | `merge(x, y, all.y = TRUE)` | | `full_join(x, y)` | `merge(x, y, all.x = TRUE, all.y = TRUE)`|
 
 근데 dplyr의 verbs가 더 깔끔하게 코드 의도를 전달한다.
 
-SQL이 dplyr 고안convention의 영감이었기 때문에, 그대로 해석하면 된다. <br /> | dplyr | SQL | |-----------------------------------|:-----------------------------------------------:| | `inner_join(x, y, by = "z")` | `SELECT * FROM x INNER JOIN y USING (z)` | | `left_join(x, y, by = "z")` | `SELECT * FROM x LEFT OUTER JOIN y USING (z)` | | `right_join(x, y, by = "z")` | `SELECT * FROM x RIGHT OUTER JOIN y USING (z)`| | `full_join(x, y, by = "z")` | `SELECT * FROM x FULL OUTER JOIN y USING (z)` |
+SQL이 dplyr 고안convention의 영감이었기 때문에, 그대로 해석하면 된다. <br /> | dplyr | SQL | |-----------------------------------|-------------------------------------------------| | `inner_join(x, y, by = "z")` | `SELECT * FROM x INNER JOIN y USING (z)` | | `left_join(x, y, by = "z")` | `SELECT * FROM x LEFT OUTER JOIN y USING (z)` | | `right_join(x, y, by = "z")` | `SELECT * FROM x RIGHT OUTER JOIN y USING (z)`| | `full_join(x, y, by = "z")` | `SELECT * FROM x FULL OUTER JOIN y USING (z)` |
 
 여기 SQL에서 "INNER"이랑 "OUTER"은 생략할 수 있다.
 
