@@ -356,7 +356,7 @@ inner join은, 두 테이블 모두에 등장하는 관측치만을 keep했다. 
 
 이 때까지 모든 다이어그램들은, keys가 unique하다고 가정했다. 하지만 항상 그런 것은 아니다. <br /> 이 섹션에서는, keys가 unique하지 않을 때는 어떻게 하는지에 대해 설명한다. <br /> 2가지의 가능성이 있다.
 
-1. 하나의 테이블만 중복된 keys를 가지고 있을 때 <br /> 이게 전형적인 일대다one-to-many 관계다.
+1.  하나의 테이블만 중복된 keys를 가지고 있을 때 <br /> 이게 전형적인 일대다one-to-many 관계다.
 
 ``` r
 x <- tribble(
@@ -388,7 +388,7 @@ left_join(x, y, by = "key")
 
 이 다이어그램을 보면, y에서는 primary key인게, x에서는 foreign key라는 걸 볼 수 있다.
 
-2. 두 테이블 모두 중복된 keys를 가지고 있을 때 <br /> 이건 보통 에러다. <br /> 왜냐하면 key값이 어떠한 테이블에서도 관측치를 unique하게 identify하지 못하고 있으니깐. <br /> 그래서 이 중복된 key들을 가지고 join을 했을 때에는, 모든 가능한 combinations들을 갖게 된다. <br /> 이걸 Cartesian product라고 부른다.
+1.  두 테이블 모두 중복된 keys를 가지고 있을 때 <br /> 이건 보통 에러다. <br /> 왜냐하면 key값이 어떠한 테이블에서도 관측치를 unique하게 identify하지 못하고 있으니깐. <br /> 그래서 이 중복된 key들을 가지고 join을 했을 때에는, 모든 가능한 combinations들을 갖게 된다. <br /> 이걸 Cartesian product라고 부른다.
 
 ``` r
 x <- tribble(
@@ -663,7 +663,7 @@ test <- data %>%
 
 이 chapter에서 다루는 데이터는, clean up이 다 되어있는 데이터라서 별 문제가 없다. <br /> 너의 데이터는 그렇지 않을 것이기에, 너가 join을 스무스하게 하기 위해 필요한 것들을 알려주겠다. <br />
 
-1. 각 테이블에서 primary key를 identifying하는 것으로 시작을 해라. <br /> 이건 데이터에 대한 이해가 필요하다. <br /> 이것저것해보면서 끼워맞추지말고, 어떤 의미를 갖는지 이해하면서 찾아라. <br /> 그딴 식으로 찾으면 찾아도 별로 의미가 없을 것이다. <br /> 예를 들어, `airports`에서 `alt`, `lon` 가지고 unique하게 identify할 수 있지만, 좋은게 아니다.
+1.  각 테이블에서 primary key를 identifying하는 것으로 시작을 해라. <br /> 이건 데이터에 대한 이해가 필요하다. <br /> 이것저것해보면서 끼워맞추지말고, 어떤 의미를 갖는지 이해하면서 찾아라. <br /> 그딴 식으로 찾으면 찾아도 별로 의미가 없을 것이다. <br /> 예를 들어, `airports`에서 `alt`, `lon` 가지고 unique하게 identify할 수 있지만, 좋은게 아니다.
 
 ``` r
 airports %>% 
@@ -673,9 +673,9 @@ airports %>%
 ## # ... with 3 variables: alt <int>, lon <dbl>, n <int>
 ```
 
-2. primary key의 어떠한 변수도 missing이 아니라는 걸 체크해라. <br /> 만약에 missing이 있다면, 이건 관측치를 identify할 수 없는거다.
+1.  primary key의 어떠한 변수도 missing이 아니라는 걸 체크해라. <br /> 만약에 missing이 있다면, 이건 관측치를 identify할 수 없는거다.
 
-3. 한 테이블에서 primary key인게 다른 테이블에서 foreign key와 match된다는 걸 확인해라. <br /> `anti_join()`을 이용해서 하는게 제일 좋은 방법이다. <br /> 무슨 소리인지 잘 이해가 안 되어서 없는 예를 만들어보겠다. <br /> 위에서 봤듯이, `flights`에 나와 있는 비행기가, `planes`에 다 있는 건 아니다. <br /> 그러니깐, `planes`에 없는 비행기로도 운항이 이루어진 적이 있다. <br /> 배운 용어로 해보면, `flights`의 `tailnum`은, `planes`의 primary key가 되는 foreign key다. <br /> 이걸 확인해볼 때 `anti_join()`을 쓸 수 있다는 것이다.
+2.  한 테이블에서 primary key인게 다른 테이블에서 foreign key와 match된다는 걸 확인해라. <br /> `anti_join()`을 이용해서 하는게 제일 좋은 방법이다. <br /> 무슨 소리인지 잘 이해가 안 되어서 없는 예를 만들어보겠다. <br /> 위에서 봤듯이, `flights`에 나와 있는 비행기가, `planes`에 다 있는 건 아니다. <br /> 그러니깐, `planes`에 없는 비행기로도 운항이 이루어진 적이 있다. <br /> 배운 용어로 해보면, `flights`의 `tailnum`은, `planes`의 primary key가 되는 foreign key다. <br /> 이걸 확인해볼 때 `anti_join()`을 쓸 수 있다는 것이다.
 
 ``` r
 planes %>% 
