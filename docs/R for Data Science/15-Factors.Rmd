@@ -8,22 +8,22 @@ output:
 # 15 Factors
 
 ## 15.1 Introduction
-R에서, factors는 categorical 변수들을 작업하기 위해서 쓰인다. 
-&emsp;이 변수들이란? fixed, known set of possible values. 
-	가능한 값들이 미리 정해져있고, 알려져 있는 것
-또한, character vectors를 non-alphabetical order로 표현하고 싶을 때 유용하다. 
+R에서, factors는 categorical 변수들을 작업하기 위해서 쓰인다. <br />
+&emsp;&emsp;&emsp;&emsp;이 변수들이란? fixed, known set of possible values. <br />
+&emsp;&emsp;&emsp;&emsp;가능한 값들이 미리 정해져있고, 알려져 있는 것
+또한, character vectors를 non-alphabetical order로 표현하고 싶을 때 유용하다.
 
-역사적으로, factors가 characters보다 더 작업하기 쉽다. 
-그래서 base R의 많은 함수들은, characters를 자동적으로 factors로 바꾼다.
-	이 말인즉슨, factors가 불쑥 튀어나와 별 도움이 안 되는 경우가 있다.
+역사적으로, factors가 characters보다 더 작업하기 쉽다. <br />
+그래서 base R의 많은 함수들은, characters를 자동적으로 factors로 바꾼다. <br />
+&emsp;&emsp;&emsp;&emsp;이 말인즉슨, factors가 불쑥 튀어나와 별 도움이 안 되는 경우가 있다.
 그런 일은 tidyverse에서 일어나지 않는다. 그냥 factors가 정말로 유용한 상황에만 집중하면 된다.
 
 ## 15.1.1 Prerequisites
-factors를 다루기 위해서, forcats 패키지를 사용할 것이다.
-	categorical variables을 다루는데 필요한 도구들을 제공해줌.
+factors를 다루기 위해서, forcats 패키지를 사용할 것이다. <br />
+&emsp;&emsp;&emsp;&emsp;categorical variables을 다루는데 필요한 도구들을 제공해줌. <br />
 **for cat**egorical이랍시고 이렇게 패키지 이름을 만들어 놓은듯.
 
-factors를 작업할 수 있는 넓은 범위의 helper들을 제공해준다.
+factors를 작업할 수 있는 넓은 범위의 helper들을 제공해준다. <br />
 forcats는 tidyverse에 포함이 안 되어 있기 때문에, 따로 로드를 해줘야 한다.
 
 ```{r echo=TRUE, message=FALSE, warning=FALSE}
@@ -32,27 +32,29 @@ library(forcats)
 ```
 
 ### 15.1.2 Learning more
-factors에 대해 더 배우고 싶다면, Amelia McNamara와 Nicholas Horton가 쓴 [Wrangling categorical data in R](https://peerj.com/preprints/3163/)을 참고할 것.
-뭐 역사적인 것들도 설명해주고, base R 방법들이랑 tidyverse간에 비교도 해주고.
+factors에 대해 더 배우고 싶다면, Amelia McNamara와 Nicholas Horton가 쓴 [Wrangling categorical data in R](https://peerj.com/preprints/3163/)을 참고할 것. <br />
+뭐 역사적인 것들도 설명해주고, base R 방법들이랑 tidyverse간에 비교도 해주고. <br />
 이 문서의 초기 버전은 forcats 패키지를 개발하고 발전시키는데 도움을 줬다. 고맙댄다!
+
 * * *
+
 ## 15.2 Creating factors
 다음과 같이 month를 기록한 변수variable가 있다고 치자.
 ```{r}
 x1 <- c("Dec", "Apr", "Jan", "Mar")
 ```
-이렇게 저장하는데 있어 string을 사용하면, 2개의 문제가 생긴다.
-  1) 12개의 가능한 month들이 있는데, 만약에 오타가 나면 아무것도 널 지켜주지 않는다.
+이렇게 저장하는데 있어 string을 사용하면, 2개의 문제가 생긴다. <br />
+&emsp;&emsp;&emsp;&emsp;1) 12개의 가능한 month들이 있는데, 만약에 오타가 나면 아무것도 널 지켜주지 않는다.
 ```{r}
 x2 <- c("Dec", "Apr", "Jam", "Mar")
 ```
-  2) 그리고 유용하도록 sort할 수가 없다.
+&emsp;&emsp;&emsp;&emsp;2) 그리고 유용하게 sort할 수가 없다. (1월부터 12월 순으로 정렬하고 싶은데 안됨.)
 ```{r collapse=TRUE}
 sort(x1)
 ```
 
-이러한 문제를, factor로 해결할 수 있다.
-factor를 만들기 위해서는, '가능한 levels의 리스트'를 만드는 것에서부터 시작해야 한다.
+이러한 문제를, factor로 해결할 수 있다. <br />
+factor를 만들기 위해서는, "가능한 levels의 리스트"를 만드는 것에서부터 시작해야 한다.
 ```{r}
 month_levels <- c("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
 ```
@@ -66,15 +68,15 @@ y1
 sort(y1)
 ```
 
-그럼 위의 2가지 문제들이 어떻게 해결되는지를 보자.
-  1) 오타가 난다면?
-  set에 없는 값들은 조용하게 `NA`로 변환된다. silently converted to `NA`
+그럼 위의 2가지 문제들이 어떻게 해결되는지를 보자. <br />
+&emsp;&emsp;&emsp;&emsp;1) 오타가 난다면? <br />
+&emsp;&emsp;&emsp;&emsp;set에 없는 값들은 조용하게 `NA`로 변환된다. silently converted to `NA`
 ```{r collapse=TRUE}
 y2 <- factor(x2, levels = month_levels)
 y2
 ```
 
-  2) 유용하게 sort도 가능하다.
+&emsp;&emsp;&emsp;&emsp;2) 유용하게 sort도 가능하다.
 ```{r collapse=TRUE}
 sort(y1)
 ```
@@ -83,14 +85,15 @@ sort(y1)
 ```{r collapse=TRUE}
 y2 <- parse_factor(x2, levels = month_levels)
 ```
-만약에 levels를 생략하면, levels를 알파벳 순으로, 데이터에서 취한다.
+만약에 levels를 생략하면, levels를 알파벳 순으로, 데이터에서 취한다. <br />
+매우 상식적인 접근이지 뭐.
 ```{r collapse=TRUE}
 factor(x1)
 ```
 
-가끔, 나타나는 순으로 levels 순서를 지정하고 싶을 때가 있다.
-이걸 factor를 만들 때, levels에다가 `unique(x)`로 설정해놓거나, 혹은,
-	factor를 만든 이후에, `fct_inorder()`로 할 수도 있다.
+가끔, 나타나는 순으로 levels 순서를 지정하고 싶을 때가 있다. 알파벳 순이 아니라. <br />
+이걸 factor를 만들 때, levels에다가 `unique(x)`로 설정해놓거나, 혹은, <br />
+&emsp;&emsp;&emsp;&emsp;factor를 만든 이후에, `fct_inorder()`로 할 수도 있다.
 
 ```{r collapse=TRUE}
 f1 <- factor(x1, levels = unique(x1))
@@ -100,7 +103,7 @@ f2 <- x1 %>% factor() %>% fct_inorder()
 f2
 ```
 
-만약 가능한 levels의 셋을 직접적으로 접근해야할 필요가 있다면, `levels()`를 사용하자.
+만약 가능한 levels의 셋을 직접적으로 접근access해야할 필요가 있다면, `levels()`를 사용하자.
 ```{r collapse=TRUE}
 levels(f2)
 ```
