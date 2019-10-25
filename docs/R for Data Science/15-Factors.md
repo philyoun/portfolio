@@ -283,7 +283,7 @@ rincome_summary %>%
 
 <details> <summary>왜 "Not applicable"의 평균 연령이 이렇게 높은 것 같나?</summary> 음.. 아마 은퇴한 사람은 소득이 없어서 not applicable을 체크하고, 그 사람들은 나이가 많으니깐? </details> <br /> reordering이 유용한 또 하나의 케이스는, plot에서 lines에 색을 넣을 때 그렇다. 'fct\_reorder2()'는 "가장 큰 `x`값과 결합되어 있는 `y`값"에 따라 reorder할 수 있게끔 해준다. 이러면 legend에 써져 있는대로 읽으면 되기 때문에 plot을 읽기가 쉬워진다.
 
-무슨 말인지는 밑에 그림 보면 바로 이해가 된다.
+무슨 말인지는 밑에 그림 보면 바로 이해가 된다. 힝 왜 엑박이 나와 씨부레
 
 ``` r
 by_age <- gss_cat %>% 
