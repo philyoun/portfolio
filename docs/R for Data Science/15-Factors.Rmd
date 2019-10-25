@@ -255,7 +255,7 @@ reordering이 유용한 또 하나의 케이스는, plot에서 lines에 색을 �
 
 무슨 말인지는 밑에 그림 보면 바로 이해가 된다.
 힝 왜 엑박이 나와 씨부레
-```{r out.width = "50%", fig.width = 4}
+```{r, out.width = "50%"}
 by_age <- gss_cat %>% 
   filter(!is.na(age)) %>% 
   count(age, marital) %>% 
