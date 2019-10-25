@@ -281,9 +281,7 @@ rincome_summary %>%
   geom_point()
 ```
 
-<details> <summary>왜 "Not applicable"의 평균 연령이 이렇게 높은 것 같나?</summary> 음.. 아마 은퇴한 사람은 소득이 없어서 not applicable을 체크하고, 그 사람들은 나이가 많으니깐? </details>
-
-reordering이 유용한 또 하나의 케이스는, plot에서 lines에 색을 넣을 때 그렇다. 'fct\_reorder2()'는 "가장 큰 `x`값과 결합되어 있는 `y`값"에 따라 reorder할 수 있게끔 해준다. 이러면 legend에 써져 있는대로 읽으면 되기 때문에 plot을 읽기가 쉬워진다.
+<details> <summary>왜 "Not applicable"의 평균 연령이 이렇게 높은 것 같나?</summary> 음.. 아마 은퇴한 사람은 소득이 없어서 not applicable을 체크하고, 그 사람들은 나이가 많으니깐? </details> <br /> reordering이 유용한 또 하나의 케이스는, plot에서 lines에 색을 넣을 때 그렇다. 'fct\_reorder2()'는 "가장 큰 `x`값과 결합되어 있는 `y`값"에 따라 reorder할 수 있게끔 해준다. 이러면 legend에 써져 있는대로 읽으면 되기 때문에 plot을 읽기가 쉬워진다.
 
 무슨 말인지는 밑에 그림 보면 바로 이해가 된다.
 
@@ -298,7 +296,7 @@ ggplot(by_age, aes(age, prop, color = marital)) +
   geom_line(na.rm = TRUE)
 ```
 
-<img src="15-Factors_files/figure-markdown_github/unnamed-chunk-24-1.png" width="300px" />
+<img src="15-Factors_files/figure-markdown_github/unnamed-chunk-24-1.png" width="50%" />
 
 ``` r
 ggplot(by_age, aes(age, prop, color = fct_reorder2(marital, age, prop))) +
@@ -306,8 +304,31 @@ ggplot(by_age, aes(age, prop, color = fct_reorder2(marital, age, prop))) +
   labs(color = "marital")
 ```
 
-<img src="15-Factors_files/figure-markdown_github/unnamed-chunk-24-2.png" width="300px" />
+<img src="15-Factors_files/figure-markdown_github/unnamed-chunk-24-2.png" width="50%" />
 
 왼쪽의 이러면 legend에 있는대로 맨 위의 No answer 선을 찾아볼까? 어... 맨 위에 깔려있어서 한 눈에 못 알아봤네. 이럴 때 `fct_reorder()`를 쓰면 보기 편해진다는 거다. 오른쪽과 같이.
 
-마지막으로, bar plot에 대해서도, `fct_infreq()`를 사용해 increasing levels로 정렬할 수도 있다.
+마지막으로, bar plot에 대해서도, `fct_infreq()`를 사용해 increasing levels로 정렬할 수도 있다. 이건 추가적인 변수들을 필요로 하지 않기 때문에, 가장 간단한 reorder이라고 할 수 있겠다. `fct_rev()`와 결합해서 사용하고 싶을 수도 있다.
+
+``` r
+gss_cat %>% 
+  mutate(marital = marital %>% fct_infreq()) %>% 
+  ggplot(aes(marital)) + 
+  geom_bar()
+```
+
+<img src="15-Factors_files/figure-markdown_github/unnamed-chunk-25-1.png" width="50%" />
+
+``` r
+gss_cat %>% 
+  mutate(marital = marital %>% fct_infreq() %>% fct_rev()) %>% 
+  ggplot(aes(marital)) +
+  geom_bar()
+```
+
+<img src="15-Factors_files/figure-markdown_github/unnamed-chunk-25-2.png" width="50%" />
+
+### 15.4.1 Exercises
+
+15.5 Modifying factor levels
+----------------------------
