@@ -260,4 +260,54 @@ ggplot(rincome_summary, aes(age, fct_reorder(rincome, age))) + geom_point()
 
 ![](15-Factors_files/figure-markdown_github/unnamed-chunk-21-1.png)
 
-ggplot(rincome\_summary, aes(age, fct\_relevel(rincome, "Not applicable"))) + geom\_point()
+그런데, 이렇게 맘대로 levels를 reorder한 것은 매우 나쁘다. 왜냐하면, `rincome`은 순서가 있는 값들이었기 때문. `fct_reorder()`은 levels가 임의로 정렬되어있을 때 사용하는 것이다.
+
+또 하나의 문제는 "Not applicable"과 등등이 맨 위에 있다는게 꼴보기가 싫다. 다른 의미 있는 값들 말고 저런 것들이 제일 위라니. 이럴 때는 `fct_relevel()`을 쓰자. 얘는 `f`로 factor를 받고, 옮기고 싶은 다른 levels를 몇 개든 받아준다.
+
+``` r
+ggplot(rincome_summary, aes(age, fct_relevel(rincome, "Not applicable"))) + 
+  geom_point()
+```
+
+![](15-Factors_files/figure-markdown_github/unnamed-chunk-22-1.png)
+
+근데, 나는 이것도 좀...맘에 안든다. income level은 올라가는 방향으로 되야하는게 맞지 않나? 다음의 코드도 직접 실행해보자. 이게 더 맞는 것 같다.
+
+``` r
+rincome_summary %>% 
+  mutate(rincome = fct_rev(rincome)) %>% 
+  mutate(rincome = fct_relevel(rincome, c("No answer", "Don't know", "Refused"))) %>% 
+  ggplot(aes(age, rincome)) +
+  geom_point()
+```
+
+왜 "Not applicable"의 평균 연령이 이렇게 높은 것 같나?
+
+<details> 음.. 아마 은퇴한 사람은 소득이 없어서 not applicable을 체크하고, 그 사람들은 나이가 많으니깐? </details>
+
+reordering이 유용한 또 하나의 케이스는, plot에서 lines에 색을 넣을 때 그렇다. 'fct\_reorder2()'는 "가장 큰 `x`값과 결합되어 있는 `y`값"에 따라 reorder할 수 있게끔 해준다. 이러면 legend에 써져 있는대로 읽으면 되기 때문에 plot을 읽기가 쉬워진다.
+
+무슨 말인지는 밑에 그림 보면 바로 이해가 된다.
+
+``` r
+by_age <- gss_cat %>% 
+  filter(!is.na(age)) %>% 
+  count(age, marital) %>% 
+  group_by(age) %>% 
+  mutate(prop = n / sum(n))
+
+par(mfrow = c(2, 1))
+ggplot(by_age, aes(age, prop, color = marital)) + 
+  geom_line(na.rm = TRUE)
+```
+
+![](15-Factors_files/figure-markdown_github/unnamed-chunk-24-1.png)
+
+``` r
+ggplot(by_age, aes(age, prop, color = fct_reorder2(marital, age, prop))) +
+  geom_line(na.rm = TRUE)
+```
+
+![](15-Factors_files/figure-markdown_github/unnamed-chunk-24-2.png)
+
+왼쪽의 이러면 legend에 있는대로 맨 위의 No answer 선을 찾아볼까? 어... 맨 위에 깔려있어서 한 눈에 못 알아봤네. 이럴 때 `fct_reorder()`를 써서, "가장 ~" 이걸 하면 보기 편해진다는 거다.
