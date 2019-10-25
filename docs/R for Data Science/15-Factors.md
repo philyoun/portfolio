@@ -1,19 +1,21 @@
 15 Factors
 ==========
 
+------------------------------------------------------------------------
+
 15.1 Introduction
 -----------------
 
-R에서, factors는 categorical 변수들을 작업하기 위해서 쓰인다. <br />     이 변수들이란? fixed, known set of possible values. <br />     가능한 값들이 미리 정해져있고, 알려져 있는 것 또한, character vectors를 non-alphabetical order로 표현하고 싶을 때 유용하다.
+R에서, factors는 categorical 변수들을 작업하기 위해서 쓰인다. <br />     이 변수들이란? fixed, known set of possible values. <br />     가능한 값들이 미리 정해져있고, 알려져 있는 것. <br /> 또한, character vectors를 알파벳 순이 아닌 것non-alphabetical order으로 표현하고 싶을 때 유용하다.
 
-역사적으로, factors가 characters보다 더 작업하기 쉽다. <br /> 그래서 base R의 많은 함수들은, characters를 자동적으로 factors로 바꾼다. <br />     이 말인즉슨, factors가 불쑥 튀어나와 별 도움이 안 되는 경우가 있다. 그런 일은 tidyverse에서 일어나지 않는다. 그냥 factors가 정말로 유용한 상황에만 집중하면 된다.
+역사적으로, factors가 characters보다 더 작업하기 쉽다. <br /> 그래서 base R의 많은 함수들은, characters를 자동적으로 factors로 바꾼다. <br />     이 말인즉슨, factors가 불쑥 튀어나와 별 도움이 안 되는 경우가 있다. <br /> 그런 일은 tidyverse에서 일어나지 않는다. 그냥 factors가 정말로 유용한 상황에만 집중하면 된다.
 
 15.1.1 Prerequisites
 --------------------
 
 factors를 다루기 위해서, forcats 패키지를 사용할 것이다. <br />     categorical variables을 다루는데 필요한 도구들을 제공해줌. <br /> **for cat**egorical이랍시고 이렇게 패키지 이름을 만들어 놓은듯.
 
-factors를 작업할 수 있는 넓은 범위의 helper들을 제공해준다. <br /> forcats는 tidyverse에 포함이 안 되어 있기 때문에, 따로 로드를 해줘야 한다.
+factors를 작업할 수 있는 넓은 범위의 helper들을 제공해준다. <br /> forcats는 tidyverse에 포함이 안 되어 있기 때문에, 따로 로드를 해줘야 함.
 
 ``` r
 library(tidyverse)
@@ -77,7 +79,7 @@ y2
 ## Levels: Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec
 ```
 
-    2) 유용하게 sort도 가능하다.
+<br />     2) 유용하게 sort도 가능하다.
 
 ``` r
 sort(y1)
