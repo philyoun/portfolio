@@ -269,7 +269,7 @@ ggplot(by_age, aes(age, prop, colour = fct_reorder2(marital, age, prop))) +
   labs(colour = "marital")
 ```
 
-![그림1](https://d33wubrfki0l68.cloudfront.net/839bf9eca63fa907dd5e18e978b1903f4adbf5d9/042b3/factors_files/figure-html/unnamed-chunk-21-1.png) ![그림2](https://d33wubrfki0l68.cloudfront.net/cfee22e92795ac05834c734c20e65465ed806795/a1423/factors_files/figure-html/unnamed-chunk-21-2.png)
+![그림1](https://d33wubrfki0l68.cloudfront.net/839bf9eca63fa907dd5e18e978b1903f4adbf5d9/042b3/factors_files/figure-html/unnamed-chunk-21-1.png){ width=50% } ![그림2](https://d33wubrfki0l68.cloudfront.net/cfee22e92795ac05834c734c20e65465ed806795/a1423/factors_files/figure-html/unnamed-chunk-21-2.png){ width=50% }
 
 
 
