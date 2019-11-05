@@ -286,6 +286,19 @@ rincome_summary %>%
 무슨 말인지는 밑에 그림 보면 바로 이해가 된다. 힝 왜 엑박이 나와 씨부레
 
 ``` r
+library(gridExtra)
+```
+
+    ## Warning: package 'gridExtra' was built under R version 3.5.3
+
+    ## 
+    ## Attaching package: 'gridExtra'
+
+    ## The following object is masked from 'package:dplyr':
+    ## 
+    ##     combine
+
+``` r
 by_age <- gss_cat %>% 
   filter(!is.na(age)) %>% 
   count(age, marital) %>% 
@@ -293,18 +306,16 @@ by_age <- gss_cat %>%
   mutate(prop = n / sum(n))
 
 ggplot(by_age, aes(age, prop, color = marital)) + 
-  geom_line(na.rm = TRUE)
-```
+  geom_line(na.rm = TRUE) -> p1
 
-<img src="15-Factors_files/figure-markdown_github/unnamed-chunk-24-1.png" width="50%" />
-
-``` r
 ggplot(by_age, aes(age, prop, color = fct_reorder2(marital, age, prop))) +
   geom_line(na.rm = TRUE) +
-  labs(color = "marital")
+  labs(color = "marital") -> p2
+
+grid.arrange(p1, p2, ncol = 2)
 ```
 
-<img src="15-Factors_files/figure-markdown_github/unnamed-chunk-24-2.png" width="50%" />
+![](15-Factors_files/figure-markdown_github/unnamed-chunk-24-1.png)
 
 왼쪽의 이러면 legend에 있는대로 맨 위의 No answer 선을 찾아볼까? 어... 맨 위에 깔려있어서 한 눈에 못 알아봤네. 이럴 때 `fct_reorder()`를 쓰면 보기 편해진다는 거다. 오른쪽과 같이.
 
