@@ -300,7 +300,7 @@ ggplot(by_age, aes(age, prop, color = fct_reorder2(marital, age, prop))) +
   labs(color = "marital")
 ```
 
-<img src="15-Factors_files/figure-markdown_github/unnamed-chunk-24-1.png" width=".49\linewidth" style="display: block; margin: auto;" /><img src="15-Factors_files/figure-markdown_github/unnamed-chunk-24-2.png" width=".49\linewidth" style="display: block; margin: auto;" />
+<img src="15-Factors_files/figure-markdown_github/unnamed-chunk-24-1.png" width="50%" /><img src="15-Factors_files/figure-markdown_github/unnamed-chunk-24-2.png" width="50%" />
 
 왼쪽의 이러면 legend에 있는대로 맨 위의 No answer 선을 찾아볼까? 어... 맨 위에 깔려있어서 한 눈에 못 알아봤네. 이럴 때 `fct_reorder()`를 쓰면 보기 편해진다는 거다. 오른쪽과 같이.
 
