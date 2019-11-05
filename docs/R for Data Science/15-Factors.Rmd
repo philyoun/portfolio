@@ -254,9 +254,7 @@ reordering이 유용한 또 하나의 케이스는, plot에서 lines에 색을 �
 이러면 legend에 써져 있는대로 읽으면 되기 때문에 plot을 읽기가 쉬워진다.
 
 무슨 말인지는 밑에 그림 보면 바로 이해가 된다.
-힝 왜 엑박이 나와 씨부레
-```{r, warning=FALSE, fig.show = "hold", out.width = "50%", fig.width = 4}
-library(cowplot)
+```{r fig.show = "hold", out.width="50%"}
 by_age <- gss_cat %>%
   filter(!is.na(age)) %>%
   count(age, marital) %>%
@@ -264,13 +262,11 @@ by_age <- gss_cat %>%
   mutate(prop = n / sum(n))
 
 ggplot(by_age, aes(age, prop, colour = marital)) +
-  geom_line(na.rm = TRUE) -> p1
+  geom_line(na.rm = TRUE)
 
 ggplot(by_age, aes(age, prop, colour = fct_reorder2(marital, age, prop))) +
   geom_line() +
-  labs(colour = "marital") -> p2
-
-plot_grid(p1, p2)
+  labs(colour = "marital")
 ```
 
 왼쪽의 이러면 legend에 있는대로 맨 위의 No answer 선을 찾아볼까? 어... 맨 위에 깔려있어서 한 눈에 못 알아봤네.
@@ -281,18 +277,15 @@ plot_grid(p1, p2)
 `fct_rev()`와 결합해서 사용하고 싶을 수도 있다.
 
 ```{r, warning=FALSE, fig.align = "default", out.width = "50%", fig.width = 4}
-library(cowplot)
 gss_cat %>% 
   mutate(marital = marital %>% fct_infreq()) %>% 
   ggplot(aes(marital)) + 
-  geom_bar() -> p1
+  geom_bar()
 
 gss_cat %>% 
   mutate(marital = marital %>% fct_infreq() %>% fct_rev()) %>% 
   ggplot(aes(marital)) +
-  geom_bar() -> p2
-
-plot_grid(p1, p2)
+  geom_bar()
 ```
 
 ### 15.4.1 Exercises
