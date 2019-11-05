@@ -1,6 +1,8 @@
 ---
 title: "15 Factors"
-output: html_document
+output:
+  md_document:
+    variant: markdown_github
 ---
 
 # 15 Factors
@@ -253,7 +255,8 @@ reordering이 유용한 또 하나의 케이스는, plot에서 lines에 색을 �
 
 무슨 말인지는 밑에 그림 보면 바로 이해가 된다.
 힝 왜 엑박이 나와 씨부레
-```{r, fig.show = "hold", out.width = "50%", fig.width = 4}
+```{r, warning=FALSE, fig.show = "hold", out.width = "50%", fig.width = 4}
+library(cowplot)
 by_age <- gss_cat %>%
   filter(!is.na(age)) %>%
   count(age, marital) %>%
@@ -261,11 +264,13 @@ by_age <- gss_cat %>%
   mutate(prop = n / sum(n))
 
 ggplot(by_age, aes(age, prop, colour = marital)) +
-  geom_line(na.rm = TRUE)
+  geom_line(na.rm = TRUE) -> p1
 
 ggplot(by_age, aes(age, prop, colour = fct_reorder2(marital, age, prop))) +
   geom_line() +
-  labs(colour = "marital")
+  labs(colour = "marital") -> p2
+
+plot_grid(p1, p2)
 ```
 
 왼쪽의 이러면 legend에 있는대로 맨 위의 No answer 선을 찾아볼까? 어... 맨 위에 깔려있어서 한 눈에 못 알아봤네.
@@ -275,16 +280,19 @@ ggplot(by_age, aes(age, prop, colour = fct_reorder2(marital, age, prop))) +
 이건 추가적인 변수들을 필요로 하지 않기 때문에, 가장 간단한 reorder이라고 할 수 있겠다.
 `fct_rev()`와 결합해서 사용하고 싶을 수도 있다.
 
-```{r, fig.align = "default", out.width = "50%", fig.width = 4}
+```{r, warning=FALSE, fig.align = "default", out.width = "50%", fig.width = 4}
+library(cowplot)
 gss_cat %>% 
   mutate(marital = marital %>% fct_infreq()) %>% 
   ggplot(aes(marital)) + 
-  geom_bar()
+  geom_bar() -> p1
 
 gss_cat %>% 
   mutate(marital = marital %>% fct_infreq() %>% fct_rev()) %>% 
   ggplot(aes(marital)) +
-  geom_bar()
+  geom_bar() -> p2
+
+plot_grid(p1, p2)
 ```
 
 ### 15.4.1 Exercises
