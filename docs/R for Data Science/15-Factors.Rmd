@@ -255,8 +255,7 @@ reordering이 유용한 또 하나의 케이스는, plot에서 lines에 색을 �
 
 무슨 말인지는 밑에 그림 보면 바로 이해가 된다.
 힝 왜 엑박이 나와 씨부레
-```{r}
-library(gridExtra)
+```{r out.width='50%', fig.show='hold'}
 by_age <- gss_cat %>% 
   filter(!is.na(age)) %>% 
   count(age, marital) %>% 
@@ -264,13 +263,11 @@ by_age <- gss_cat %>%
   mutate(prop = n / sum(n))
 
 ggplot(by_age, aes(age, prop, color = marital)) + 
-  geom_line(na.rm = TRUE) -> p1
+  geom_line(na.rm = TRUE)
 
 ggplot(by_age, aes(age, prop, color = fct_reorder2(marital, age, prop))) +
   geom_line(na.rm = TRUE) +
-  labs(color = "marital") -> p2
-
-grid.arrange(p1, p2, ncol = 2)
+  labs(color = "marital")
 
 ```
 
