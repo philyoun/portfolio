@@ -235,7 +235,7 @@ ggplot(rincome_summary, aes(age, fct_relevel(rincome, "Not applicable"))) +
 ```
 
 근데, 나는 이것도 좀...맘에 안든다. income level은 올라가는 방향으로 되야하는게 맞지 않나?
-다음의 코드도 직접 실행해보자. 이게 더 맞는 것 같다.
+다음의 코드는 직접 실행해보자. 이게 더 맞는 것 같다.
 ```{r eval=FALSE}
 rincome_summary %>% 
   mutate(rincome = fct_rev(rincome)) %>% 
@@ -255,20 +255,19 @@ reordering이 유용한 또 하나의 케이스는, plot에서 lines에 색을 �
 
 무슨 말인지는 밑에 그림 보면 바로 이해가 된다.
 힝 왜 엑박이 나와 씨부레
-```{r, out.width="50%", fig.show='hold'}
-by_age <- gss_cat %>% 
-  filter(!is.na(age)) %>% 
-  count(age, marital) %>% 
-  group_by(age) %>% 
+```{r, fig.align = "default", out.width = "50%", fig.width = 4}
+by_age <- gss_cat %>%
+  filter(!is.na(age)) %>%
+  count(age, marital) %>%
+  group_by(age) %>%
   mutate(prop = n / sum(n))
 
-ggplot(by_age, aes(age, prop, color = marital)) + 
+ggplot(by_age, aes(age, prop, colour = marital)) +
   geom_line(na.rm = TRUE)
 
-ggplot(by_age, aes(age, prop, color = fct_reorder2(marital, age, prop))) +
-  geom_line(na.rm = TRUE) +
-  labs(color = "marital")
-
+ggplot(by_age, aes(age, prop, colour = fct_reorder2(marital, age, prop))) +
+  geom_line() +
+  labs(colour = "marital")
 ```
 
 왼쪽의 이러면 legend에 있는대로 맨 위의 No answer 선을 찾아볼까? 어... 맨 위에 깔려있어서 한 눈에 못 알아봤네.

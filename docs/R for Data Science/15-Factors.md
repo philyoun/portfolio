@@ -271,7 +271,7 @@ ggplot(rincome_summary, aes(age, fct_relevel(rincome, "Not applicable"))) +
 
 ![](15-Factors_files/figure-markdown_github/unnamed-chunk-22-1.png)
 
-근데, 나는 이것도 좀...맘에 안든다. income level은 올라가는 방향으로 되야하는게 맞지 않나? 다음의 코드도 직접 실행해보자. 이게 더 맞는 것 같다.
+근데, 나는 이것도 좀...맘에 안든다. income level은 올라가는 방향으로 되야하는게 맞지 않나? 다음의 코드는 직접 실행해보자. 이게 더 맞는 것 같다.
 
 ``` r
 rincome_summary %>% 
@@ -286,21 +286,25 @@ rincome_summary %>%
 무슨 말인지는 밑에 그림 보면 바로 이해가 된다. 힝 왜 엑박이 나와 씨부레
 
 ``` r
-by_age <- gss_cat %>% 
-  filter(!is.na(age)) %>% 
-  count(age, marital) %>% 
-  group_by(age) %>% 
+by_age <- gss_cat %>%
+  filter(!is.na(age)) %>%
+  count(age, marital) %>%
+  group_by(age) %>%
   mutate(prop = n / sum(n))
 
-ggplot(by_age, aes(age, prop, color = marital)) + 
+ggplot(by_age, aes(age, prop, colour = marital)) +
   geom_line(na.rm = TRUE)
-
-ggplot(by_age, aes(age, prop, color = fct_reorder2(marital, age, prop))) +
-  geom_line(na.rm = TRUE) +
-  labs(color = "marital")
 ```
 
-<img src="15-Factors_files/figure-markdown_github/unnamed-chunk-24-1.png" width="50%" /><img src="15-Factors_files/figure-markdown_github/unnamed-chunk-24-2.png" width="50%" />
+<img src="15-Factors_files/figure-markdown_github/unnamed-chunk-24-1.png" width="50%" />
+
+``` r
+ggplot(by_age, aes(age, prop, colour = fct_reorder2(marital, age, prop))) +
+  geom_line() +
+  labs(colour = "marital")
+```
+
+<img src="15-Factors_files/figure-markdown_github/unnamed-chunk-24-2.png" width="50%" />
 
 왼쪽의 이러면 legend에 있는대로 맨 위의 No answer 선을 찾아볼까? 어... 맨 위에 깔려있어서 한 눈에 못 알아봤네. 이럴 때 `fct_reorder()`를 쓰면 보기 편해진다는 거다. 오른쪽과 같이.
 
