@@ -1,8 +1,6 @@
 ---
 title: "15 Factors"
-output: 
-  md_document:
-    variant: markdown_github
+output: html_document
 ---
 
 # 15 Factors
