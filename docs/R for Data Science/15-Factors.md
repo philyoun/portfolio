@@ -283,7 +283,24 @@ rincome_summary %>%
 
 <details> <summary>왜 "Not applicable"의 평균 연령이 이렇게 높은 것 같나?</summary> 음.. 아마 은퇴한 사람은 소득이 없어서 not applicable을 체크하고, 그 사람들은 나이가 많으니깐? </details> <br /> reordering이 유용한 또 하나의 케이스는, plot에서 lines에 색을 넣을 때 그렇다. 'fct\_reorder2()'는 "가장 큰 `x`값과 결합되어 있는 `y`값"에 따라 reorder할 수 있게끔 해준다. 이러면 legend에 써져 있는대로 읽으면 되기 때문에 plot을 읽기가 쉬워진다.
 
-무슨 말인지는 밑에 그림 보면 바로 이해가 된다. 힝 왜 엑박이 나와 씨부레 <img src="15-Factors_files/figure-markdown_github/unnamed-chunk-24-1.png" width=".49\linewidth" style="display: block; margin: auto;" /><img src="15-Factors_files/figure-markdown_github/unnamed-chunk-24-2.png" width=".49\linewidth" style="display: block; margin: auto;" />
+무슨 말인지는 밑에 그림 보면 바로 이해가 된다. 힝 왜 엑박이 나와 씨부레
+
+``` r
+by_age <- gss_cat %>% 
+  filter(!is.na(age)) %>% 
+  count(age, marital) %>% 
+  group_by(age) %>% 
+  mutate(prop = n / sum(n))
+
+ggplot(by_age, aes(age, prop, color = marital)) + 
+  geom_line(na.rm = TRUE)
+
+ggplot(by_age, aes(age, prop, color = fct_reorder2(marital, age, prop))) +
+  geom_line(na.rm = TRUE) +
+  labs(color = "marital")
+```
+
+<img src="15-Factors_files/figure-markdown_github/unnamed-chunk-24-1.png" width=".49\linewidth" style="display: block; margin: auto;" /><img src="15-Factors_files/figure-markdown_github/unnamed-chunk-24-2.png" width=".49\linewidth" style="display: block; margin: auto;" />
 
 왼쪽의 이러면 legend에 있는대로 맨 위의 No answer 선을 찾아볼까? 어... 맨 위에 깔려있어서 한 눈에 못 알아봤네. 이럴 때 `fct_reorder()`를 쓰면 보기 편해진다는 거다. 오른쪽과 같이.
 
