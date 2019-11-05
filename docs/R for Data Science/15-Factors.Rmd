@@ -254,7 +254,7 @@ reordering이 유용한 또 하나의 케이스는, plot에서 lines에 색을 �
 이러면 legend에 써져 있는대로 읽으면 되기 때문에 plot을 읽기가 쉬워진다.
 
 무슨 말인지는 밑에 그림 보면 바로 이해가 된다.
-```{r fig.show = "hold", out.width="50%"}
+```{r eval=FALSE}
 by_age <- gss_cat %>%
   filter(!is.na(age)) %>%
   count(age, marital) %>%
@@ -268,6 +268,8 @@ ggplot(by_age, aes(age, prop, colour = fct_reorder2(marital, age, prop))) +
   geom_line() +
   labs(colour = "marital")
 ```
+
+![그림1](C:\Users\Phil2\Documents\portfolio\docs\R for Data Science\15-Factors_files\figure-markdown_github\Rplot.png){ width = 50% }
 
 왼쪽의 이러면 legend에 있는대로 맨 위의 No answer 선을 찾아볼까? 어... 맨 위에 깔려있어서 한 눈에 못 알아봤네.
 이럴 때 `fct_reorder()`를 쓰면 보기 편해진다는 거다. 오른쪽과 같이.
