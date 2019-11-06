@@ -130,7 +130,7 @@ levels(f2)
 15.3 General Social Survey
 --------------------------
 
-남은 chapter 내내, `forcats::gss_cat`에 대해서 다룰 것이다. [General Social Survey](http://gss.norc.org/)에서 나온 데이터, 시카고 대학의 독립적인 조사 기구 NORC에서 진행한 long-running US survey다. 이 설문조사는 수천 개의 질문들이 있었는데, `gss_cat`에서는 일부분만 Hadley가 뽑아낸 것. factors를 작업할 때 일반적으로 마주치는 문제들을 다루어보려고.
+남은 chapter 내내, `forcats::gss_cat`에 대해서 다룰 것이다. <br /> [General Social Survey](http://gss.norc.org/)에서 나온 데이터, 시카고 대학의 독립적인 조사 기구 NORC에서 진행한 long-running US survey다. <br /> 이 설문조사는 수천 개의 질문들이 있었는데, `gss_cat`에서는 일부분만 Hadley가 뽑아낸 것. <br /> factors를 작업할 때 일반적으로 마주치는 문제들을 다루어보려고.
 
 ``` r
 gss_cat
@@ -150,7 +150,7 @@ gss_cat
 ## # ... with 21,473 more rows
 ```
 
-`?gss_cat`으로 변수들이 무엇을 뜻하는지를 좀 알아보자. tibble에 factors가 저장되어 있으면, levels를 쉽게 볼 수 없다. 이걸 보는 방법으로, `count()`를 쓰자.
+`?gss_cat`으로 변수들이 무엇을 뜻하는지를 좀 알아보자. <br /> tibble에 factors가 저장되어 있으면, levels를 쉽게 볼 수 없다. <br /> 이걸 보는 방법으로, `count()`를 쓰자.
 
 ``` r
 gss_cat %>% 
@@ -183,7 +183,7 @@ unique(gss_cat$race)
 ## Levels: Other Black White Not applicable
 ```
 
-그런데 위에 bar chart에서 봤듯이, ggplot2는 디폴트로, 값이 없는 levels는 드랍해버린다. 그러고싶지 않다면, 다음과 같이 해결할 수 있다.
+그런데 위에 bar chart에서 봤듯이, ggplot2는 디폴트로, 값이 없는 levels는 드랍해버린다. <br /> 그러고싶지 않다면, 다음과 같이 해결할 수 있다.
 
 ``` r
 ggplot(gss_cat, aes(race)) + geom_bar() + scale_x_discrete(drop = FALSE)
@@ -195,9 +195,9 @@ ggplot(gss_cat, aes(race)) + geom_bar() + scale_x_discrete(drop = FALSE)
 
 factors를 다룰 때, 가장 일반적인 2개의 조작은,
 
-1.  levels의 순서order를 바꾸는 것. changing the order of the levels
+1.  *levels의 순서order를 바꾸는 것*. <br /> changing the order of the levels
 
-2.  levels의 값을 바꾸는 것. 이 있겠다. changing the values of the levels
+2.  *levels의 값을 바꾸는 것*. 이 있겠다. <br /> changing the values of the levels
 
 아래의 section에서 한 번 봐보자.
 
@@ -208,7 +208,7 @@ factors를 다룰 때, 가장 일반적인 2개의 조작은,
 15.4 Modifying factor order
 ---------------------------
 
-levels의 순서를 바꾸는 것부터 해보자. factor levels의 순서를 바꾸는 것은, visualisation에서 특히 유용하다. 예를 들어서, 종교별로 하루에 TV 평균 시청시간이 얼마나 되는지를 구하고 싶다치자.     average number of hours spent watching TV per day across religions
+levels의 순서를 바꾸는 것부터 해보자. <br /> factor levels의 순서를 바꾸는 것은, visualisation에서 특히 유용하다. <br /> 예를 들어서, 종교별로 하루에 TV 평균 시청시간이 얼마나 되는지를 구하고 싶다치자. <br />     average number of hours spent watching TV per day across religions
 
 ``` r
 relig_summary <- gss_cat %>% 
@@ -224,7 +224,7 @@ ggplot(relig_summary, aes(tvhours, relig)) + geom_point()
 
 ![](15-Factors_files/figure-markdown_github/unnamed-chunk-18-1.png)
 
-그런데 이 plot을 보면, 전반적인 패턴이 없어서, 해석하기가 힘들다. 이럴 때는 `relig`의 levels 순서를 바꿔서 다시 한번 봐야한다. `fct_reorder()`를 이용하자. 이 함수는 3개의 요소arguments를 받는다. - `f`, 니가 수정하고 싶은 factor - `x`, levels를 reorder하는데 있어, 어떤 값을 쓸건지. - 옵션으로 `fun`이 있다. `f`의 각 값에 있어, 여러 개가 있으면 어떻게 할 건지를 정해주는 함수. 디폴트는 `mean`.
+그런데 이 plot을 보면, 전반적인 패턴이 없어서, 해석하기가 힘들다. <br /> 이럴 때는 `relig`의 levels 순서를 바꿔서 다시 한번 봐야한다. `fct_reorder()`를 이용하자. <br /> 이 함수는 3개의 요소arguments를 받는다. <br /> - `f`, 니가 수정하고 싶은 factor - `x`, levels를 reorder하는데 있어, 어떤 값을 쓸건지. - 옵션으로 `fun`이 있다. `f`의 각 값에 있어, 여러 개가 있으면 어떻게 할 건지를 정해주는 함수. 디폴트는 `mean`.
 
 ``` r
 ggplot(relig_summary, aes(tvhours, fct_reorder(relig, tvhours))) + 
@@ -235,7 +235,7 @@ ggplot(relig_summary, aes(tvhours, fct_reorder(relig, tvhours))) +
 
 이렇게 되면, "Don't know" 카테고리의 사람들이 tv를 많이 보고, Hinduism과 Other Eastern 종교들이 tv를 덜 본다는 것을 딱 보고 알 수 있다.
 
-이렇게 transformations가 복잡해짐에 따라, `aes()`안의 것들을, 별개의 `mutate()` 스텝으로 꺼내는걸 추천한다. 예를 들어서, 위에 코드를 다시 써보면,
+이렇게 transformations가 복잡해짐에 따라, `aes()`안의 것들을, 별개의 `mutate()` 스텝으로 꺼내는걸 추천한다. <br /> 예를 들어서, 위에 코드를 다시 써보면,
 
 ``` r
 relig_summary %>% 
@@ -244,7 +244,7 @@ relig_summary %>%
   geom_point()
 ```
 
-이와 비슷한 plot을, 보고된 income level에 따른, 평균 연령이 어떤지를 보고 싶다면? how average age varies across reported income level?
+이와 비슷한 plot을, 보고된 income level에 따른, 평균 연령이 어떤지를 보고 싶다면? <br /> how average age varies across reported income level?
 
 ``` r
 rincome_summary <- gss_cat %>% 
@@ -260,9 +260,9 @@ ggplot(rincome_summary, aes(age, fct_reorder(rincome, age))) + geom_point()
 
 ![](15-Factors_files/figure-markdown_github/unnamed-chunk-21-1.png)
 
-그런데, 이렇게 맘대로 levels를 reorder한 것은 매우 나쁘다. 왜냐하면, `rincome`은 순서가 있는 값들이었기 때문. `fct_reorder()`은 levels가 임의로 정렬되어있을 때 사용하는 것이다.
+그런데, 이렇게 맘대로 levels를 reorder한 것은 매우 나쁘다. <br /> 왜냐하면, `rincome`은 순서가 있는 값들이었기 때문. <br /> `fct_reorder()`은 levels가 임의로 정렬되어있을 때 사용하는 것이다.
 
-또 하나의 문제는 "Not applicable"과 등등이 맨 위에 있다는게 꼴보기가 싫다. 다른 의미 있는 값들 말고 저런 것들이 제일 위라니. 이럴 때는 `fct_relevel()`을 쓰자. 얘는 `f`로 factor를 받고, 옮기고 싶은 다른 levels를 몇 개든 받아준다.
+또 하나의 문제는 "Not applicable"과 등등이 맨 위에 있다는게 꼴보기가 싫다. <br /> 다른 의미 있는 값들 말고 저런 것들이 제일 위라니. <br /> 이럴 때는 `fct_relevel()`을 쓰자. <br /> 얘는 `f`로 factor를 받고, 옮기고 싶은 다른 levels를 몇 개든 받아준다.
 
 ``` r
 ggplot(rincome_summary, aes(age, fct_relevel(rincome, "Not applicable"))) + 
@@ -271,7 +271,7 @@ ggplot(rincome_summary, aes(age, fct_relevel(rincome, "Not applicable"))) +
 
 ![](15-Factors_files/figure-markdown_github/unnamed-chunk-22-1.png)
 
-근데, 나는 이것도 좀...맘에 안든다. income level은 올라가는 방향으로 되야하는게 맞지 않나? 다음의 코드는 직접 실행해보자. 이게 더 맞는 것 같다.
+근데, 나는 이것도 좀...맘에 안든다. income level은 올라가는 방향으로 되야하는게 맞지 않나? <br /> 다음의 코드는 직접 실행해보자. 이게 더 맞는 것 같다.
 
 ``` r
 rincome_summary %>% 
@@ -281,7 +281,9 @@ rincome_summary %>%
   geom_point()
 ```
 
-<details> <summary>왜 "Not applicable"의 평균 연령이 이렇게 높은 것 같나?</summary> 음.. 아마 은퇴한 사람은 소득이 없어서 not applicable을 체크하고, 그 사람들은 나이가 많으니깐? </details> <br /> reordering이 유용한 또 하나의 케이스는, plot에서 lines에 색을 넣을 때 그렇다. 'fct\_reorder2()'는 "가장 큰 `x`값과 결합되어 있는 `y`값"에 따라 reorder할 수 있게끔 해준다. 이러면 legend에 써져 있는대로 읽으면 되기 때문에 plot을 읽기가 쉬워진다.
+<details> <summary>왜 "Not applicable"의 평균 연령이 이렇게 높은 것 같나?</summary> 음.. 아마 은퇴한 사람은 소득이 없어서 not applicable을 체크하고, 그 사람들은 나이가 많으니깐? </details> <br />
+
+reordering이 유용한 또 하나의 케이스는, plot에서 lines에 색을 넣을 때 그렇다. <br /> `fct_reorder2()`는 "가장 큰 `x`값과 결합되어 있는 `y`값"에 따라 reorder할 수 있게끔 해준다. <br /> 이러면 legend에 써져 있는대로 읽으면 되기 때문에 plot을 읽기가 쉬워진다. <br />
 
 무슨 말인지는 밑에 그림 보면 바로 이해가 된다.
 
@@ -302,29 +304,29 @@ ggplot(by_age, aes(age, prop, colour = fct_reorder2(marital, age, prop))) +
 
 <img src="https://d33wubrfki0l68.cloudfront.net/839bf9eca63fa907dd5e18e978b1903f4adbf5d9/042b3/factors_files/figure-html/unnamed-chunk-21-1.png" alt="그림1" style="width:50.0%" /> <img src="https://d33wubrfki0l68.cloudfront.net/cfee22e92795ac05834c734c20e65465ed806795/a1423/factors_files/figure-html/unnamed-chunk-21-2.png" alt="그림2" style="width:50.0%" />
 
-왼쪽의 이러면 legend에 있는대로 맨 위의 No answer 선을 찾아볼까? 어... 맨 위에 깔려있어서 한 눈에 못 알아봤네. 이럴 때 `fct_reorder()`를 쓰면 보기 편해진다는 거다. 오른쪽과 같이.
+왼쪽의 이러면 legend에 있는대로 맨 위의 No answer 선을 찾아볼까? 어... 맨 위에 깔려있어서 한 눈에 못 알아봤네. <br /> 이럴 때 `fct_reorder()`를 쓰면 보기 편해진다는 거다. 오른쪽과 같이.
 
-마지막으로, bar plot에 대해서도, `fct_infreq()`를 사용해 increasing levels로 정렬할 수도 있다. 이건 추가적인 변수들을 필요로 하지 않기 때문에, 가장 간단한 reorder이라고 할 수 있겠다. `fct_rev()`와 결합해서 사용하고 싶을 수도 있다.
+마지막으로, bar plot에 대해서도, `fct_infreq()`를 사용해 increasing levels로 정렬할 수도 있다. <br /> 이건 추가적인 변수들을 필요로 하지 않기 때문에, 가장 간단한 reorder이라고 할 수 있겠다. <br /> `fct_rev()`와 결합해서 사용하고 싶을 수도 있다.
 
 ``` r
 gss_cat %>% 
   mutate(marital = marital %>% fct_infreq()) %>% 
   ggplot(aes(marital)) + 
   geom_bar()
-```
 
-<img src="15-Factors_files/figure-markdown_github/unnamed-chunk-25-1.png" width="50%" />
-
-``` r
 gss_cat %>% 
   mutate(marital = marital %>% fct_infreq() %>% fct_rev()) %>% 
   ggplot(aes(marital)) +
   geom_bar()
 ```
 
-<img src="15-Factors_files/figure-markdown_github/unnamed-chunk-25-2.png" width="50%" />
+<img src="15-Factors_files/figure-markdown_github/unnamed-chunk-25-1.png" width="50%" /><img src="15-Factors_files/figure-markdown_github/unnamed-chunk-25-2.png" width="50%" />
 
 ### 15.4.1 Exercises
 
+------------------------------------------------------------------------
+
 15.5 Modifying factor levels
 ----------------------------
+
+levels의 순서를 바꾸는 것보다 더 강력한 것은, levels의 값들을 바꾸는 것이다. <br /> 이러면 출판publication을 할 때, 좀 더 high-levels로 collapse해서 표시할 수도 있음. <br /> 가장 일반적이고 강력한 도구는 `fct_recode()`이다.
