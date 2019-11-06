@@ -302,9 +302,9 @@ ggplot(by_age, aes(age, prop, colour = fct_reorder2(marital, age, prop))) +
   labs(colour = "marital")
 ```
 
-|                                                                                    Solarized dark                                                                                   |                                                                                   Solarized Ocean                                                                                   |
-|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
-| <img src="https://d33wubrfki0l68.cloudfront.net/839bf9eca63fa907dd5e18e978b1903f4adbf5d9/042b3/factors_files/figure-html/unnamed-chunk-21-1.png" alt="그림1" style="width:50.0%" /> | <img src="https://d33wubrfki0l68.cloudfront.net/cfee22e92795ac05834c734c20e65465ed806795/a1423/factors_files/figure-html/unnamed-chunk-21-2.png" alt="그림2" style="width:50.0%" /> |
+|                                                            `fct_reorder()` 안 했을 때                                                           |                                                             `fct_reorder()` 했을 때                                                             |
+|:-----------------------------------------------------------------------------------------------------------------------------------------------:|:-----------------------------------------------------------------------------------------------------------------------------------------------:|
+| ![그림1](https://d33wubrfki0l68.cloudfront.net/839bf9eca63fa907dd5e18e978b1903f4adbf5d9/042b3/factors_files/figure-html/unnamed-chunk-21-1.png) | ![그림2](https://d33wubrfki0l68.cloudfront.net/cfee22e92795ac05834c734c20e65465ed806795/a1423/factors_files/figure-html/unnamed-chunk-21-2.png) |
 
 왼쪽의 이러면 legend에 있는대로 맨 위의 No answer 선을 찾아볼까? 어... 맨 위에 깔려있어서 한 눈에 못 알아봤네. <br /> 이럴 때 `fct_reorder()`를 쓰면 보기 편해진다는 거다. 오른쪽과 같이.
 
@@ -332,3 +332,146 @@ gss_cat %>%
 ----------------------------
 
 levels의 순서를 바꾸는 것보다 더 강력한 것은, levels의 값들을 바꾸는 것이다. <br /> 이러면 출판publication을 할 때, 좀 더 high-levels로 collapse해서 표시할 수도 있음. <br /> 가장 일반적이고 강력한 도구는 `fct_recode()`이다.
+
+얘는 각 level의 값을 recode하거나 change할 수 있도록 해준다. <br /> 예를 들어 `gss_cat$partyid`를 보자.
+
+``` r
+gss_cat %>% 
+  count(partyid)
+## # A tibble: 10 x 2
+##    partyid                n
+##    <fct>              <int>
+##  1 No answer            154
+##  2 Don't know             1
+##  3 Other party          393
+##  4 Strong republican   2314
+##  5 Not str republican  3032
+##  6 Ind,near rep        1791
+##  7 Independent         4119
+##  8 Ind,near dem        2499
+##  9 Not str democrat    3690
+## 10 Strong democrat     3490
+```
+
+levels들이 지나치게 짧고 일관성이 없는걸 볼 수 있다. <br /> 이걸 좀 더 길고 일관성 있는 문구로 변환해보자.
+
+``` r
+gss_cat %>% 
+  mutate(partyid = fct_recode(partyid,
+                              "Republican, strong" = "Strong republican",
+                              "Republican, weak" = "Not str republican",
+                              "Independent, near rep" = "Ind,near rep",
+                              "Independent, near dem" = "Ind,near dem",
+                              "Democrat, weak" = "Not str democrat",
+                              "Democrat, strong" = "Strong democrat"
+                              )) %>% 
+  count(partyid)
+## # A tibble: 10 x 2
+##    partyid                   n
+##    <fct>                 <int>
+##  1 No answer               154
+##  2 Don't know                1
+##  3 Other party             393
+##  4 Republican, strong     2314
+##  5 Republican, weak       3032
+##  6 Independent, near rep  1791
+##  7 Independent            4119
+##  8 Independent, near dem  2499
+##  9 Democrat, weak         3690
+## 10 Democrat, strong       3490
+```
+
+`fct_recode()`는, 직접적으로 언급이 되지 않은 levels들은 그냥 놔둔다. <br /> 그리고 만약 존재하지 않는 level을 수정하려고 하면 warning을 준다.
+
+groups를 결합하고 싶다면, 여러 개의 old levels를 새로운 하나의 level로 할당해주면 된다.
+
+``` r
+gss_cat %>% 
+  mutate(partyid = fct_recode(partyid, 
+                              "Republican, strong" = "Strong republican", 
+                              "Republican, weak" = "Not str republican",
+                              "Independent, near rep" = "Ind,near rep",
+                              "Independent, near dem" = "Ind,near dem",
+                              "Democrat, weak" = "Not str democrat",
+                              "Democrat, strong" = "Strong democrat", # 여기까진 위와 같고,
+                              "Other" = "No answer",
+                              "Other" = "Don't know",
+                              "Other" = "Other party"
+                              )) %>% 
+  count(partyid)
+## # A tibble: 8 x 2
+##   partyid                   n
+##   <fct>                 <int>
+## 1 Other                   548
+## 2 Republican, strong     2314
+## 3 Republican, weak       3032
+## 4 Independent, near rep  1791
+## 5 Independent            4119
+## 6 Independent, near dem  2499
+## 7 Democrat, weak         3690
+## 8 Democrat, strong       3490
+```
+
+물론, 이러한 기술을 쓸 때에는 아예 잘못된 결과로 해석할 수도 있으니 카테고리를 묶을 때는 조심하고.
+
+이렇게, 여러 개의 levels를 collapse하고 싶을 때에는, `fct_collapse()`는 `fct_recode()`의 유용한 변형이다. <br /> 새로운 level에다가, old levels의 벡터를 할당해주면 된다.
+
+``` r
+gss_cat %>% 
+  mutate(partyid = fct_collapse(partyid,
+                                other = c("No answer", "Don't know", "Other party"),
+                                rep = c("Strong republican", "Not str republican"),
+                                ind = c("Ind,near rep", "Ind,near dem"),
+                                dem = c("Strong democrat", "Not str democrat")
+                                )) %>% 
+  count(partyid)
+## # A tibble: 5 x 2
+##   partyid         n
+##   <fct>       <int>
+## 1 other         548
+## 2 rep          5346
+## 3 ind          4290
+## 4 Independent  4119
+## 5 dem          7180
+```
+
+가끔, 자잘한 그룹들은 그냥 하나로 퉁쳐lump together버리고 싶을 때가 있다. <br /> 이럴 때는 `fct_lump()`를 쓰면 된다.
+
+``` r
+gss_cat %>% 
+  mutate(relig = fct_lump(relig)) %>% 
+  count(relig)
+## # A tibble: 2 x 2
+##   relig          n
+##   <fct>      <int>
+## 1 Protestant 10846
+## 2 Other      10637
+```
+
+이 함수는 디폴트로, 합계가 여전히 가장 작은 그룹이 되도록 가장 작은 그룹들을 점진적으로 퉁친다. <br /> The default behavior is to progressively lump together the smallest groups, ensuring that the aggregate is still the smallest group.
+
+이 경우에는 이게 별로 도움이 안 된다. 너무 심하게 퉁쳤기 때문. Protestant거나 아니냐로.
+
+`n` paramter 값을 줘서, 얼마나 많은 그룹들을 keep할 것인지를 정할 수 있다.
+
+``` r
+gss_cat %>% 
+  mutate(relig = fct_lump(relig, n = 10)) %>% 
+  count(relig, sort = TRUE) %>% 
+  print(n = Inf)
+## # A tibble: 10 x 2
+##    relig                       n
+##    <fct>                   <int>
+##  1 Protestant              10846
+##  2 Catholic                 5124
+##  3 None                     3523
+##  4 Christian                 689
+##  5 Other                     458
+##  6 Jewish                    388
+##  7 Buddhism                  147
+##  8 Inter-nondenominational   109
+##  9 Moslem/islam              104
+## 10 Orthodox-christian         95
+```
+
+### 15.5.1 Exercises
