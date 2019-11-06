@@ -302,7 +302,9 @@ ggplot(by_age, aes(age, prop, colour = fct_reorder2(marital, age, prop))) +
   labs(colour = "marital")
 ```
 
-<img src="https://d33wubrfki0l68.cloudfront.net/839bf9eca63fa907dd5e18e978b1903f4adbf5d9/042b3/factors_files/figure-html/unnamed-chunk-21-1.png" alt="그림1" style="width:50.0%" /> <img src="https://d33wubrfki0l68.cloudfront.net/cfee22e92795ac05834c734c20e65465ed806795/a1423/factors_files/figure-html/unnamed-chunk-21-2.png" alt="그림2" style="width:50.0%" />
+|                                                                                    Solarized dark                                                                                   |                                                                                   Solarized Ocean                                                                                   |
+|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
+| <img src="https://d33wubrfki0l68.cloudfront.net/839bf9eca63fa907dd5e18e978b1903f4adbf5d9/042b3/factors_files/figure-html/unnamed-chunk-21-1.png" alt="그림1" style="width:50.0%" /> | <img src="https://d33wubrfki0l68.cloudfront.net/cfee22e92795ac05834c734c20e65465ed806795/a1423/factors_files/figure-html/unnamed-chunk-21-2.png" alt="그림2" style="width:50.0%" /> |
 
 왼쪽의 이러면 legend에 있는대로 맨 위의 No answer 선을 찾아볼까? 어... 맨 위에 깔려있어서 한 눈에 못 알아봤네. <br /> 이럴 때 `fct_reorder()`를 쓰면 보기 편해진다는 거다. 오른쪽과 같이.
 
