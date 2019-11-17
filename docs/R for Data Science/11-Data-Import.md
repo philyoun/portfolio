@@ -335,7 +335,11 @@ parse_factor(c("apple", "banana", "bananana"), levels = fruit)
 
 ### 11.3.4 Dates, date-times, and times
 
-자, 다음의 3가지 parsers 중에 필요한 걸 쓰자. <br /> 1. 날짜 Dates 2. 날짜와 시간 Date-times 3. 시간 Times
+자, 다음의 3가지 parsers 중에 필요한 걸 쓰자. <br /> 1. 날짜 Dates
+
+1.  날짜와 시간 Date-times
+
+2.  시간 Times
 
 다른 추가적인 인자들arguments 없이 호출해보면,
 
@@ -376,17 +380,17 @@ base R은 time 데이터에 대한 built-in 클래스가 딱히 좋은게 없어
 
 여기까지는 추가적인 인자들, extra arguments 없이 호출해본 것. <br /> 만약에 이 디폴트들이 당신의 데이터에는 잘 맞지 않다면, 필요에 맞게끔 format을 공급해줄 수 있다. <br /> 다음을 보자.
 
-**Year** `%Y` (4자리) <br /> `%y` (2자리); 00-69 -&gt; 2000-2069, 70-99 -&gt; 1970-1999 (이러면 1969년같은건 표현 못한다는거네)
+**Year** <br /> `%Y` (4자리) <br /> `%y` (2자리); 00-69 -&gt; 2000-2069, 70-99 -&gt; 1970-1999 (이러면 1969년같은건 표현 못한다는거네)
 
-**Month** `%m` (2자리) <br /> `%b` ("Jan"과 같이 축약된 이름) <br /> `%B` ("January"와 같은 풀네임) <br />
+**Month** <br /> `%m` (2자리) <br /> `%b` ("Jan"과 같이 축약된 이름) <br /> `%B` ("January"와 같은 풀네임) <br />
 
-**Day** `%d` (2자리) <br /> `%e` (optional leading space앞에 몇 자리 공백을 없애준다는 뜻인듯)
+**Day** <br /> `%d` (2자리) <br /> `%e` (optional leading space앞에 몇 자리 공백을 없애준다는 뜻인듯)
 
-**Time** `%H` 0-23 hours <br /> `%I` 0-12, 대신에 `%p`와 항상 같이 쓰여야한다. <br /> `%p` AM/PM 지표Indicator <br /> `%M` minutes <br /> `%S` integer seconds <br /> `%OS` real seconds <br /> `%Z` Time zone(이름으로, 예를 들면, `America/Chicago`) <br /> 축약해서 부르는 거에 조심하자. <br /> 만약 미국인이라면, "EST"가 "Eastern Standard Time"이 아니라. <br /> 서머타임이 없는 Canadian time zone이다. (Canadian time zone that doesn't have daylight savings time) <br /> `%z` UTC에서 얼마나 차이가 나는지. 예를 들어, +0800처럼.
+**Time** <br /> `%H` 0-23 hours <br /> `%I` 0-12, 대신에 `%p`와 항상 같이 쓰여야한다. <br /> `%p` AM/PM 지표Indicator <br /> `%M` minutes <br /> `%S` integer seconds <br /> `%OS` real seconds <br /> `%Z` Time zone(이름으로, 예를 들면, `America/Chicago`) <br /> 축약해서 부르는 거에 조심하자. <br /> 만약 미국인이라면, "EST"가 "Eastern Standard Time"이 아니라. <br /> 서머타임이 없는 Canadian time zone이다. (Canadian time zone that doesn't have daylight savings time) <br /> `%z` UTC에서 얼마나 차이가 나는지. 예를 들어, +0800처럼.
 
-**Non-digits** `%.` (숫자가 아닌 하나의 캐릭터를 skip해줌)skips one non-digit character <br /> `%*` (숫자가 아닌 모든 캐릭터들을 skip해줌)skips any number of non-digits
+**Non-digits** <br /> `%.` (숫자가 아닌 하나의 캐릭터를 skip해줌)skips one non-digit character <br /> `%*` (숫자가 아닌 모든 캐릭터들을 skip해줌)skips any number of non-digits
 
-정확한 포맷을 찾기 위한 방법으로, 몇 개의 예를 character vector로 만들어보고, parsing을 해보는거다. <br /> 예를 들어,
+정확한 포맷을 찾기 위한 방법으로, 몇 개 예제를 character vector로 만들어보고, parsing 해보는거다. <br /> 예를 들어,
 
 ``` r
 parse_date("01/02/15", "%m/%d/%y")
@@ -432,5 +436,169 @@ parse_date("2016년 10월 12일", "%Y년 %B %d일", locale = loc)
 
 ------------------------------------------------------------------------
 
-11.4 Parsing a vector
----------------------
+11.4 Parsing a file
+-------------------
+
+이제 individual vector를 어떻게 parse하는지 배웠으니, 이제 처음으로 돌아가서 어떻게 readr이 파일을 parse하는지 알아보자.
+
+새롭게 배울게 2가지 있음. 1. 어떻게 readr이 각 칼럼의 타입을 자동적으로 추측하는지 2. 어떻게 디폴트 specification을 override하는지(그러니깐 제대로 안 될때 직접 설정)
+
+### 11.4.1 Strategy
+
+readr은, 각 칼럼이 어떠한 타입을 갖고 있는지를 알기 위해서 heuristic한 방법을 사용한다. 먼저 1000개의 행을 읽은 다음에, 어떤 타입인지를 알아내기 위해 heuristic(조금 보수적인)을 이용. 아래의 예시와 같이, 이 process를 `guess_parser()`에다 character vector를 넣음으로써 모방해 볼 수 있다. 그럼 얘는 best guess를 반환하고, `parse_guess()`는 그 guess를, 칼럼 parse하는데 쓴다.
+
+``` r
+guess_parser("2010-10-01") # 이렇게 캐릭터 벡터를 넣어야한다.
+## [1] "date"
+guess_parser("15:01")
+## [1] "time"
+guess_parser(c("TRUE", "FALSE"))
+## [1] "logical"
+guess_parser(c("1", "5", "9"))
+## [1] "double"
+guess_parser(c("12,352,561"))
+## [1] "number"
+```
+
+``` r
+str(parse_guess("2010-10-10"))
+##  Date[1:1], format: "2010-10-10"
+```
+
+heuristic은 다음의 각각을 시도해보고, match를 찾으면 멈춘다.
+
+-   logical: "F", "T", "FALSE", "TRUE"만을 가지고 있는지
+-   integer: numeric 캐릭터와 `-`만을 가지고 있는지
+-   double: 유효한 doubles만을 가지고 있는지(`4.5e-5`도 포함해서)
+-   number: grouping mark를 가지고 있는 유효한 doubles인지
+-   time: 디폴트 `time_format`와 매치가 되는지
+-   date: 디폴트 `date_format`과 매치가 되는지
+-   date-time: ISO8601 date가 있다면
+
+만약에 어떠한 타입도 아닌 것 같다면, 그냥 그 칼럼을 vector of strings 그대로 놔둔다.
+
+살짝 헷갈리니깐 정리하고 넘어가는데, `guess_parser()`는 parser의 이름을 반환, 어떤 종류의 parser인지 `parse_guess()`는 그 종류에 맞는 parser vector를 반환
+
+``` r
+guess_parser("1,234,566")
+## [1] "number"
+```
+
+``` r
+parse_guess("1,234,566")
+## [1] 1234566
+```
+
+### 11.4.2 Problems
+
+이 디폴트가 큰 파일에 대해서도 항상 잘 되지는 않는다. 2가지 basic 문제점들이 있음.
+
+1.  처음 1000개의 행들만 special할 수가 있음. 예를 들어서, 사실 double인 칼럼인데, 처음 1000개의 행들만 integer일 때.
+
+2.  칼럼에 missing값들이 많을 수 있다. 만약에 처음 1000개의 행들이 NA만을 가지고 있을 때, readr이 캐릭터 벡터라고 추측할 수 있다. 사실 그게 아님에도 불구하고 ㅇㅇ
+
+이러한 challenging한 csv를 readr은 가지고 있다. 이 csv는 위 2개의 문제들 싹다 있음.
+
+``` r
+challenge <- read_csv(readr_example("challenge.csv"))
+```
+
+    ## Parsed with column specification:
+    ## cols(
+    ##   x = col_double(),
+    ##   y = col_logical()
+    ## )
+
+    ## Warning: 1000 parsing failures.
+    ##  row col           expected     actual                                                                     file
+    ## 1001   y 1/0/T/F/TRUE/FALSE 2015-01-16 'C:/Users/Phil2/Documents/R/win-library/3.5/readr/extdata/challenge.csv'
+    ## 1002   y 1/0/T/F/TRUE/FALSE 2018-05-18 'C:/Users/Phil2/Documents/R/win-library/3.5/readr/extdata/challenge.csv'
+    ## 1003   y 1/0/T/F/TRUE/FALSE 2015-09-05 'C:/Users/Phil2/Documents/R/win-library/3.5/readr/extdata/challenge.csv'
+    ## 1004   y 1/0/T/F/TRUE/FALSE 2012-11-28 'C:/Users/Phil2/Documents/R/win-library/3.5/readr/extdata/challenge.csv'
+    ## 1005   y 1/0/T/F/TRUE/FALSE 2020-01-13 'C:/Users/Phil2/Documents/R/win-library/3.5/readr/extdata/challenge.csv'
+    ## .... ... .................. .......... ........................................................................
+    ## See problems(...) for more details.
+
+`readr_example()`은 패키지 안에 있는 파일의 path를 찾아주는 것.
+
+이렇게 불러보면, 2개의 출력된 아웃풋이 있다. 하나는 처음 1000개의 행을 보고 어떤 칼럼인지 specification을 한 것, 두 번째는 처음 5개의 parsing failures.
+
+`problems()`를 이용해서 문제가 뭔지 직접적으로 끄집어내어, 좀 더 깊게 탐구해보는 건 항상 좋은 생각이다.
+
+``` r
+problems(challenge)
+## # A tibble: 1,000 x 5
+##      row col   expected      actual   file                                 
+##    <int> <chr> <chr>         <chr>    <chr>                                
+##  1  1001 y     1/0/T/F/TRUE~ 2015-01~ 'C:/Users/Phil2/Documents/R/win-libr~
+##  2  1002 y     1/0/T/F/TRUE~ 2018-05~ 'C:/Users/Phil2/Documents/R/win-libr~
+##  3  1003 y     1/0/T/F/TRUE~ 2015-09~ 'C:/Users/Phil2/Documents/R/win-libr~
+##  4  1004 y     1/0/T/F/TRUE~ 2012-11~ 'C:/Users/Phil2/Documents/R/win-libr~
+##  5  1005 y     1/0/T/F/TRUE~ 2020-01~ 'C:/Users/Phil2/Documents/R/win-libr~
+##  6  1006 y     1/0/T/F/TRUE~ 2016-04~ 'C:/Users/Phil2/Documents/R/win-libr~
+##  7  1007 y     1/0/T/F/TRUE~ 2011-05~ 'C:/Users/Phil2/Documents/R/win-libr~
+##  8  1008 y     1/0/T/F/TRUE~ 2020-07~ 'C:/Users/Phil2/Documents/R/win-libr~
+##  9  1009 y     1/0/T/F/TRUE~ 2011-04~ 'C:/Users/Phil2/Documents/R/win-libr~
+## 10  1010 y     1/0/T/F/TRUE~ 2010-05~ 'C:/Users/Phil2/Documents/R/win-libr~
+## # ... with 990 more rows
+```
+
+좋은 전략은, 칼럼별로 하나씩 작업을 해서, 문제가 없도록 하는 것이다. x 칼럼을 parsing하는데 있어 문제가 있다고 원문에선 그러는데, 없는데? y 칼럼 parsing할때만 문제라고 뜨는구만.
+
+그러니깐 결론적으로 x칼럼은 `col_double()`이, y칼럼은 `col_date()`가 나와야하는데, 처음에 읽을 때 x칼럼은 `col_double()`로 잘 읽었지만, y칼럼이 `col_logical()`이라고 잘못 읽은건데,
+
+저자의 착각이 있는듯.
+
+대충 뭐하려는건지는 알겠으니깐, 저자는 x칼럼은 `col_integer()`, y칼럼은 `col_character()`라고 읽어졌다고 가정하는듯.
+
+뭐 여튼간에, call을 fix할 필요가 있는데, 그럼 맨 처음에 challenge를 불렀을 때 나오는 column specification을 복붙한다.
+
+``` r
+challenge <- read_csv(
+    readr_example("challenge.csv"),
+    col_types = cols(
+        x = col_integer(),
+        y = col_character()
+    )
+)
+```
+
+    ## Warning: 1000 parsing failures.
+    ##  row col               expected             actual                                                                     file
+    ## 1001   x no trailing characters .23837975086644292 'C:/Users/Phil2/Documents/R/win-library/3.5/readr/extdata/challenge.csv'
+    ## 1002   x no trailing characters .41167997173033655 'C:/Users/Phil2/Documents/R/win-library/3.5/readr/extdata/challenge.csv'
+    ## 1003   x no trailing characters .7460716762579978  'C:/Users/Phil2/Documents/R/win-library/3.5/readr/extdata/challenge.csv'
+    ## 1004   x no trailing characters .723450553836301   'C:/Users/Phil2/Documents/R/win-library/3.5/readr/extdata/challenge.csv'
+    ## 1005   x no trailing characters .614524137461558   'C:/Users/Phil2/Documents/R/win-library/3.5/readr/extdata/challenge.csv'
+    ## .... ... ...................... .................. ........................................................................
+    ## See problems(...) for more details.
+
+그런 다음 x칼럼을 수정
+
+``` r
+challenge <- read_csv(
+    readr_example("challenge.csv"),
+    col_types = cols(
+        x = col_double(),
+        y = col_character()
+    )
+)
+```
+
+그 다음 y칼럼을 date 칼럼으로 수정
+
+``` r
+challenge <- read_csv(
+    readr_example("challenge.csv"),
+    col_types = cols(
+        x = col_double(),
+        y = col_date()
+    )
+)
+```
+
+모든 `parse_xyz()` 함수는, 연결되는 `col_xyz()` 함수가 있다. 데이터가 R의 character vector안에 이미 들어있다면, `parse_xyz()`를 사용하면 된다. 아니면 `col_xyz()`를 이용해서 readr에게 data를 어떻게 로드해야하는지를 알려줘야 한다.
+
+나는(Hadley는) 위의 예처럼, 항상 `col_types`를 공급해줄 것을 추천한다. 위의 예처럼 출력되는걸 복붙해서 수정해주는 식으로. 이건 항상 일관적이고, 다른 사람들도 재현해볼 수 있는 data import 스크립트를 갖고 있다는걸 보장해주니깐. 그냥 디폴트 guesses에만 의존하다 데이터가 바뀌어버리면 readr은 그냥 하던대로 해버린다.
+
+정말 엄격해지고 싶다면, `stop_for_problems()`를 사용해라. 만약 parsing 문제가 생긴다면 에러를 주고 스크립트를 그만둘 것이다.
