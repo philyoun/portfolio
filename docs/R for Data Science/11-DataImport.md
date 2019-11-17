@@ -1,0 +1,60 @@
+11 Data Import
+================
+
+11.1 Introduction
+-----------------
+
+R 패키지에 제공된 데이터로 작업하는건 데이터 사이언스 툴을 배우기에는 좋은 방법이지만, <br /> 언젠가 그만 배우고 니 데이터로 직접 작업하고 싶어질 때가 있을 것이다. <br /> 이 장에서는, 텍스트만 있는 네모난 파일들plain-text rectangular files을 어떻게 R로 읽을지를 배운다.
+
+Data import의 겉만 다룰 것이지만, 많은 원리들이 다른 데이터 형식에도 적용가능하다. <br /> 다른 데이터 형식들에 대한 유용한 패키지들을 소개하며 마무리할 것.
+
+### 11.1.1 Prerequisites
+
+``` r
+library(tidyverse)
+```
+
+    ## -- Attaching packages -------------------------------------------------------------------------- tidyverse 1.2.1 --
+
+    ## √ ggplot2 3.1.0     √ purrr   0.2.5
+    ## √ tibble  2.1.3     √ dplyr   0.7.8
+    ## √ tidyr   0.8.2     √ stringr 1.3.1
+    ## √ readr   1.3.1     √ forcats 0.4.0
+
+    ## -- Conflicts ----------------------------------------------------------------------------- tidyverse_conflicts() --
+    ## x dplyr::filter() masks stats::filter()
+    ## x dplyr::lag()    masks stats::lag()
+
+**readr** 패키지를 사용해서 flat files를 로드하는 것을 배울 것이다. <br /> 이 패키지는 tidyverse의 핵심 중 하나다.
+
+------------------------------------------------------------------------
+
+11.2 Getting Started
+--------------------
+
+readr 패키지의 대부분 함수들은, flat files를 데이터 프레임으로 바꾸는 것과 연관되어 있다.
+
+-   `read_csv()`는 , 로 분리된 파일을 읽고, `read_csv2()`는 ; 로 분리된 파일을 읽는다.(소수점 자리에 , 를 쓰는 나라에서 빈번) <br /> `read_tsv()`는 tab으로 분리된 파일을 읽음. <br /> `read_delim()`은 any delimiter로 분리된 파일을 읽음.
+
+-   `read_fwf()`는 고정된 폭width으로 파일을 읽는다. <br /> width를 `fwf_widths()`로 정해주거나, `fwf_positions()`로 position을 결정해줄 수 있다. <br /> `read_table()`은 칼럼들이 띄어쓰기로 구분이 되어있는, 고정 폭 파일의 일반적인 변형을 읽어준다. <br /> `read_table()` reads a common variation of fixed width files where columns are separated by white space.
+
+-   `read_log()`는 Apache style log files를 읽는다. <br /> ([webreadr](https://github.com/Ironholds/webreadr)도 체크해봐라. 이건 `read_log()`위에 만들어졌으며, 다른 유용한 도구들을 제공해줌.)
+
+여튼 이 함수들은 모두 비슷한 문법Syntax을 가지고 있다. 하나만 마스터하면, 나머지도 같음. <br /> 그래서 남은 챕터 동안 read\_csv()에 집중할 것이다. <br /> csv파일이 가장 흔한 데이터 저장 형식일 뿐 아니라, 이것만 알면 readr의 다른 함수들에도 쉽게 적용가능해서.
+
+------------------------------------------------------------------------
+
+`read_csv()`의 첫 번째 인자argument가 제일 중요하다: 읽을 파일의 경로path to the file to read.
+
+``` r
+heights <- read_csv("data/heights.csv")
+## Parsed with column specification:
+## cols(
+##   earn = col_double(),
+##   height = col_double(),
+##   sex = col_character(),
+##   ed = col_double(),
+##   age = col_double(),
+##   race = col_character()
+## )
+```

@@ -1,9 +1,7 @@
 ---
-title: "3 Data Visualisation"
+title: "03 Data Visualisation"
 output: github_document
 ---
-
-# 3 Data Visualisation
 
 ## 3.1 Introduction
 > "간단한 그래프가 다른 어떤 도구보다 데이터 애널리스트에게 많은 정보를 전달해준다." - 존 튜키 <br />
@@ -42,12 +40,13 @@ library(tidyverse)
 패키지 설치는 처음 한 번만 하면 되는데, 패키지를 로드 하는 것은 세션을 시작할때마다 해줘야 한다. <br />
 (독자가 beginner라고 가정하고 설명을 해놓은듯..)
 
-어떤 함수가 어디에서 왔는지를 명시해주고 싶다면, <br />
-&emsp;&emsp;&emsp;&emsp;`package::function()`이라는 특별한 형식으로 사용해줘야 한다. <br />
+어떤 함수가 어디에서 왔는지를 명시해주고 싶다면, `package::function()`이라는 특별한 형식으로 사용해줘야 한다. <br />
 예를 들어, `ggplot2::ggplot()`라고 하면, <br />
 &emsp;&emsp;&emsp;&emsp;우리가 ggplot2라는 패키지에서 `ggplot()`이라는 함수를 사용하고 있다는 걸 뜻한다.
 
+___
 
+## 3.2 
 
 
 
