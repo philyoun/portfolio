@@ -1,0 +1,147 @@
+---
+title: "11 Data Import"
+output: github_document
+---
+
+## 11.1 Introduction
+R 패키지에 제공된 데이터로 작업하는건 데이터 사이언스 툴을 배우기에는 좋은 방법이지만, <br />
+언젠가 그만 배우고 니 데이터로 직접 작업하고 싶어질 때가 있을 것이다. <br />
+이 장에서는, 텍스트만 있는 네모난 파일들plain-text rectangular files을 어떻게 R로 읽을지를 배운다.
+
+Data import의 겉만 다룰 것이지만, 많은 원리들이 다른 데이터 형식에도 적용가능하다. <br />
+다른 데이터 형식들에 대한 유용한 패키지들을 소개하며 마무리할 것.
+
+### 11.1.1 Prerequisites
+```{r warning=FALSE}
+library(tidyverse)
+```
+**readr** 패키지를 사용해서 flat files를 로드하는 것을 배울 것이다. <br />
+이 패키지는 tidyverse의 핵심 중 하나다.
+
+___
+
+## 11.2 Getting Started
+readr 패키지의 대부분 함수들은, flat files를 데이터 프레임으로 바꾸는 것과 연관되어 있다.
+
+- `read_csv()`는 , 로 분리된 파일을 읽고, `read_csv2()`는 ; 로 분리된 파일을 읽는다.(소수점 자리에 , 를 쓰는 나라에서 빈번) <br />
+`read_tsv()`는 tab으로 분리된 파일을 읽음. <br />
+`read_delim()`은 any delimiter로 분리된 파일을 읽음.
+
+- `read_fwf()`는 고정된 폭width으로 파일을 읽는다. <br />
+width를 `fwf_widths()`로 정해주거나, `fwf_positions()`로 position을 결정해줄 수 있다. <br />
+`read_table()`은 칼럼들이 띄어쓰기로 구분이 되어있는, 고정 폭 파일의 일반적인 변형을 읽어준다. <br />
+`read_table()` reads a common variation of fixed width files where columns are separated by white space.
+
+- `read_log()`는 Apache style log files를 읽는다. <br />
+([webreadr](https://github.com/Ironholds/webreadr)도 체크해봐라. 이건 `read_log()`위에 만들어졌으며, 다른 유용한 도구들을 제공해줌.)
+
+여튼 이 함수들은 모두 비슷한 문법Syntax을 가지고 있다. 하나만 마스터하면, 나머지도 같음. <br />
+그래서 남은 챕터 동안 read_csv()에 집중할 것이다. <br />
+csv파일이 가장 흔한 데이터 저장 형식일 뿐 아니라, 이것만 알면 readr의 다른 함수들에도 쉽게 적용가능해서.
+
+___
+`read_csv()`의 첫 번째 인자argument가 제일 중요하다: 읽을 파일의 경로path to the file to read.
+```{r eval=FALSE}
+heights <- read_csv("data/heights.csv")
+## Parsed with column specification:
+## cols(
+##   earn = col_double(),
+##   height = col_double(),
+##   sex = col_character(),
+##   ed = col_double(),
+##   age = col_double(),
+##   race = col_character()
+## )
+```
+
+`read_csv()`를 실행하면, 먼저 column specification부터 출력된다. <br />
+각 칼럼의 이름과 타입을 출력하는데, parsing a file을 할 때 다시 볼거다. readr의 중요한 부분임.
+
+inline csv 파일을 넣어줄 수도 있다. <br />
+readr을 가지고 실험해보고 싶거나, <br />
+&emsp;&emsp;&emsp;&emsp;reproducible한 예제를 만들어서 다른 사람들과 공유하고 싶을 때 유용함. <br />
+아래의 예를 봐보자.
+```{r collapse=TRUE}
+read_csv("a,b,c
+1,2,3
+4,5,6")
+```
+
+위의 2가지 case를 보면 알 수 있듯, `read_csv()`는 가장 첫 줄을 데이터의 이름으로 사용한다. <br />
+그러고 싶지 않다면 사용할 수 있는 2가지의 방법이 있다.
+
+1. 처음 몇 줄에, 데이터에 대한 데이터(메타데이터)가 써져있을 때, `skip = n`을 쓰면 된다. <br />
+혹은 #이 붙어있는 모든 줄들을 drop시키고 싶다면 `comment = "#"`를 추가
+```{r collapse=TRUE}
+read_csv("The first line of metadata
+  The second line of metadata
+  x,y,z
+  1,2,3", skip = 2)
+```
+
+```{r collapse=TRUE}
+read_csv("# A comment I want to skip
+  x,y,z
+  1,2,3", comment = "#")
+```
+
+2. 칼럼 이름이 없는 데이터. `col_names = FALSE`를 쓰면 된다. `header = F`와 같은 의미. <br />
+이러면 첫 줄을 headings로 다루지 않는다. 대신에 `X1`, ..., `Xn`으로 라벨한다.
+```{r collapse=TRUE}
+read_csv("1,2,3\n4,5,6", col_names = FALSE)
+```
+
+(`"\n"`은 한 줄을 추가하는 편리한 shortcut. 이것과 비슷한 것들을, string basics에서 배우게 될 것이다.)
+
+아니면, `col_names`에다가 character vector를 패스해서, 칼럼 이름으로 쓰게할 수도 있다.
+```{r collapse=TRUE}
+read_csv("1,2,3\n4,5,6", col_names = c("x", "y", "z"))
+```
+
+약간 수정이 필요한 또 한 가지 경우는, missing values를 `na`로 바꿔줘야할 때. <br />
+예를 들어 파일에 missing value가 na로 저장되어있지 않고 .로 표현되어 있다면, na = "." 옵션을 추가
+```{r collapse=TRUE}
+read_csv("a,b,c\n1,2,.", na = ".")
+```
+
+이제 니가 실제생활에서 만날 75%의 csv파일들은 다 어떻게 읽어야할지 안다. <br />
+앞서 배운 것들을, `read_tsv()`나 `read_fwf()`에 쉽게 적용할 수도 있다. <br />
+좀 더 어려운 파일들에 대해서는, 먼저 readr이 각 칼럼을 어떻게 parse해서 R 벡터로 바꾸는지를 배워야한다.
+
+### 11.2.1 Compare to base R
+왜 `read.csv()`를 안 쓰는지? readr의 것들이 어떤 이점이 있는지를 나열해주자면,
+
+1. 훨씬 빠르다.(최대 10배) <br />
+&emsp;&emsp;큰 파일에 대해서는 progress bar가 나오기 때문에, 무슨 일이 일어나고 있는지 파악가능하다. <br />
+&emsp;&emsp;진짜 속도만 원한다면, `data.table::fread()`를 사용해보라. tidyverse에 잘 맞는다고 할 수는 없지만, 꽤나 빠를 수 있다.
+
+2. 이 함수들은 tibbles로 만들어준다. <br />
+&emsp;&emsp;character 벡터를 factors로 만들거나, 행의 이름을 사용하거나, 칼럼 이름을 망가뜨리지않는다. <br />
+&emsp;&emsp;위의 저것들이 base R의 함수에선 꽤나 자주 일어나는 일이다.
+
+3. 더 reproducible하다. <br />
+&emsp;&emsp;base R 함수들은 작동하고 있는 시스템이나 environment variables에서 some behavior를 inherit할 수 있어서, <br />
+&emsp;&emsp;그래서, 다른 사람의 컴퓨터에서는 니가 쓴 코드가 작동하지 않을 수도 있다.
+
+### 11.2.2 Exercises
+
+___
+
+## 11.3 Parsing a vector
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
