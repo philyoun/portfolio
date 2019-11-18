@@ -439,13 +439,13 @@ parse_date("2016년 10월 12일", "%Y년 %B %d일", locale = loc)
 11.4 Parsing a file
 -------------------
 
-이제 individual vector를 어떻게 parse하는지 배웠으니, 이제 처음으로 돌아가서 어떻게 readr이 파일을 parse하는지 알아보자.
+이제 individual vector를 어떻게 parse하는지 배웠으니, <br />     이제 처음으로 돌아가서 어떻게 readr이 파일을 parse하는지 알아보자.
 
-새롭게 배울게 2가지 있음. 1. 어떻게 readr이 각 칼럼의 타입을 자동적으로 추측하는지 2. 어떻게 디폴트 specification을 override하는지(그러니깐 제대로 안 될때 직접 설정)
+새롭게 배울게 2가지 있음. <br /> 1. 어떻게 readr이 각 칼럼의 타입을 자동적으로 추측하는지 <br /> 2. 어떻게 디폴트 specification을 override하는지(그러니깐 제대로 안 될때 직접 설정)
 
 ### 11.4.1 Strategy
 
-readr은, 각 칼럼이 어떠한 타입을 갖고 있는지를 알기 위해서 heuristic한 방법을 사용한다. 먼저 1000개의 행을 읽은 다음에, 어떤 타입인지를 알아내기 위해 heuristic(조금 보수적인)을 이용. 아래의 예시와 같이, 이 process를 `guess_parser()`에다 character vector를 넣음으로써 모방해 볼 수 있다. 그럼 얘는 best guess를 반환하고, `parse_guess()`는 그 guess를, 칼럼 parse하는데 쓴다.
+readr은, 각 칼럼이 어떠한 타입을 갖고 있는지를 알기 위해서 heuristic한 방법을 사용한다. <br /> 먼저 1000개의 행을 읽고, 어떤 타입인지를 알아내기 위해 heuristic(조금 보수적인)을 이용. <br /> 아래의 예시에서 볼 수 있듯, 이 process를 `guess_parser()`에다 character vector를 넣어 모방해 볼 수 있다. <br /> 그럼 얘는 best guess를 반환하고, `parse_guess()`는 그 guess를, 칼럼 parse하는데 쓴다.
 
 ``` r
 guess_parser("2010-10-01") # 이렇게 캐릭터 벡터를 넣어야한다.
@@ -469,15 +469,15 @@ heuristic은 다음의 각각을 시도해보고, match를 찾으면 멈춘다.
 
 -   logical: "F", "T", "FALSE", "TRUE"만을 가지고 있는지
 -   integer: numeric 캐릭터와 `-`만을 가지고 있는지
--   double: 유효한 doubles만을 가지고 있는지(`4.5e-5`도 포함해서)
+-   double: 유효한 doubles만을 가지고 있는지(`4.5e-5`같은 것도 포함해서)
 -   number: grouping mark를 가지고 있는 유효한 doubles인지
 -   time: 디폴트 `time_format`와 매치가 되는지
 -   date: 디폴트 `date_format`과 매치가 되는지
--   date-time: ISO8601 date가 있다면
+-   date-time: ISO8601 date가 하나라도 있다면
 
 만약에 어떠한 타입도 아닌 것 같다면, 그냥 그 칼럼을 vector of strings 그대로 놔둔다.
 
-살짝 헷갈리니깐 정리하고 넘어가는데, `guess_parser()`는 parser의 이름을 반환, 어떤 종류의 parser인지 `parse_guess()`는 그 종류에 맞는 parser vector를 반환
+살짝 헷갈리니깐 정리하고 넘어가는데, <br />     `guess_parser()`는 parser의 이름을 반환, 어떤 종류의 parser인지 <br />     `parse_guess()`는 그 종류에 맞는 parser vector를 반환
 
 ``` r
 guess_parser("1,234,566")
@@ -491,13 +491,13 @@ parse_guess("1,234,566")
 
 ### 11.4.2 Problems
 
-이 디폴트가 큰 파일에 대해서도 항상 잘 되지는 않는다. 2가지 basic 문제점들이 있음.
+이 디폴트가 큰 파일에 대해서도 항상 잘 되지는 않는다. <br /> 2가지 basic 문제점들이 있음.
 
-1.  처음 1000개의 행들만 special할 수가 있음. 예를 들어서, 사실 double인 칼럼인데, 처음 1000개의 행들만 integer일 때.
+1.  처음 1000개의 행들만 special했던 것일 수 있음. <br /> 예를 들어서, 사실 double인 칼럼인데, 처음 1000개의 행들만 integer일 때.
 
-2.  칼럼에 missing값들이 많을 수 있다. 만약에 처음 1000개의 행들이 NA만을 가지고 있을 때, readr이 캐릭터 벡터라고 추측할 수 있다. 사실 그게 아님에도 불구하고 ㅇㅇ
+2.  칼럼에 missing값들이 많을 수 있다. <br /> 만약에 처음 1000개의 행들이 NA만을 가지고 있을 때, readr이 캐릭터 벡터라고 추측할 수 있다. <br /> 사실 그게 아님에도 불구하고 ㅇㅇ
 
-이러한 challenging한 csv를 readr은 가지고 있다. 이 csv는 위 2개의 문제들 싹다 있음.
+이러한 challenging한 CSV를 readr은 가지고 있다. 이 CSV는 위 2개의 문제들을 다 갖고 있다.
 
 ``` r
 challenge <- read_csv(readr_example("challenge.csv"))
@@ -521,7 +521,7 @@ challenge <- read_csv(readr_example("challenge.csv"))
 
 `readr_example()`은 패키지 안에 있는 파일의 path를 찾아주는 것.
 
-이렇게 불러보면, 2개의 출력된 아웃풋이 있다. 하나는 처음 1000개의 행을 보고 어떤 칼럼인지 specification을 한 것, 두 번째는 처음 5개의 parsing failures.
+이렇게 불러보면, 2개의 출력된 아웃풋이 있다. <br /> 하나는 처음 1000개의 행을 보고 어떤 칼럼인지 specification을 한 것, <br /> 두 번째는 처음 5개의 parsing failures.
 
 `problems()`를 이용해서 문제가 뭔지 직접적으로 끄집어내어, 좀 더 깊게 탐구해보는 건 항상 좋은 생각이다.
 
@@ -543,9 +543,9 @@ problems(challenge)
 ## # ... with 990 more rows
 ```
 
-좋은 전략은, 칼럼별로 하나씩 작업을 해서, 문제가 없도록 하는 것이다. x 칼럼을 parsing하는데 있어 문제가 있다고 원문에선 그러는데, 없는데? y 칼럼 parsing할때만 문제라고 뜨는구만.
+좋은 전략은, 칼럼별로 하나씩 작업을 해서, 문제가 없도록 하는 것이다. <br /> x 칼럼을 parsing하는데 있어 문제가 있다고 원문에선 그러는데, 없는데? <br /> y 칼럼 parsing할때만 문제라고 뜨는구만.
 
-그러니깐 결론적으로 x칼럼은 `col_double()`이, y칼럼은 `col_date()`가 나와야하는데, 처음에 읽을 때 x칼럼은 `col_double()`로 잘 읽었지만, y칼럼이 `col_logical()`이라고 잘못 읽은건데,
+그러니깐 결론적으로 x칼럼은 `col_double()`이, y칼럼은 `col_date()`가 나와야하는데, <br /> 처음에 읽을 때 x칼럼은 `col_double()`로 잘 읽었지만, y칼럼이 `col_logical()`이라고 잘못 읽은건데,
 
 저자의 착각이 있는듯.
 
@@ -597,8 +597,95 @@ challenge <- read_csv(
 )
 ```
 
-모든 `parse_xyz()` 함수는, 연결되는 `col_xyz()` 함수가 있다. 데이터가 R의 character vector안에 이미 들어있다면, `parse_xyz()`를 사용하면 된다. 아니면 `col_xyz()`를 이용해서 readr에게 data를 어떻게 로드해야하는지를 알려줘야 한다.
+모든 `parse_xyz()` 함수는, 연결되는 `col_xyz()` 함수가 있다. <br /> 데이터가 R의 character vector안에 이미 들어있다면, `parse_xyz()`를 사용하면 된다. <br /> 아니면 `col_xyz()`를 이용해서 readr에게 data를 어떻게 로드해야하는지를 알려줘야 한다.
 
-나는(Hadley는) 위의 예처럼, 항상 `col_types`를 공급해줄 것을 추천한다. 위의 예처럼 출력되는걸 복붙해서 수정해주는 식으로. 이건 항상 일관적이고, 다른 사람들도 재현해볼 수 있는 data import 스크립트를 갖고 있다는걸 보장해주니깐. 그냥 디폴트 guesses에만 의존하다 데이터가 바뀌어버리면 readr은 그냥 하던대로 해버린다.
+나는(Hadley는) 위의 예처럼, 항상 `col_types`를 공급해줄 것을 추천한다. <br /> 위의 예처럼 출력되는걸 복붙해서 수정해주는 식으로. <br /> 이건 항상 일관적이고, 다른 사람들도 재현해볼 수 있는 data import 스크립트를 갖고 있다는걸 보장해주니깐. <br /> 그냥 디폴트 guesses에만 의존하다 데이터가 바뀌어버리면 readr은 그냥 하던대로 해버린다.
 
-정말 엄격해지고 싶다면, `stop_for_problems()`를 사용해라. 만약 parsing 문제가 생긴다면 에러를 주고 스크립트를 그만둘 것이다.
+정말 엄격해지고 싶다면, `stop_for_problems()`를 사용해라. <br /> 만약 parsing 문제가 생긴다면 에러를 주고 스크립트를 그만둘 것이다.
+
+### 11.4.3 Other Strategies
+
+files를 parse할 때 도움을 줄 수 있는 몇 가지 일반적인 전략들이 있다. <br />
+
+-   guess를 하는데 있어 몇 가지 줄을 참고할 건지를 정해줄 수 있다. <br /> 예를 들어서, 위에서 했던 예는 좀 불행했다. 디폴트보다 한 줄만 더 봤어도 한 번에 제대로 parse할 수 있었을거니깐.
+
+``` r
+challenge2 <- read_csv(readr_example("challenge.csv"), guess_max = 1001)
+## Parsed with column specification:
+## cols(
+##   x = col_double(),
+##   y = col_date(format = "")
+## )
+```
+
+``` r
+challenge2
+## # A tibble: 2,000 x 2
+##        x y         
+##    <dbl> <date>    
+##  1   404 NA        
+##  2  4172 NA        
+##  3  3004 NA        
+##  4   787 NA        
+##  5    37 NA        
+##  6  2332 NA        
+##  7  2489 NA        
+##  8  1449 NA        
+##  9  3665 NA        
+## 10  3863 NA        
+## # ... with 1,990 more rows
+```
+
+이러면 한 번에 제대로 parse를 할 수 있었다.
+
+-   가끔은 그냥 모든 칼럼들을 character vectors로 읽으면 문제를 진단하는게 훨씬 쉽다.
+
+``` r
+challenge2 <- read_csv(readr_example("challenge.csv"),
+                       col_types = cols(.default = col_character())
+                       )
+```
+
+`type_convert()`와 함께 쓸 때 특히나 유용하다. <br /> 얘는 데이터 프레임의 character 칼럼들을 parsing heuristics를 적용해준다.
+
+``` r
+df <- tribble(
+    ~x, ~y,
+    "1", "1.21",
+    "2", "2.32",
+    "3", "4.56"
+)
+df
+## # A tibble: 3 x 2
+##   x     y    
+##   <chr> <chr>
+## 1 1     1.21 
+## 2 2     2.32 
+## 3 3     4.56
+```
+
+여기다가 `type_convert()`를 적용해주는거임.
+
+``` r
+type_convert(df)
+## Parsed with column specification:
+## cols(
+##   x = col_double(),
+##   y = col_double()
+## )
+## # A tibble: 3 x 2
+##       x     y
+##   <dbl> <dbl>
+## 1     1  1.21
+## 2     2  2.32
+## 3     3  4.56
+```
+
+-   만약에 엄청나게 큰 파일을 읽고 있다면, `n_max`를 10000이나 100000같이 좀 작은 수로 정하자. <br /> 그러면 iterations는 빨라지고, 일반적인 문제들은 사라질 수 있다.
+
+-   중요한 parsing 문제를 가지고 있다면, `read_lines()`를 이용해서 character로 구성된 행으로 읽는 것이 더 쉽다. <br /> 그러니깐 아예 parsing을 안 하겠다는 것임.
+
+아니면 아예 `read_file()`을 이용해서 길이 1짜리 character vector로 읽는 것이 더 쉬울수도 있다. <br /> 그리고 난 다음, 나중에 string parsing에서 배우게 될 스킬들을 이용해서, exotic 포맷들을 사용하는 거다.
+
+11.5 Writing to a file
+----------------------
