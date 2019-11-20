@@ -4,9 +4,9 @@
 11.1 Introduction
 -----------------
 
-R 패키지에 제공된 데이터로 작업하는건 데이터 사이언스 툴을 배우기에는 좋은 방법이지만, <br /> 언젠가 그만 배우고 니 데이터로 직접 작업하고 싶어질 때가 있을 것이다. <br /> 이 장에서는, 텍스트만 있는 네모난 파일들plain-text rectangular files을 어떻게 R로 읽을지를 배운다.
+R 패키지에 제공된 데이터로 작업하는건 데이터 사이언스 툴을 배우기에는 좋은 방법이지만, <br /> 언젠가 그만 배우고 니 데이터로 직접 작업하고 싶어질 때가 있게 된다. <br /> 이 장에서는, 텍스트만 있는 네모난 파일들plain-text rectangular files을 어떻게 R로 읽을지를 배운다.
 
-Data import의 겉만 다룰 것이지만, 많은 원리들이 다른 데이터 형식에도 적용가능하다. <br /> 다른 데이터 형식들에 대한 유용한 패키지들을 소개하며 마무리할 것.
+Data import의 겉만 다룰 것이지만, 많은 원리들이 다른 데이터 형식에도 적용가능하다. <br /> 다른 데이터 형식들에 대한 유용한 패키지들을 소개하며 마무리.
 
 ### 11.1.1 Prerequisites
 
@@ -23,13 +23,13 @@ library(tidyverse)
 
 readr 패키지의 대부분 함수들은, flat files를 데이터 프레임으로 바꾸는 것과 연관되어 있다.
 
--   `read_csv()`는 , 로 분리된 파일을 읽고, `read_csv2()`는 ; 로 분리된 파일을 읽는다.(소수점 자리에 , 를 쓰는 나라에서 빈번) <br /> `read_tsv()`는 tab으로 분리된 파일을 읽음. <br /> `read_delim()`은 any delimiter로 분리된 파일을 읽음.
+-   `read_csv()`는 , 로 분리된 파일을 읽고, `read_csv2()`는 ; 로 분리된 파일을 읽는다.(소수점 자리에 , 를 쓰는 나라에서 ;를 사용) <br /> `read_tsv()`는 tab으로 분리된 파일을 읽음. <br /> `read_delim()`은 any delimiter로 분리된 파일을 읽음.
 
--   `read_fwf()`는 고정된 폭width으로 파일을 읽는다. <br /> width를 `fwf_widths()`로 정해주거나, `fwf_positions()`로 position을 결정해줄 수 있다. <br /> `read_table()`은 칼럼들이 띄어쓰기로 구분이 되어있는, 고정 폭 파일의 일반적인 변형을 읽어준다. <br /> `read_table()` reads a common variation of fixed width files where columns are separated by white space.
+-   `read_fwf()`는 고정된 폭width으로 파일을 읽는다. <br /> width를 `fwf_widths()`로 정해주거나, `fwf_positions()`로 position을 결정해줄 수 있다. <br /> `read_table()`은 칼럼들이 띄어쓰기로 구분 되어있는, 고정 폭 파일의 일반적인 변형을 읽어줌. <br /> `read_table()` reads a common variation of fixed width files where columns are separated by white space.
 
 -   `read_log()`는 Apache style log files를 읽는다. <br /> ([webreadr](https://github.com/Ironholds/webreadr)도 체크해봐라. 이건 `read_log()`위에 만들어졌으며, 다른 유용한 도구들을 제공해줌.)
 
-여튼 이 함수들은 모두 비슷한 문법Syntax을 가지고 있다. 하나만 마스터하면, 나머지도 같음. <br /> 그래서 남은 챕터 동안 read\_csv()에 집중할 것이다. <br /> csv파일이 가장 흔한 데이터 저장 형식일 뿐 아니라, 이것만 알면 readr의 다른 함수들에도 쉽게 적용가능해서.
+여튼 이 함수들은 모두 비슷한 문법Syntax을 가지고 있다. 하나만 마스터하면, 나머지도 같음. <br /> 그래서 남은 챕터 동안 `read_csv()`에 집중할 것이다. <br /> csv파일이 가장 흔한 데이터 저장 형식일 뿐 아니라, 이것만 알면 readr의 다른 함수들에도 쉽게 적용가능해서ㅇㅇ.
 
 ------------------------------------------------------------------------
 
@@ -48,7 +48,7 @@ heights <- read_csv("data/heights.csv")
 ## )
 ```
 
-`read_csv()`를 실행하면, 먼저 column specification부터 출력된다. <br /> 각 칼럼의 이름과 타입을 출력하는데, parsing a file을 할 때 다시 볼거다. readr의 중요한 부분임.
+`read_csv()`를 실행하면, 이렇게 먼저 column specification부터 출력된다. <br /> 각 칼럼의 이름과 타입을 출력하는데, 11.4의 parsing a file을 할 때 다시 볼거다. <br /> readr의 중요한 부분임.
 
 inline csv 파일을 넣어줄 수도 있다. <br /> readr을 가지고 실험해보고 싶거나, <br />     reproducible한 예제를 만들어서 다른 사람들과 공유하고 싶을 때 유용함. <br /> 아래의 예를 봐보자.
 
@@ -88,7 +88,9 @@ read_csv("# A comment I want to skip
 ## 1     1     2     3
 ```
 
-1.  칼럼 이름이 없는 데이터. `col_names = FALSE`를 쓰면 된다. `header = F`와 같은 의미. <br /> 이러면 첫 줄을 headings로 다루지 않는다. 대신에 `X1`, ..., `Xn`으로 라벨한다.
+<br />
+
+. 칼럼 이름이 없는 데이터. `col_names = FALSE`를 쓰면 된다. `header = F`와 같은 의미. <br /> 이러면 첫 줄을 headings로 다루지 않는다. 대신에 `X1`, ..., `Xn`으로 라벨한다.
 
 ``` r
 read_csv("1,2,3\n4,5,6", col_names = FALSE)
@@ -101,7 +103,7 @@ read_csv("1,2,3\n4,5,6", col_names = FALSE)
 
 (`"\n"`은 한 줄을 추가하는 편리한 shortcut. 이것과 비슷한 것들을, string basics에서 배우게 될 것이다.)
 
-아니면, `col_names`에다가 character vector를 패스해서, 칼럼 이름으로 쓰게할 수도 있다.
+또는, `col_names`에다가 character vector를 패스해서, 칼럼 이름으로 쓰게할 수도 있다.
 
 ``` r
 read_csv("1,2,3\n4,5,6", col_names = c("x", "y", "z"))
@@ -112,7 +114,7 @@ read_csv("1,2,3\n4,5,6", col_names = c("x", "y", "z"))
 ## 2     4     5     6
 ```
 
-약간 수정이 필요한 또 한 가지 경우는, missing values를 `na`로 바꿔줘야할 때. <br /> 예를 들어 파일에 missing value가 na로 저장되어있지 않고 .로 표현되어 있다면, na = "." 옵션을 추가
+약간 수정이 필요한 또 한 가지 경우는, missing values를 `na`로 바꿔줘야할 때. <br /> 예를 들어 파일에 missing value가 na로 저장되어있지 않고 `.`로 표현되어 있다면, na = "." 옵션을 추가
 
 ``` r
 read_csv("a,b,c\n1,2,.", na = ".")
@@ -130,9 +132,9 @@ read_csv("a,b,c\n1,2,.", na = ".")
 
 1.  훨씬 빠르다.(최대 10배) <br />   큰 파일에 대해서는 progress bar가 나오기 때문에, 무슨 일이 일어나고 있는지 파악가능하다. <br />   진짜 속도만 원한다면, `data.table::fread()`를 사용해보라. tidyverse에 잘 맞는다고 할 수는 없지만, 꽤나 빠를 수 있다.
 
-2.  이 함수들은 tibbles로 만들어준다. <br />   character 벡터를 factors로 만들거나, 행의 이름을 사용하거나, 칼럼 이름을 망가뜨리지않는다. <br />   위의 저것들이 base R의 함수에선 꽤나 자주 일어나는 일이다.
+<br /> 2. 이 함수들은 tibbles로 만들어준다. <br />   character 벡터를 factors로 만들거나, 행의 이름을 사용하거나, 칼럼 이름을 망치지 않는다. <br />   위의 저것들이 base R의 함수에선 꽤나 자주 일어나는 일이다.
 
-3.  더 reproducible하다. <br />   base R 함수들은 작동하고 있는 시스템이나 environment variables에서 some behavior를 inherit할 수 있어서, <br />   그래서, 다른 사람의 컴퓨터에서는 니가 쓴 코드가 작동하지 않을 수도 있다.
+<br /> 3. 더 reproducible하다. <br />   base R 함수들은 작동하고 있는 시스템이나 environment variables에서 some behavior를 inherit할 수 있다. <br />   그래서, 다른 사람의 컴퓨터에서는 내가 쓴 코드가 작동하지 않을 수도 있다.
 
 ### 11.2.2 Exercises
 
@@ -163,7 +165,7 @@ parse_integer(c("1", "231", ".", "456"), na = ".")
 ## [1]   1 231  NA 456
 ```
 
-만약 parsing이 실패한다면, wargning을 갖게 된다.
+만약 parsing이 실패한다면, warning을 갖게 된다.
 
 ``` r
 x <- parse_integer(c("123", "345", "abc", "123.45"))
@@ -186,7 +188,7 @@ x
 ## 2     4    NA no trailing characters .45
 ```
 
-많은 parsing failures가 있다면, complete set을 얻기 위해서 `problems()`을 사용해야 할 수도 있다. <br /> 이건 tibble을 반환하고, dplyr로 니가 조작할 수 있다.
+많은 parsing failures가 있다면, complete set을 얻기 위해서 `problems()`을 사용해야 할 수도 있다. <br /> 이건 tibble을 반환하고, dplyr로 조작할 수 있다.
 
 ``` r
 problems(x)
@@ -197,25 +199,22 @@ problems(x)
 ## 2     4    NA no trailing characters .45
 ```
 
-parser를 이용한다는 것은 대부분, <br />     무엇이 사용가능한지 그리고 어떻게 다른 타입의 input을 다룰 건지를 이해하는 것이다. Using parsers is mostly a matter of understanding what's available and how they deal with different types of input. 8개의 특히 중요한 parser들이 있다.
+parser를 이용한다는 것은 대부분, <br />     무엇이 사용가능한지 그리고 어떻게 다른 타입의 input을 다룰 건지를 이해하는 것이다. <br /> Using parsers is mostly a matter of understanding what's available and how they deal with different types of input. <br /> 8개의 특히 중요한 parser들이 있다.
 
-1.  `parse_logical()`와 `parse_integers()`은 각각 logical과 integer를 parse. <br /> 잘못될게 없기 때문에 더 설명 안하겠다.
+1.  `parse_logical()`와 `parse_integers()`은 각각 logical과 integer를 parse. <br /> 잘못될게 없기 때문에 더 설명 안하겠다. <br />
+2.  `parse_double()`은 strict numeric parser고, `parse_number()`은 flexible numeric parser다. <br /> 생각보다 더 복잡하다. 왜냐하면 세상에는 숫자를 다른 방법으로 쓰는데도 있기 때문. <br />
 
-2.  `parse_double()`은 strict numeric parser고, `parse_number()`은 flexible numeric parser다. <br /> 니 생각보다 더 복잡하다. 왜냐하면 세상에는 숫자를 다른 방법으로 쓰는데도 있기 때문.
-
-3.  `parse_character()`는 너무 단순simple해서 필요없을 것 같지만, 하나의 문제, character encodings때문에 중요하다.
-
-4.  `parse_factor()`는 factors를 만든다. <br /> factors라는건, R이, 고정되어 있고 알려져있는fixed and known 카테고리컬 변수들을 표현하는데 쓰는 데이터 구조.
-
-5.  `parse_datetime()`, `parse_date()`, `parse_time()`은 다양한 date, time 을 parse하도록 해준다. <br /> 그런데 세상엔 날짜를 쓰는 방식이 너무나도 많아서, 이것들이 가장 복잡한 것들이다.
+3.  `parse_character()`는 너무 단순simple해서 필요없을 것 같지만, 하나의 문제, character encodings때문에 중요하다. <br />
+4.  `parse_factor()`는 factors를 만든다. <br /> factors라는건, R이, 고정되어 있고 알려져있는fixed and known 카테고리컬 변수들을 표현하는데 쓰는 데이터 구조. <br />
+5.  `parse_datetime()`, `parse_date()`, `parse_time()`은 다양한 date, time 을 parse하도록 해준다. <br /> 그런데 세상엔 날짜를 쓰는 방식이 너무나도 많아서, 이것들이 가장 복잡하다. <br />
 
 ### 11.3.1 Numbers
 
 숫자를 parse하는건 쉽고 간단할 것 같지만, 3가지 문제가 까다롭게 만든다.
 
-1.  세상에는 수를 다르게 쓰는 나라가 많다. <br /> 보통 소수점으로 `.`을 쓰지만, 어떤 나라에서는 `,`을 쓴다.
+1.  세상에는 수를 다르게 쓰는 나라가 많다. <br /> 보통 소수점으로 `.`을 쓰지만, 어떤 나라에서는 `,`을 쓴다. <br />
 
-2.  숫자는 종종, 어떠한 context를 공급하기 위해, 다른 캐릭터들로 둘러싸여있다. <br /> 예를 들어, "$1000", "10%" 같은거.
+2.  숫자는 종종, 어떠한 context를 공급하기 위해, 다른 캐릭터들로 둘러싸여있다. <br /> 예를 들어, "$1000", "10%" 같은거. <br />
 
 3.  숫자는 보통 읽기 쉽게 해주는 grouping 캐릭터가 있다. 예를 들어서, "1,000,000"에서 쉼표의 역할. <br /> 그리고 이러한 grouping 캐릭터는 세상에 많은 종류가 있다.
 
@@ -259,7 +258,7 @@ parse_number("123'456'789", locale = locale(grouping_mark = "'"))
 
 ### 11.3.2 Strings
 
-`parse_Character()`는 간단해야할 것처럼 보인다. 인풋을 그대로 반환하면 되니깐. <br /> 하지만 인생이 그렇게 쉽지 않다. Unfortunately life isn't so simple. <br /> 왜냐하면 같은 string을 표현할 방법이 여러가지이기 때문. <br /> 뭐가 어떻게 돌아가는지 이해하기 위해서, 어떻게 컴퓨터가 strings을 표현하는지 디테일하게 알아봐야한다. <br /> `charToRaw()`를 사용해서 string의 underlying representation을 얻을 수 있다.
+`parse_character()`는 간단해야할 것처럼 보인다. 인풋을 그대로 반환하면 되니깐. <br /> 하지만 인생이 그렇게 쉽지 않다. Unfortunately life isn't so simple. <br /> 왜냐하면 같은 string을 표현할 방법이 여러가지이기 때문. <br /> 뭐가 어떻게 돌아가는지 이해하기 위해서, 어떻게 컴퓨터가 strings을 표현하는지 디테일하게 알아봐야한다. <br /> `charToRaw()`를 사용해서 string의 underlying representation을 얻을 수 있다.
 
 ``` r
 charToRaw("Hadley")
@@ -268,7 +267,7 @@ charToRaw("Hadley")
 
 각 16진법 수는, 하나의 정보 바이트(ASCII 문자 하나)를 표현한다. `48`은 H, `61`은 a, 이런 식으로. <br /> 이 16진법 수를 character로 mapping하는 걸 encoding이라고 부른다. <br /> 이 인코딩은 ASCII임. 영어 캐릭터 표현에는 ASCII가 좋은데, <br />     애초에 ASCII는 American Standard Code for Information Interchange의 줄임말이기 때문.
 
-영어가 아닌 다른 문자들에 대해서는 좀 더 복잡해진다. <br /> non-English문자들에 대해서 여러가지 기준이 있었고, <br />     정확하게 string을 번역하기 위해서는 값과 인코딩 둘 다를 알아야 했었다. <br /> 예를 들어, 가장 흔하게 쓰던 인코딩이 Latin1(서유럽 언어들에 사용되는 ISO-8859-1), Latin2(동유럽 언어들에 사용되는 ISO-8859-2) <br /> 그런데 Latin1에서 `b1`이라는 바이트는 "±"이고, Latin2에서는 "ą"이다.(...)
+영어가 아닌 다른 문자들에 대해서는 좀 더 복잡해진다. <br /> non-English 문자들에 대해서 여러가지 기준이 있었고, <br />     정확하게 string을 번역하기 위해서는 값과 인코딩 둘 다를 알아야 했었다. <br /> 예를 들어, 가장 흔하게 쓰던 인코딩이 Latin1(서유럽 언어들에 사용되는 ISO-8859-1), Latin2(동유럽 언어들에 사용되는 ISO-8859-2) <br /> 그런데 Latin1에서 `b1`이라는 바이트는 "±"이고, Latin2에서는 "ą"이다.(...)
 
 다행히도, 오늘날에는 거의 모든 곳에서 지원되는 단 하나의 스탠다드가 있다. UTF-8. <br /> 얘는 사람들이 쓰는 모든 character들을 인코드할 수 있고, 심지어는 emoji같은 extra symbols도 가능하다.
 
@@ -308,7 +307,65 @@ guess_encoding(charToRaw(x2))
 ## 1 KOI8-R         0.42
 ```
 
-`guess_encoding()`의 첫 번째 인자argument는 이 경우에서처럼 raw vector일수도 있고, <br /> 파일 경로file path일 수도 있다.
+`guess_encoding()`의 첫 번째 인자argument는 이 경우에서처럼 raw vector일수도 있고, <br /> 파일 경로file path일 수도 있다. <br /> 이 경로를 통해서 하는게 상당히 좋은 것 같다. <br /> 이건 내가 작업을 하며 얻은 데이터인데, 그냥 메모장을 통해 저장하다보니 ANSI 형식으로 저장이 되어 있다.
+
+``` r
+platinum <- read_tsv("C:\\Users\\Phil2\\Desktop\\Dream\\lol_project\\platinum2.txt")
+## Parsed with column specification:
+## cols(
+##   tier = col_character(),
+##   rank = col_character(),
+##   leaguePoints = col_double(),
+##   summonerName = col_character(),
+##   wins = col_double(),
+##   losses = col_double(),
+##   total = col_double()
+## )
+platinum
+## # A tibble: 83,190 x 7
+##    tier   rank  leaguePoints summonerName                 wins losses total
+##    <chr>  <chr>        <dbl> <chr>                       <dbl>  <dbl> <dbl>
+##  1 PLATI~ II              42 "\xbb\xa1\xb0\xa3\xb8\xc0\~     8      2    10
+##  2 PLATI~ II               0 "\xb1\xb9\xbb\xea\xc2\xde\~   355    338   693
+##  3 PLATI~ II              21 "\x9d\x9d \xc0\xcc \xb4\xe~   114    114   228
+##  4 PLATI~ II               7 "\xc1\xdf2\xba\xb4\xb5\xb8~    72     47   119
+##  5 PLATI~ II              64 "\xc8\xfb\xc0\xcc \xbc\xbe"   322    302   624
+##  6 PLATI~ II               0 "\xba\xfb \xbf\xb5 \xbc\xa~    56     71   127
+##  7 PLATI~ II               2 "\xb7\xd1\xc0\xdf\xc7\xcf\~   117    115   232
+##  8 PLATI~ II              39 "\xbc\xd5\xb0\xa1\xb6\xf4\~    57     57   114
+##  9 PLATI~ II              17 "\xb0\xed\xb5\xb6\xc7\xd1 ~   182    203   385
+## 10 PLATI~ II              64 "\xc1\xb8\xb9\xf6 \xb0\xcb~   517    532  1049
+## # ... with 83,180 more rows
+```
+
+이렇게 되어있는걸 `guess_encoding()`을 사용하면 다음과 같은 결과를 얻는다.
+
+``` r
+guess_encoding("C:\\Users\\Phil2\\Desktop\\Dream\\lol_project\\platinum2.txt")
+## # A tibble: 4 x 2
+##   encoding confidence
+##   <chr>         <dbl>
+## 1 EUC-KR        1    
+## 2 GB18030       0.76 
+## 3 Big5          0.570
+## 4 EUC-JP        0.49
+```
+
+이걸 보고 "EUC-KR"로 인코딩을 해보니, 잘 되는걸 볼 수 있다. <br /> 메모장에서는 ANSI라고 나와있는건 이렇게 인코딩을 하면 되더라.
+
+``` r
+platinum2 <- read_tsv("C:\\Users\\Phil2\\Desktop\\Dream\\lol_project\\platinum2.txt", locale = locale(encoding = "EUC-KR"))
+## Parsed with column specification:
+## cols(
+##   tier = col_character(),
+##   rank = col_character(),
+##   leaguePoints = col_double(),
+##   summonerName = col_character(),
+##   wins = col_double(),
+##   losses = col_double(),
+##   total = col_double()
+## )
+```
 
 인코딩은 풍부하고 복잡한 주제이기 때문에, 여기서는 겉만 핥아봤다. <br /> 좀 더 알아보고 싶다면, <http://kunststube.net/encoding/>을 읽어볼 것을 추천한다.
 
@@ -335,11 +392,13 @@ parse_factor(c("apple", "banana", "bananana"), levels = fruit)
 
 ### 11.3.4 Dates, date-times, and times
 
-자, 다음의 3가지 parsers 중에 필요한 걸 쓰자. <br /> 1. 날짜 Dates
+자, 다음의 3가지 parsers 중에 필요한 걸 쓰자. <br />
 
-1.  날짜와 시간 Date-times
+1.  날짜 Dates
 
-2.  시간 Times
+2.  날짜와 시간 Date-times
+
+3.  시간 Times
 
 다른 추가적인 인자들arguments 없이 호출해보면,
 
@@ -408,7 +467,7 @@ parse_date("1 janvier 2015", "%d %B %Y", locale = locale("fr"))
 ## [1] "2015-01-01"
 ```
 
-하, 이걸 한글의 경우에서도 일관성 있게 적용할 수 있도록 시도해봤는데, 잘 안 된다. 뭔가 문제가 있는 것 같다. 인코딩은 다 UTF-8인걸로 봐서 인코딩 문제는 아닐텐데.. 여튼 좀 손을 봐주면 해결이 되긴 한다.
+하, 이걸 한글의 경우에서도 일관성 있게 적용할 수 있도록 시도해봤는데, 잘 안 된다. <br /> 뭔가 문제가 있는 것 같다. 인코딩은 다 UTF-8인걸로 봐서 인코딩 문제는 아닐텐데.. <br /> 여튼 좀 손을 봐주면 해결이 되긴 한다.
 
 ``` r
 "2016년 10월 12일" # 이런 자료가 있어서 이걸 parse하고 싶다고 하자.
@@ -687,6 +746,8 @@ type_convert(df)
 
 아니면 아예 `read_file()`을 이용해서 길이 1짜리 character vector로 읽는 것이 더 쉬울수도 있다. <br /> 그리고 난 다음, 나중에 string parsing에서 배우게 될 스킬들을 이용해서, exotic 포맷들을 사용하는 거다.
 
+------------------------------------------------------------------------
+
 11.5 Writing to a file
 ----------------------
 
@@ -785,7 +846,6 @@ read_rds("challenge.rds")
 
 ``` r
 library(feather)
-## Warning: package 'feather' was built under R version 3.5.3
 write_feather(challenge, "challenge.feather")
 read_feather("challenge.feather")
 ## # A tibble: 2,000 x 2
@@ -804,7 +864,11 @@ read_feather("challenge.feather")
 ## # ... with 1,990 more rows
 ```
 
+둘 다 `x` 칼럼과 `y` 칼럼의 type 정보를 가지고 있는걸 볼 수 있다.
+
 Feather가 RDS보다 빠른 경향이 있다. 그리고 R이 아닌 다른 곳에서도 사용할 수 있다. RDS는 list-columns([many models](https://r4ds.had.co.nz/many-models.html#many-models)에서 배우게 될 것)을 지원한다. feather는 못함.
+
+------------------------------------------------------------------------
 
 11.6 Other types of data
 ------------------------
