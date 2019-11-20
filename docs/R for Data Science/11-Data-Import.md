@@ -689,3 +689,132 @@ type_convert(df)
 
 11.5 Writing to a file
 ----------------------
+
+readr은 또한, 디스크에다가 데이터를 write해주는 2개의 유용한 함수들이 있다. <br /> `write_csv()`와 `write_tsv()`
+
+이 두 함수들은, 2가지 방법을 이용해서, output 파일들이 올바르게 읽어질 확률을 올려준다.
+
+1.  항상 strings를 UTF-8로 인코딩해줌. <br />
+2.  dates와 date-times는 ISO8601 포맷으로 저장해서, 다른 곳에서 쉽게 parse될 수 있도록.
+
+Excel로 csv 파일을 export하고 싶다면, `write_excel_csv()`을 사용해라. <br /> 파일의 처음 부분에 special character을 남겨서, Excel이 UTF-8 인코딩을 사용하고 있음을 알려준다. <br /> BOM(byte order mark)이라고 불리는 이건, 문서 맨 앞에 눈에 보이지 않는 특정 바이트를 넣은 다음, 이걸 해석해서 정확히 어떤 인코딩 방식이 사용되었는지를 알아내나봄.
+
+일단 이것들의 가장 중요한 인자argument들은 `x`(저장할 데이터 프레임), `path`(어디다 정할건지). <br /> 뭐 나머지 것들로는 `na`를 이용해서 missing values를 뭐라고 저장할건지 정해줄 수도 있고, <br /> 이미 존재하는 파일에 덧붙이고 싶다면, `append`를 이용하면 됨.
+
+그런데 csv로 저장할 때는, type 정보는 사라진다는 걸 알아두자.
+
+``` r
+setwd("C:\\Users\\Phil2\\Desktop\\DS")
+write_csv(challenge, "challenge.csv")
+```
+
+``` r
+challenge
+## # A tibble: 2,000 x 2
+##        x y         
+##    <dbl> <date>    
+##  1   404 NA        
+##  2  4172 NA        
+##  3  3004 NA        
+##  4   787 NA        
+##  5    37 NA        
+##  6  2332 NA        
+##  7  2489 NA        
+##  8  1449 NA        
+##  9  3665 NA        
+## 10  3863 NA        
+## # ... with 1,990 more rows
+write_csv(challenge, "challenge-2.csv")
+read_csv("challenge-2.csv")
+## Parsed with column specification:
+## cols(
+##   x = col_double(),
+##   y = col_logical()
+## )
+## Warning: 1000 parsing failures.
+##  row col           expected     actual              file
+## 1001   y 1/0/T/F/TRUE/FALSE 2015-01-16 'challenge-2.csv'
+## 1002   y 1/0/T/F/TRUE/FALSE 2018-05-18 'challenge-2.csv'
+## 1003   y 1/0/T/F/TRUE/FALSE 2015-09-05 'challenge-2.csv'
+## 1004   y 1/0/T/F/TRUE/FALSE 2012-11-28 'challenge-2.csv'
+## 1005   y 1/0/T/F/TRUE/FALSE 2020-01-13 'challenge-2.csv'
+## .... ... .................. .......... .................
+## See problems(...) for more details.
+## # A tibble: 2,000 x 2
+##        x y    
+##    <dbl> <lgl>
+##  1   404 NA   
+##  2  4172 NA   
+##  3  3004 NA   
+##  4   787 NA   
+##  5    37 NA   
+##  6  2332 NA   
+##  7  2489 NA   
+##  8  1449 NA   
+##  9  3665 NA   
+## 10  3863 NA   
+## # ... with 1,990 more rows
+```
+
+`x` 칼럼은 dbl, `y` 칼럼은 date였는데, 쓰고 다시 읽어보면 각각 dbl, lgl이 되는걸 볼 수 있다.
+
+이래서 CSV는 중간의 결과물을 임시로 저장해두기엔(캐싱하기엔) 못 미덥다. <br /> 로드할 때마다 칼럼 specification을 다시 해줘야한다. 2가지 대안이 있는데,
+
+1.  `write_rds()`와 `read_rds()`는 기본 함수인 `readRDS()`와 `saveRDS()`의 uniform wrappers다. <br /> 이건 데이터를, R의 RDS라고 부르는 커스텀 binary 포맷으로 저장하는 것.
+
+``` r
+write_rds(challenge, "challenge.rds")
+read_rds("challenge.rds")
+## # A tibble: 2,000 x 2
+##        x y         
+##    <dbl> <date>    
+##  1   404 NA        
+##  2  4172 NA        
+##  3  3004 NA        
+##  4   787 NA        
+##  5    37 NA        
+##  6  2332 NA        
+##  7  2489 NA        
+##  8  1449 NA        
+##  9  3665 NA        
+## 10  3863 NA        
+## # ... with 1,990 more rows
+```
+
+1.  feather 패키지는, 프로그래밍 언어에 걸쳐 사용될 수 있는, 빠른 binary file 포맷을 구현해놨다.
+
+``` r
+library(feather)
+## Warning: package 'feather' was built under R version 3.5.3
+write_feather(challenge, "challenge.feather")
+read_feather("challenge.feather")
+## # A tibble: 2,000 x 2
+##        x y         
+##    <dbl> <date>    
+##  1   404 NA        
+##  2  4172 NA        
+##  3  3004 NA        
+##  4   787 NA        
+##  5    37 NA        
+##  6  2332 NA        
+##  7  2489 NA        
+##  8  1449 NA        
+##  9  3665 NA        
+## 10  3863 NA        
+## # ... with 1,990 more rows
+```
+
+Feather가 RDS보다 빠른 경향이 있다. 그리고 R이 아닌 다른 곳에서도 사용할 수 있다. RDS는 list-columns([many models](https://r4ds.had.co.nz/many-models.html#many-models)에서 배우게 될 것)을 지원한다. feather는 못함.
+
+11.6 Other types of data
+------------------------
+
+다른 타입의 데이터를 R로 가져올 때, 아래 나열된 tidyverse의 패키지들로 시작할 것을 추천한다. <br /> 현재 완벽하지는 않은데, 시작하기에 좋다. rectangular 데이터들에 대해,
+
+-   **haven**은 SPSS, Stata, SAS 파일들을 읽는다. <br />
+-   **readxl**은 excel 파일들을 읽는다. `.xls`나 `.xlsx` <br />
+-   **DBI**는 데이터베이스 별 백엔드(**RMySQL**, **RSQLite**, **RPostgreSQL** 등)와 함께, <br /> SQL 쿼리문을 쓰고 데이터 프레임을 얻게끔 해준다.
+
+hierarchical 데이터에 대해서는, json에 대해서는 **jsonlite**을 사용하거나, <br /> XML에 대해서는 **xml2**을 사용. Jenny Bryan은 [좋은 예](https://jennybc.github.io/purrr-tutorial/)를 만들어놨다.
+
+다른 파일 타입들에 대해서는, [R 데이터 import/export 메뉴얼](https://cran.r-project.org/doc/manuals/r-release/R-data.html)과 [rio](https://github.com/leeper/rio) 패키지를 시도해보자.
