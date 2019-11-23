@@ -9,3 +9,9 @@ output: github_document
 
 이 chapter에서는, R의 데이터를 organise하는 consistent 방법에 대해서 배울 것이다. <br />
 이 구조가 tidy data이다.
+
+너의 데이터를, 이러한 포맷으로 만드는건 선불의upfront 작업을 필요로 한다. 근데 가치가 있는 일임.
+이러한 tidy data랑 tidy tools를 잘 쓰면, 데이터를 어떠한 표현에서 다른 표현으로 개조하는데에,
+시간을 훨씬 적게 쓰게 될거다. 그리고 그만큼 분석하는데에 시간을 더 쓸 수 있고.
+
+이 단원은 tidy data에 대한 실용적인 소개와 tidyr에 딸려있는 도구들에 대해 설명
