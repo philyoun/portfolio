@@ -13,7 +13,7 @@ strings는 보통 구조가 없거나 좀 덜한(structured or semi-structured) 
 &emsp;&emsp;&emsp;&emsp;regexp는 strings의 패턴을 묘사해주는, 간결한concise 언어이기 때문. <br />
 처음 regexp를 볼 때면, 고양이가 키보드 위를 걸어간 것 같겠지만, 이해하고 나면 말이 될 것이다.
 
-(이후 Regular expression = regexp = 정규표현식 3단어 모두 혼용해서 씁니당)
+(이 글에서는, Regular expression = regexp = 정규표현식 3단어 모두 혼용해서 씁니당)
 
 
 ### 14.1.1 Prerequisites
@@ -208,12 +208,26 @@ str_sort(x, locale = "haw")
 ```
 
 
+### 14.2.5 Exercises
+___
 
+## 14.3 Matching patterns with regular expressions
+Regexps(이하 정규표현식)는 string에 있는 패턴을 묘사할 수 있도록 해주는, 매우 간결한terse 언어다. 
+처음엔 낯설지만, 이해하고 나면 매우 유용하다.
 
+regular expressions(이하 정규표현식)를 배우기 위해서, str_view()와 str_view_all()를 사용할거다.
+이 함수들은 character vector와 정규표현식을 받고, 어떻게 매치가 되는지를 보여줄거다.
 
+매우 간단한 정규표현식에서 시작해서, 점점 더 복잡해져갈 것이다. 
+이 패턴 매칭을 마스터하고 나면, 다양한 stringr 함수들에 어떻게 적용을 해야하는지 알 수 있다.
 
-
-
+### 14.3.1 Basic matches
+가장 간단한 패턴 매칭은 exact strings다.
+```{r eval=FALSE}
+x <- c("apple", "banana", "pear")
+str_view(x, "an")
+```
+![그림](C:\Users\Phil2\Desktop\20191126_062106.png)
 
 
 
