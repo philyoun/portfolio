@@ -6,7 +6,7 @@
 
 이 chapter에서는, R에서 string 조작manipulation을 어떻게 해야할지 알려줄 것이다. <br /> 어떻게 strings가 작동하는지를 배우고, 어떻게 손으로 만들어낼 수 있는지도 배우지만, <br /> 이 chapter의 핵심은 regular expression, 줄여서 regexps라고 부르는 것이다.
 
-Regexp는 유용하다. 왜냐하면, <br /> strings는 보통 구조가 없거나 좀 덜한(structured or semi-structured) 데이터를 가지고 있는데, <br />     regexp는 strings의 패턴을 묘사해주는, 정확한 언어이기 때문. <br /> 처음 regexp를 볼 때면, 고양이가 키보드 위를 걸어간 것 같겠지만, 이해하고 나면 말이 될 것이다.
+Regexp는 유용하다. 왜냐하면, <br /> strings는 보통 구조가 없거나 좀 덜한(structured or semi-structured) 데이터를 가지고 있는데, <br />     regexp는 strings의 패턴을 묘사해주는, 간결한concise 언어이기 때문. <br /> 처음 regexp를 볼 때면, 고양이가 키보드 위를 걸어간 것 같겠지만, 이해하고 나면 말이 될 것이다.
 
 (이후 Regular expression = regexp = 정규표현식 3단어 모두 혼용해서 씁니당)
 
@@ -18,6 +18,8 @@ Regexp는 유용하다. 왜냐하면, <br /> strings는 보통 구조가 없거�
 library(tidyverse)
 library(stringr)
 ```
+
+------------------------------------------------------------------------
 
 14.2 String basics
 ------------------
@@ -74,4 +76,130 @@ x
 ``` r
 c("one", "two", "three")
 ## [1] "one"   "two"   "three"
+```
+
+### 14.2.1 String Length
+
+base R에는 strings를 작업할 수 있는 여러가지 함수들이 있다. <br /> 근데 이것들은 일관적이지 않아서inconsistent 기억을 하기가 힘들다. <br /> 그렇기 때문에 사용하지 않을거다.
+
+대신에 stringr에 있는 함수들을 쓸 것이다. <br /> 이 함수들은 전부다 str\_로 시작하기 때문에 직관적인 이름들을 가지고 있다. <br /> 예를 들어, `str_length()`는 해당 string의 길이가 얼마나 되는지를 알려준다.
+
+``` r
+str_length(c("a", "R for data science", NA))
+## [1]  1 18 NA
+```
+
+RStudio에서 작업을 하면 더 편리하다. <br /> `str_`라고 치기만 하면 자동완성autocomplete이 되기 때문에, 다른 stringr 함수들을 볼 수가 있다. <br /> <img src="https://d33wubrfki0l68.cloudfront.net/7d1defbecac1e73595c3841f2753a09734dcb0be/0b58f/screenshots/stringr-autocomplete.png" alt="그림1" style="width:50.0%" />
+
+### 14.2.2 Combining strings
+
+2개 이상의 string들을 결합하고 싶다면, `str_c()`를 사용하자.
+
+``` r
+str_c("x", "y")
+## [1] "xy"
+str_c("x", "y", "z")
+## [1] "xyz"
+```
+
+`sep` 인자argument를 사용해서 어떻게 분리를 할지 컨트롤할 수 있다.
+
+``` r
+str_c("x", "y", sep = ", ")
+## [1] "x, y"
+```
+
+R의 다른 대부분의 함수들과 마찬가지로, 결측값missing values는 위험할 수 있다. <br /> 그냥 `"NA"` 그대로 프린트하고 싶다면, `str_replace_na()`을 사용하자.
+
+``` r
+x <- c("abc", NA)
+str_c("|-", x, "-|")
+## [1] "|-abc-|" NA
+str_c("|-", str_replace_na(x), "-|")
+## [1] "|-abc-|" "|-NA-|"
+```
+
+위에서 볼 수 있듯, `str_c()`는 벡터화vectorized되고, 길이가 안 맞는게 있다면 recycle을 해서 맞춘다.
+
+``` r
+str_c("prefix-", c("a", "b", "c"), "-suffix")
+## [1] "prefix-a-suffix" "prefix-b-suffix" "prefix-c-suffix"
+```
+
+길이 0짜리 오브젝트들은 조용하게 드랍된다. Objects of length 0 are silently dropped. <br /> 이건 `if` 문과 함께 쓸 때 특히나 유용하다.
+
+``` r
+name <- "Hadley"
+time_of_day <- "morning"
+birthday <- FALSE
+
+str_c(
+    "Good ", time_of_day, " ", name, 
+    if (birthday) " and HAPPY BIRTHDAY",
+    "."
+)
+## [1] "Good morning Hadley."
+```
+
+strings의 벡터를 하나로 축소collapse하고 싶다면, `collapse` 인자argument를 사용하자.
+
+``` r
+str_c(c("x", "y", "z"), collapse = ", ")
+## [1] "x, y, z"
+```
+
+### 14.2.3 Subsetting strings
+
+`str_sub()`를 사용해서, string의 일부를 추출해낼 수 있다. <br /> string과 마찬가지로, `str_sub()`도 substring의 포지션을 알려주는, `start`와 `end` 인자들arguments을 받는다.
+
+``` r
+x <- c("Apple", "Banana", "Pear")
+str_sub(x, 1, 3)
+## [1] "App" "Ban" "Pea"
+
+str_sub(x, -3, -1)
+## [1] "ple" "ana" "ear"
+```
+
+`str_sub()`는 string이 너무 짧아도 상관없다는 걸 인지하시라. <br /> 가능한만큼만 return한다.
+
+``` r
+str_sub("a", 1, 5)
+## [1] "a"
+```
+
+strings를 수정하기 위해서, `str_sub()`를 assignment form으로 써줄 수 있다. <br /> 위의 "Apple", "Banana", "Pear"의 첫 글자를 소문자로 수정하고 싶다고 치자.
+
+``` r
+str_sub(x, 1, 1) <- str_to_lower(str_sub(x, 1, 1))
+x
+## [1] "apple"  "banana" "pear"
+```
+
+이렇게도 수정을 할 수가 있다는 말.
+
+### 14.2.4 Locales
+
+위에서 텍스트를 소문자로 바꿀 때 `str_to_lower()`을 사용했다. <br /> 마찬가지로 `str_to_upper()`와 `str_to_title()`도 있다. <br /> 하지만, 이렇게 바꾸는건 생각보다 복잡하다. <br /> 왜냐하면 각 언어마다 바꾸는게 좀 다른 룰을 가지고 있기 때문. <br /> 그럴 때, locale을 정해줌으로써 룰을 정할 수 있다.
+
+``` r
+# 터키는 2개의 i를 갖고 있다. 점이 있는 것과 없는 것. 그래서 대문자화하면 다르게 된다.
+str_to_upper(c("i", "ı"))
+## [1] "I" "I"
+str_to_upper(c("i", "ı"), locale = "tr")
+## [1] "<U+0130>" "I"
+```
+
+locale은 ISO 639 언어코드로 정해져있다. 언어 코드는 2, 3개의 줄임말로 되어있다는거. <br /> tr, kr 등등.. 어떤 언어의 코드를 모르겠다면, [Wikipedia](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes)에 리스트가 나와 있다. <br /> locale 부분을 비워두면, operating system에 있는 current locale대로 사용한다. (우리나라를 찾아보니 kr이 아니고 ko로 쓰네.)
+
+locale에 영향을 받는 또다른 중요한 operation은 sorting이다. <br /> base R의 `order()`과 `sort()` 함수들은 현재 locale을 이용해서 strings를 정렬sort한다. <br /> 다른 컴퓨터들간에도 변함없는 결과를 얻고 싶다면robust behavior, <br />     `str_sort()`와 `str_order()`을 사용해서 `locale` 인자argument를 컨트롤해라.
+
+``` r
+x <- c("apple", "eggplant", "banana")
+
+str_sort(x, locale = "en")
+## [1] "apple"    "banana"   "eggplant"
+
+str_sort(x, locale = "haw")
+## [1] "apple"    "eggplant" "banana"
 ```
