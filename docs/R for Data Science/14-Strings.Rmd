@@ -103,7 +103,7 @@ str_length(c("a", "R for data science", NA))
 
 RStudio에서 작업을 하면 더 편리하다. <br />
 `str_`라고 치기만 하면 자동완성autocomplete이 되기 때문에, 다른 stringr 함수들을 볼 수가 있다. <br />
-![그림1](https://d33wubrfki0l68.cloudfront.net/7d1defbecac1e73595c3841f2753a09734dcb0be/0b58f/screenshots/stringr-autocomplete.png){ width=50% }
+![그림1](https://d33wubrfki0l68.cloudfront.net/7d1defbecac1e73595c3841f2753a09734dcb0be/0b58f/screenshots/stringr-autocomplete.png)
 
 ### 14.2.2 Combining strings
 2개 이상의 string들을 결합하고 싶다면, `str_c()`를 사용하자.
@@ -233,7 +233,9 @@ str_view(x, "an")
 
 
 
-
+![그림](https://www.jopenbusiness.com/mediawiki/%ED%8C%8C%EC%9D%BC:RegExp_Cheatsheets.png)
+![그림2](https://github.com/philyoun/portfolio/blob/master/docs/R%20for%20Data%20Science/20191126_062106.png?raw=true)
+![그림3](https://github.com/philyoun/portfolio/blob/master/docs/R%20for%20Data%20Science/20191126_062106.png)
 
 
 
