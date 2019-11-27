@@ -226,6 +226,12 @@ x <- c("apple", "banana", "pear")
 str_view(x, "an")
 ```
 
-![그림](C:\Users\Phil2\Desktop\20191126_062106.png)
+![14.3.1-1](https://github.com/philyoun/portfolio/blob/master/docs/R%20for%20Data%20Science/14-Strings_files/14.3.1-1.png?raw=true)
 
-![그림](https://www.jopenbusiness.com/mediawiki/%ED%8C%8C%EC%9D%BC:RegExp_Cheatsheets.png) ![그림2](https://github.com/philyoun/portfolio/blob/master/docs/R%20for%20Data%20Science/20191126_062106.png?raw=true) ![그림3](https://github.com/philyoun/portfolio/blob/master/docs/R%20for%20Data%20Science/20191126_062106.png)
+복잡함을 한 단계 올려서, `.`이라는건 any character라는 뜻이다.
+
+``` r
+str_view(x, ".a.")
+```
+
+![14.3.1-2](https://github.com/philyoun/portfolio/blob/master/docs/R%20for%20Data%20Science/14-Strings_files/14.3.1-2.png?raw=true)
