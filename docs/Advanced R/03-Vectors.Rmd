@@ -1,0 +1,39 @@
+---
+title: "03 Vectors"
+output: github_document
+---
+
+## 3.1 Introduction
+
+이 chapter에서는, R에서 가장 중요한 데이터 타입 family인, vector에 대해 다룬다. <br />
+이미, 다는 아니어도 대부분의 타입들의 vector에 대해서 사용해봤을건데, <br />
+&emsp;&emsp;&emsp;&emsp;어떻게 interrelated되어있는지는 깊게 생각해보지는 않았을거다. <br />
+이 chapter에서 각각의 vector 타입들에 대해 너무 깊게 알아보지는 않을거지만, <br />
+&emsp;&emsp;&emsp;&emsp;어떻게 모든 타입들이 전체적으로 fit together되어있는지는 알려줄 것이다. <br />
+더 자세하게 알고 싶다면, R's documentation을 찾아보면 된다.
+
+Vectors는 두 가지 종류가 있다. atomic vectors와 list. <br />
+이 둘은, elements의 타입에 따라 나뉜다. 
+
+atomic vectors는, 모든 elements들이 같은 타입을 가져야한다. <br />
+lists는, elements들이 다른 타입을 가져도 된다.
+
+`NULL`은, vector는 아니지만 vectors와 밀접한 관련이 있고, 가끔 일반적인 zero length vector의 역할을 한다. <br />
+(`integer(0)`, `logical(0)`의 일반화된 버전) <br />
+다음의 다이어그램은, 이 chapter에서 계속 확장해나갈건데, 기본적인 관계를 illustrate해준다.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
