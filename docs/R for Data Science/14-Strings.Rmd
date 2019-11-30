@@ -281,294 +281,33 @@ str_view(x, "\\\\")
  
 <details>
 <summary>14.3.1.1 Exercises</summary>
-1. 왜 다음의 각각은 <code>\</code>를 match하지 못하는지를 설명해봐라. : <code>"\"</code>, <code>"\\"</code>, <code>"\\\"</code>
+  1. 왜 다음의 각각은 <code>\</code>를 match하지 못하는지를 설명해봐라. : <code>"\"</code>, <code>"\\"</code>, <code>"\\\"</code>
 
-2. <code>"'\</code>를 어떻게 match할 건지?
-```{r eval=FALSE}
+  2. <code>"'\</code>를 어떻게 match할 건지?
+```{r collapse=TRUE}
 x <- "asdf\"'\\"
 writeLines(x)
+```
+
+```{r eval=FALSE}
 str_view(x, "\"\'\\\\")
 # str_view(x, "\"'\\\\") 이것도 되네
 ```
 
-<img src="https://github.com/philyoun/portfolio/blob/master/docs/R%20for%20Data%20Science/14-Strings_files/14.3.1-5.png?raw=true">
+  3. 어떤 패턴이 <code>\..\..\..</code>라는 정규표현식에 match가 될지? 이걸 어떻게 string으로 표현할건지? <br />
+  (진짜 .) + any character + (진짜 .) + any character + (진짜 .) + any character 같은 정규표현식을 match가능.
 
-
-3. 어떤 패턴이 <code>\..\..\..</code>라는 정규표현식에 match가 될지? 이걸 어떻게 string으로 표현할건지? <br />
-(진짜 .) + any character + (진짜 .) + any character + (진짜 .) + any character 같은 정규표현식을 match가능.
-
-string으로는 `"\\..\\..\\.."` 이렇게 써야겠지?
-
+string으로는 <code>"\\..\\..\\.."</code> 이렇게 써야겠지?
+  
 ```{r eval=FALSE}
-str_view(".q.w.e", "\\..", "\\..\\..\\..")
+str_view(".a.b.c", "\\..\\..\\..")
 ```
-<img src="https://github.com/philyoun/portfolio/blob/master/docs/R%20for%20Data%20Science/14-Strings_files/14.3.1-6.png?raw=true">
-
-
 </details>
-
-<br />
-<br />
-<br />
-<br />
-
-
-### 14.3.2 Anchors
-디폴트로, 정규표현식은 string의 어떠한 부분이나 매치할 수 있다. <br />
-string의 start나 end를 매치시키도록 고정anchor할 수 있다. <br />
-- `^` :  string의 start를 매치
-- `$` : string의 end를 매치
-
-```{r eval=FALSE}
-x <- c("apple", "banana", "pear")
-str_view(x, "^a")
-```
-![14.3.2-1](https://github.com/philyoun/portfolio/blob/master/docs/R%20for%20Data%20Science/14-Strings_files/14.3.2-1.png?raw=true)
-
-```{r eval=FALSE}
-str_view(x, "a$")
-```
-![14.3.2-2](https://github.com/philyoun/portfolio/blob/master/docs/R%20for%20Data%20Science/14-Strings_files/14.3.2-2.png?raw=true)
-
-뭐가 뭔지 기억하기 쉽도록, try this mnemonic: if you begin with power(`^`), you end up with money(`$`). <br />
-(...이게 왜 기억하기 쉽단건지 이해불가;)
-
-오직 complete string만을 매치하도록 정규표현식을 강제할 수 있는데, `^`랑 `$`를 둘 다 이용해 고정anchor할 수 있다.
-
-```{r eval=FALSE}
-x <- c("apple pie", "apple", "apple cake")
-str_view(x, "apple")
-```
-![14.3.2-3](https://github.com/philyoun/portfolio/blob/master/docs/R%20for%20Data%20Science/14-Strings_files/14.3.2-3.png?raw=true)
-
-```{r eval=FALSE}
-str_view(x, "^apple$")
-```
-![14.3.2-4](https://github.com/philyoun/portfolio/blob/master/docs/R%20for%20Data%20Science/14-Strings_files/14.3.2-4.png?raw=true)
-
-`\b`로 boundary 매치를 시킬수도 있다. <br />
-나는(Hadley는) R에서 이걸 자주 사용하지는 않는데, RStudio에서는 검색할 때 가끔 사용한다. <br />
-예를 들어, `\bsum\b`를 사용해서, `summarise`, `summary`, `rowsum` 등등이 검색되는걸 피할 수 있다.
-
- <br />
+  
   <br />
-   <br />
-   
-<details>
-<summary>14.3.2.1 Exercises</summary>
-1. <code>"$^$"</code> 이 자체를 match하고 싶다면?
-string 사이에 <code>$^$</code>가 있을수도 있는건데, 딱 이것만을 match하고 싶다면.
-```{r eval=FALSE}
-x <- c("$^$", "ab$^$sfas")
-str_view(x, "^\\$\\^\\$$")
-```
-<img src="https://github.com/philyoun/portfolio/blob/master/docs/R%20for%20Data%20Science/14-Strings_files/14.3.2-5.png?raw=true">
-
-
-2. `stringr::words`에는 단어들이 잔뜩 있다. 다음의 각 조건을 맞는 단어들을 찾아보라.
-  1번. "y"로 시작, 
-```{r eval=FALSE}
-str_view(words, "^y", match = TRUE)
-```
-<img src="https://github.com/philyoun/portfolio/blob/master/docs/R%20for%20Data%20Science/14-Strings_files/14.3.2-6.png?raw=true">
-
-
-  2번. "x"로 끝
-```{r eval=FALSE}
-str_view(words, "x$", match = TRUE)
-```
-<img src="https://github.com/philyoun/portfolio/blob/master/docs/R%20for%20Data%20Science/14-Strings_files/14.3.2-7.png?raw=true">
-
-  3번. 정확하게 3개의 알파벳으로 구성(<code>str_length()</code> 쓰지 말고!)
-```{r eval=FALSE}
-str_view(words, "^...$", match = TRUE)
-```
-
-  4번. 7개 이상의 알파벳들로 구성
-```{r eval=FALSE}
-str_view(words, ".......", match = TRUE)
-```
-
-3번, 4번은 너무 길어서 결과를 포함하지 않겠다.
-
-해당이 되는 것들만 출력이 되길 원한다면, 위와 같이 <code>match = TRUE</code> 옵션을 넣으면 된다.
-</details>
-
- <br />
   <br />
-   <br />
-   
-### 14.3.3 Character classes and alternatives
-딱 하나만의 캐릭터를 match시켜주는게 아니라, 여러 개의 캐릭터를 match시켜주는, 특별한 패턴들이 많다. <br />
-이미 `.`를 봤는데, 새로운 라인에 있지 않은 any character들을 매치시켜줌. <br />
-4개의 다른 유용한 툴들이 있다. 
-
-- `\d`: 어떠한 숫자를 매치시켜줌
-- `\s`: 어떠한 공백이나 매치시켜줌(띄어쓰기, 탭, 새로운 라인)
-- `[abc]`: a, b, 혹은 c를 매치
-- `[^abc]`: a, b, c를 제외한 아무거나 매치
-
-`\d`, `\s`를 포함한 정규표현식을 만들기 위해서는, string에서 `\`를 escape해야되므로,
-`"\\d"`, `"\\s"`로 타이핑해야된다는 것을 꼭 기억.
-
-특히 저 3번째 저건, escape를 쓰지 않고 하나의 metacharacter를 정규표현식에 넣을 수 있도록 해준다. <br />
-이걸 character class라고 부른다. <br />
-그리고 많은 사람들이 이게 더 읽기 쉽다고 느낀다. 다음의 예를 보자.
-```{r eval=FALSE}
-str_view(c("abc", "a.c", "a*c", "a c"), "a[.]c")
-```
-![14.3.3-1](https://github.com/philyoun/portfolio/blob/master/docs/R%20for%20Data%20Science/14-Strings_files/14.3.3-1.png?raw=true)
-
-```{r eval=FALSE}
-str_view(c("abc", "a.c", "a*c", "a c"), ".[*]c")
-```
-![14.3.3-2](https://github.com/philyoun/portfolio/blob/master/docs/R%20for%20Data%20Science/14-Strings_files/14.3.3-2.png?raw=true)
-
-```{r eval=FALSE}
-str_view(c("abc", "a.c", "a*c", "a c"), "a[ ]")
-```
-![14.3.3-3](https://github.com/philyoun/portfolio/blob/master/docs/R%20for%20Data%20Science/14-Strings_files/14.3.3-3.png?raw=true)
-
-대부분의 정규표현식 metacharacters에 대해(다는 아니고) 작동한다. `$`, `.`, `|`, `?`, `*`, `+`, `(`, `)`, `[`, `{` <br />
-하지만, 몇몇 캐릭터들은 character class 안에서도 특별한 뜻을 가져서, 백슬래쉬 escape와 함께 써줘야 한다.
-`]`, `\`, `^`, `=`
-
-하나 이상의 패턴 중에서 pick하고 싶다면, alternation을 쓸 수 있다. <br />
-예를 들어서, `abc|d..f`라고 하면, "abc"나 "deaf"를 match한다. <br />
-`|` 의 우선순위가 낮아서, `abc|xyz`라고 하면, `abc` 혹은 `xyz`를 match하지, `abcyz` 혹은 `abxyz`를 match하는게 아니다. <br />
-수학적 표현과 마찬가지로, 우선순위가 좀 헷갈린다면, 괄호를 써서 명확하게 할 수 있다.
-
-```{r eval=FALSE}
-str_view(c("grey", "gray"), "gr(e|a)y")
-```
-![14.3.3-4](https://github.com/philyoun/portfolio/blob/master/docs/R%20for%20Data%20Science/14-Strings_files/14.3.3-4.png?raw=true)
-<br />
-<br />
-<br />
-<br />
-<details>
-<summary>14.3.3.1 Exercises</summary>
-
-</details>
-<br />
-<br />
-<br />
-<br />
-
-
-### 14.3.4 Repetition
-몇 번이나 나오는지를 컨트롤하는 것이 다음 단계.
-
-- `?` : 0 or 1
-- `+` : 1 or 그 이상
-- `*` : 0 or 그 이상
-
-```{r eval=FALSE}
-x <- "1888 is the longest year in Roman numerals: MDCCCLXXXVIII"
-str_view(x, "CC?")
-```
-![14.3.4-1](https://github.com/philyoun/portfolio/blob/master/docs/R%20for%20Data%20Science/14-Strings_files/14.3.4-1.png?raw=true)
-
-```{r eval=FALSE}
-str_view(x, "CC+")
-```
-![14.3.4-2](https://github.com/philyoun/portfolio/blob/master/docs/R%20for%20Data%20Science/14-Strings_files/14.3.4-2.png?raw=true)
-
-```{r eval=FALSE}
-str_view(x, "C[LX]+")
-```
-![14.3.4-3](https://github.com/philyoun/portfolio/blob/master/docs/R%20for%20Data%20Science/14-Strings_files/14.3.4-3.png?raw=true)
-
-이 operators의 우선순위는 높다. 그래서 다음과 같이 쓸 수도 있다. <br />
-미국-영국 스펠링에 대한 match를 위해, `colou?r`처럼. <br />
-이 말인즉슨, 대부분의 사용법에서는 괄호가 필요할 거란 뜻이다. 예를 들어 `bana(na)+`같이.
-
-몇 번이나 나올지를 정해줄 수도 있다.
-
-- `{n}` : 정확히 n번
-- `{n, }` : n번 or 그 이상
-- `{, m}` : 최대 m번
-- `{n, m}` : n번과 m번 사이
-
-```{r eval=FALSE}
-str_view(x, "C{2}")
-```
-![14.3.4-4](https://github.com/philyoun/portfolio/blob/master/docs/R%20for%20Data%20Science/14-Strings_files/14.3.4-4.png?raw=true)
-
-```{r eval=FALSE}
-str_view(x, "C{2,}")
-```
-![14.3.4-5](https://github.com/philyoun/portfolio/blob/master/docs/R%20for%20Data%20Science/14-Strings_files/14.3.4-5.png?raw=true)
-
-```{r eval=FALSE}
-str_view(x, "C{2,3}")
-```
-![14.3.4-6](https://github.com/philyoun/portfolio/blob/master/docs/R%20for%20Data%20Science/14-Strings_files/14.3.4-6.png?raw=true)
-
-디폴트로, 이러한 match들은 "greedy"하다. 가능한 가장 긴 string을 match한다. <br />
-이걸 "lazy"하게 만들 수 있다. 가능한 가장 짧은 string을 match하도록. 끝에 `?`를 붙여서. <br />
-정규표현식의 고급특성인데, 존재한다는걸 알아두면 좋다.
-
-```{r eval=FALSE}
-str_view(x, "C{2,3}?")
-```
-![14.3.4-7](https://github.com/philyoun/portfolio/blob/master/docs/R%20for%20Data%20Science/14-Strings_files/14.3.4-7.png?raw=true)
-
-```{r eval=FALSE}
-str_view(x, "C[LX]+?")
-```
-![14.3.4-8](https://github.com/philyoun/portfolio/blob/master/docs/R%20for%20Data%20Science/14-Strings_files/14.3.4-8.png?raw=true)
-
-<br />
-<br />
-<br />
-<br />
-<details>
-<summary>14.3.4.1 Exercises</summary>
-
-</details>
-<br />
-<br />
-<br />
-<br />
-
-### 14.3.5 Grouping and backreferences
-복잡한 표현을 명확하게하는 방법으로 괄호를 쓰는 걸 배웠다. <br />
-괄호는 또한, 번호가 매겨진 capturing group을 만드는데도 쓸 수 있다.
-
-capturing group은 괄호 안의 정규표현식 부분과 일치하는, 문자열 부분을 저장한다. <br />
-그리고 이렇게 capturing group 뒤에다가, `\1`, `\2`와 같은 역참조backreference를 통해, 이전에 일치했던 것과 동일한 텍스트를 refer하도록 할 수 있다. <br />
-A capturing group stores the part of the string matched by the part of the regular expression inside the parentheses. <br />
-You can refer to the same text as previously matched by a capturing group with backreferences, like `\1`, `\2` etc.
-
-이거 이해하느라 한참 걸렸는데, 어려운거 아니다. <br />
-그런데, 말로 하면 도대체 뭔소린지를 모르겠다. 예제를 빠르게 보자.
-
-```{r eval=FALSE}
-str_view(fruit, "(..)\\1", match = TRUE)
-```
-![14.3.5-1](https://github.com/philyoun/portfolio/blob/master/docs/R%20for%20Data%20Science/14-Strings_files/14.3.5-1.png?raw=true)
-
-그러니깐 뒤에 나오는 `\\1`은 앞에 나온 `(..)`를 refer하는거다. <br />
-그래서 즉, repeated pair of letters가 있는 걸 찾아준다.
-
-이건 특히나 exercises를 보면서 예제들을 보며 이해를 해보자.
-
-<br />
-<br />
-<br />
-<br />
-<details>
-<summary>14.3.5.1 Exercises</summary>
-
-</details>
-<br />
-<br />
-<br />
-<br />
-
-## 14.4 Tools
-
+  <br />
+  <br />
 
 
 
