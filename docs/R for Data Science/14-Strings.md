@@ -275,6 +275,6 @@ str_view(x, "\\\\")
 
 <br /> <br /> <br />
 
-<details> <summary>14.3.1.1 Exercises</summary> 1. 왜 다음의 각각은  를 match하지 못하는지를 설명해봐라. </details>
+<details> <summary>14.3.1.1 Exercises</summary> 1. 왜 다음의 각각은 <code>  </code> 를 match하지 못하는지를 설명해봐라. </details>
 
 <br /> <br /> <br /> <br />
