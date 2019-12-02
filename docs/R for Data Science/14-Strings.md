@@ -288,6 +288,12 @@ str_view(x, "\"\'\\\\")
 # str_view(x, "\"'\\\\") 이것도 되네
 ```
 
-<img src="https://github.com/philyoun/portfolio/blob/master/docs/R%20for%20Data%20Science/14-Strings_files/14.3.1-5.png?raw=true" alt="14.3.1-5"> </details>
+<img src="https://github.com/philyoun/portfolio/blob/master/docs/R%20for%20Data%20Science/14-Strings_files/14.3.1-5.png?raw=true" alt="14.3.1-5"> <br /> <br /> 3. 어떤 패턴이 <code>......</code>라는 정규표현식에 match가 될지? 이걸 어떻게 string으로 표현할건지? <br /> (진짜 .) + any character + (진짜 .) + any character + (진짜 .) + any character 같은 정규표현식을 match가능. <br /> <br /> string으로는 <code>"\\..\\..\\.."</code> 이렇게 써야겠지? <br />
+
+``` r
+str_view(".a.b.c", "\\..\\..\\..")
+```
+
+<img src="https://github.com/philyoun/portfolio/blob/master/docs/R%20for%20Data%20Science/14-Strings_files/14.3.1-6.png?raw=true" alt="14.3.1-6"> <br /> </details>
 
 <br /> <br /> <br /> <br />

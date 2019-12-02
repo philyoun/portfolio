@@ -22,7 +22,8 @@ strings는 보통 구조가 없거나 좀 덜한(structured or semi-structured) 
 따로 explicit하게 로드를 해줘야한다. <br />
 (라고 되어 있지만 `library(tidyverse)`하면 stringr 패키지도 로드된다.)
 
-```{r warning=FALSE, message=FALSE}
+
+```r
 library(tidyverse)
 library(stringr)
 ```
@@ -34,14 +35,16 @@ ___
 다른 언어와는 다르게, 이 둘은 아무런 차이가 없다. <br />
 저자는 항상 `"`를 사용할 것을 추천한다. string이 여러 개의 `"`를 포함하고 있지 않는 이상. <br />
 
-```{r}
+
+```r
 string1 <- "This is a string"
 string2 <- 'If I want to include a "quote" inside a string, I use single quotes'
 ```
 
 만약 따옴표 닫는걸 깜빡했다면, `+`라는 continuation character를 보게 될 것이다.
 
-```{r eval=FALSE}
+
+```r
 > "This is a string without a closing quote
 +
 +
@@ -52,7 +55,8 @@ string2 <- 'If I want to include a "quote" inside a string, I use single quotes'
 
 string에다가 진짜로 작은 따옴표나 큰 따옴표를 넣고 싶다면, 앞에다가 `\`를 사용해서 "escape"해야 한다.
 
-```{r}
+
+```r
 double_quote <- "\"" # 아니면 '"'
 single_quote <- '\'' # 아니면 "'"
 ```
@@ -64,11 +68,15 @@ single_quote <- '\'' # 아니면 "'"
 왜냐하면 프린트된 문자열 표현은 escapes를 보여주기 때문. <br />
 string의 raw contents를 보고 싶다면, `writeLines()`를 사용해야한다.
 
-```{r collapse=TRUE}
+
+```r
 x <- c("\"", "\\")
 x
+## [1] "\"" "\\"
 
 writeLines(x)
+## "
+## \
 ```
 
 특별한 캐릭터들이 좀 있다. <br />
@@ -76,15 +84,19 @@ writeLines(x)
 완전한 리스트를 보고싶다면, `"`에 help를 해볼 것. `?'"'` 혹은 `?"'"` <br />
 가끔 `"\u00b5"`와 같은 string도 볼 수 있는데, 모든 플랫폼에서 작동하는 non-English 캐릭터를 쓰는 방법이다.
 
-```{r collapse=TRUE}
+
+```r
 x <- "\u00b5"
 x
+## [1] "μ"
 ```
 
 여러 개의 strings를, `c()`를 이용해 character vector에 저장할 수 있다.
 
-```{r collapse=TRUE}
+
+```r
 c("one", "two", "three")
+## [1] "one"   "two"   "three"
 ```
 
 
@@ -97,8 +109,10 @@ base R에는 strings를 작업할 수 있는 여러가지 함수들이 있다. <
 이 함수들은 전부다 str_로 시작하기 때문에 직관적인 이름들을 가지고 있다. <br />
 예를 들어, `str_length()`는 해당 string의 길이가 얼마나 되는지를 알려준다.
 
-```{r collapse=TRUE}
+
+```r
 str_length(c("a", "R for data science", NA))
+## [1]  1 18 NA
 ```
 
 RStudio에서 작업을 하면 더 편리하다. <br />
@@ -107,32 +121,43 @@ RStudio에서 작업을 하면 더 편리하다. <br />
 
 ### 14.2.2 Combining strings
 2개 이상의 string들을 결합하고 싶다면, `str_c()`를 사용하자.
-```{r collapse=TRUE}
+
+```r
 str_c("x", "y")
+## [1] "xy"
 str_c("x", "y", "z")
+## [1] "xyz"
 ```
 
 `sep` 인자argument를 사용해서 어떻게 분리를 할지 컨트롤할 수 있다.
-```{r collapse=TRUE}
+
+```r
 str_c("x", "y", sep = ", ")
+## [1] "x, y"
 ```
 
 R의 다른 대부분의 함수들과 마찬가지로, 결측값missing values는 위험할 수 있다. <br />
 그냥 `"NA"` 그대로 프린트하고 싶다면, `str_replace_na()`을 사용하자.
-```{r collapse=TRUE}
+
+```r
 x <- c("abc", NA)
 str_c("|-", x, "-|")
+## [1] "|-abc-|" NA
 str_c("|-", str_replace_na(x), "-|")
+## [1] "|-abc-|" "|-NA-|"
 ```
 
 위에서 볼 수 있듯, `str_c()`는 벡터화vectorized되고, 길이가 안 맞는게 있다면 recycle을 해서 맞춘다.
-```{r collapse=TRUE}
+
+```r
 str_c("prefix-", c("a", "b", "c"), "-suffix")
+## [1] "prefix-a-suffix" "prefix-b-suffix" "prefix-c-suffix"
 ```
 
 길이 0짜리 오브젝트들은 조용하게 드랍된다. Objects of length 0 are silently dropped. <br />
 이건 `if` 문과 함께 쓸 때 특히나 유용하다.
-```{r collapse=TRUE}
+
+```r
 name <- "Hadley"
 time_of_day <- "morning"
 birthday <- FALSE
@@ -142,35 +167,45 @@ str_c(
 	if (birthday) " and HAPPY BIRTHDAY",
 	"."
 )
+## [1] "Good morning Hadley."
 ```
 
 
 strings의 벡터를 하나로 축소collapse하고 싶다면, `collapse` 인자argument를 사용하자.
-```{r collapse=TRUE}
+
+```r
 str_c(c("x", "y", "z"), collapse = ", ")
+## [1] "x, y, z"
 ```
 
 ### 14.2.3 Subsetting strings
 `str_sub()`를 사용해서, string의 일부를 추출해낼 수 있다. <br />
 string과 마찬가지로, `str_sub()`도 substring의 포지션을 알려주는, `start`와 `end` 인자들arguments을 받는다.
-```{r collapse=TRUE}
+
+```r
 x <- c("Apple", "Banana", "Pear")
 str_sub(x, 1, 3)
+## [1] "App" "Ban" "Pea"
 
 str_sub(x, -3, -1)
+## [1] "ple" "ana" "ear"
 ```
 
 `str_sub()`는 string이 너무 짧아도 상관없다는 걸 인지하시라. <br />
 가능한만큼만 return한다.
-```{r collapse=TRUE}
+
+```r
 str_sub("a", 1, 5)
+## [1] "a"
 ```
 
 strings를 수정하기 위해서, `str_sub()`를 assignment form으로 써줄 수 있다. <br />
 위의 "Apple", "Banana", "Pear"의 첫 글자를 소문자로 수정하고 싶다고 치자.
-```{r collapse=TRUE}
+
+```r
 str_sub(x, 1, 1) <- str_to_lower(str_sub(x, 1, 1))
 x
+## [1] "apple"  "banana" "pear"
 ```
 
 이렇게도 수정을 할 수가 있다는 말.
@@ -182,10 +217,13 @@ x
 왜냐하면 각 언어마다 바꾸는게 좀 다른 룰을 가지고 있기 때문. <br />
 그럴 때, locale을 정해줌으로써 룰을 정할 수 있다.
 
-```{r collapse=TRUE}
+
+```r
 # 터키는 2개의 i를 갖고 있다. 점이 있는 것과 없는 것. 그래서 대문자화하면 다르게 된다.
 str_to_upper(c("i", "ı"))
+## [1] "I" "I"
 str_to_upper(c("i", "ı"), locale = "tr")
+## [1] "<U+0130>" "I"
 ```
 
 locale은 ISO 639 언어코드로 정해져있다. 언어 코드는 2, 3개의 줄임말로 되어있다는거. <br />
@@ -199,12 +237,15 @@ base R의 `order()`과 `sort()` 함수들은 현재 locale을 이용해서 strin
 다른 컴퓨터들간에도 변함없는 결과를 얻고 싶다면robust behavior, <br />
 &emsp;&emsp;&emsp;&emsp;`str_sort()`와 `str_order()`을 사용해서 `locale` 인자argument를 컨트롤해라.
 
-```{r collapse=TRUE}
+
+```r
 x <- c("apple", "eggplant", "banana")
 
 str_sort(x, locale = "en")
+## [1] "apple"    "banana"   "eggplant"
 
 str_sort(x, locale = "haw")
+## [1] "apple"    "eggplant" "banana"
 ```
 
 
@@ -223,7 +264,8 @@ regular expressions(이하 정규표현식)를 배우기 위해서, `str_view()`
 
 ### 14.3.1 Basic matches
 가장 간단한 패턴 매칭은 exact strings다.
-```{r eval=FALSE}
+
+```r
 x <- c("apple", "banana", "pear")
 str_view(x, "an")
 ```
@@ -232,7 +274,8 @@ str_view(x, "an")
 
 
 복잡함을 한 단계 올려서, `.`이라는건 any character라는 뜻이다.
-```{r eval=FALSE}
+
+```r
 str_view(x, ".a.")
 ```
 ![14.3.1-2](https://github.com/philyoun/portfolio/blob/master/docs/R%20for%20Data%20Science/14-Strings_files/14.3.1-2.png?raw=true)
@@ -245,13 +288,16 @@ strings와 마찬가지로, 정규표현식도 특별한 행동을 escape하기 
 정규표현식을 표현하기 위해서 strings를 사용했는데, `\`는 strings에서 symbol을 escape하는데도 사용. <br />
 그래서 `\.`라는 정규표현식을 만들고 싶다면, `\\.`을 사용.
 
-```{r collapse=TRUE}
+
+```r
 dot <- "\\."
 
 writeLines(dot)
+## \.
 ```
 
-```{r eval=FALSE}
+
+```r
 str_view(c("abc", "a.c", "bef"), "a\\.c")
 ```
 ![14.3.1-3](https://github.com/philyoun/portfolio/blob/master/docs/R%20for%20Data%20Science/14-Strings_files/14.3.1-3.png?raw=true)
@@ -261,12 +307,15 @@ str_view(c("abc", "a.c", "bef"), "a\\.c")
 근데 이걸 또 escape해야하니깐 하나 더.  `\\\\`
 
 그래서 `\` 하나 매치시키기 위해서, `"\\\\"`, 즉 4번의 백슬래쉬가 필요하다는 것.
-```{r collapse=TRUE}
+
+```r
 x <- "a\\b"
 writeLines(x)
+## a\b
 ```
 
-```{r eval=FALSE}
+
+```r
 str_view(x, "\\\\")
 ```
 ![14.3.1-4](https://github.com/philyoun/portfolio/blob/master/docs/R%20for%20Data%20Science/14-Strings_files/14.3.1-4.png?raw=true)
@@ -286,12 +335,15 @@ str_view(x, "\\\\")
   <br />
   <br />
   2. <code> "'\ </code>를 어떻게 match할 건지?
-```{r collapse=TRUE}
+
+```r
 x <- "asdf\"'\\"
 writeLines(x)
+## asdf"'\
 ```
 
-```{r eval=FALSE}
+
+```r
 str_view(x, "\"\'\\\\")
 # str_view(x, "\"'\\\\") 이것도 되네
 ```
@@ -303,7 +355,8 @@ str_view(x, "\"\'\\\\")
  <br />
   string으로는 <code>"\\..\\..\\.."</code> 이렇게 써야겠지? <br />
   
-```{r eval=FALSE}
+
+```r
 str_view(".a.b.c", "\\..\\..\\..")
 ```
 <img src="https://github.com/philyoun/portfolio/blob/master/docs/R%20for%20Data%20Science/14-Strings_files/14.3.1-6.png?raw=true" alt="14.3.1-6">
