@@ -275,7 +275,7 @@ str_view(x, "\\\\")
 
 <br /> <br /> <br />
 
-<details> <summary>14.3.1.1 Exercises</summary> 1. 왜 다음의 각각은 <code> `\` </code> 를 match하지 못하는지를 생각해보자: <code>`"\"`</code>, <code> `"\\"` </code>, <code> `"\\\"` </code><br /> 뭐가 문제인지 모르겠는데, 백슬래쉬가 코드같이 표시되었다 말았다 한다. ticktack(<code>\`</code>)으로 감싸져있으면 코드라고 봐주시길 바란다. <br /> <code> "\\" </code> <code> \\ </code> <code> \\\\ </code> <code> "\\" </code> <code> "&\#92" </code> <br /> 2. <code> "' </code>를 어떻게 match할 건지?
+<details> <summary>14.3.1.1 Exercises</summary> 1. 왜 다음의 각각은 <code> `\` </code> 를 match하지 못하는지를 생각해보자: <code>`"\"`</code>, <code> `"\\"` </code>, <code> `"\\\"` </code><br /> 뭐가 문제인지 모르겠는데, 백슬래쉬가 코드같이 표시되었다 말았다 한다. ticktack(<code> \` </code>)으로 감싸져있으면 코드라고 봐주시길 바란다. <br /> <br /> 2. <code> "' </code>를 어떻게 match할 건지?
 
 ``` r
 x <- "asdf\"'\\"
