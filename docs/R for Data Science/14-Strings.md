@@ -304,7 +304,7 @@ str_view(".a.b.c", "\\..\\..\\..")
 
 ### 14.3.2 Anchors
 
-디폴트로, 정규표현식은 string의 어떠한 부분이나 매치할 수 있다. <br /> string의 start나 end를 매치시키도록 고정anchor할 수 있다. <br /> - `^` : string의 start를 매치 - `$` : string의 end를 매치
+디폴트로, 정규표현식은 string의 어떠한 부분이나 매치할 수 있다. <br /> string의 start나 end를 매치시키도록 고정anchor할 수 있다. <br /> - `^` : string의 start를 매치 <br /> - `$` : string의 end를 매치
 
 ``` r
 x <- c("apple", "banana", "pear")
@@ -319,7 +319,7 @@ str_view(x, "a$")
 
 ![14.3.2-2](https://github.com/philyoun/portfolio/blob/master/docs/R%20for%20Data%20Science/14-Strings_files/14.3.2-2.png?raw=true)
 
-뭐가 뭔지 기억하기 쉽도록, try this mnemonic: if you begin with power(`^`), you end up with money(`$`). <br /> (...이게 왜 기억하기 쉽단건지 이해불가;)
+뭐가 뭔지 기억하기 쉽도록, <br /> try this mnemonic: if you begin with power(`^`), you end up with money(`$`). <br /> (...이게 왜 기억하기 쉽단건지 이해불가;;)
 
 오직 complete string만을 매치하도록 정규표현식을 강제할 수 있는데, `^`랑 `$`를 둘 다 이용해 고정anchor할 수 있다.
 
@@ -341,9 +341,7 @@ str_view(x, "^apple$")
 #### 14.3.2.1 Exercises
 
 1.  `"$^$"` 이 자체를 match하고 싶다면? string 사이에 <code>$^$</code>가 있을수도 있는건데, 그게 아니라 딱 이것만을 match하고 싶다면 string으로 어떻게 써야할까? <br /> <br />
-2.  `stringr::words`에는 단어들이 잔뜩 있다. 다음의 각 조건을 맞는 단어들을 찾아보라.    1번. "y"로 시작하는 단어들?    2번. "x"로 끝나는 단어들?    3번. 정확하게 3개의 알파벳으로 구성(`str_length()` 쓰지 말고!)된 단어들?    4번. 7개 이상의 알파벳들로 구성된 단어들?
-
-해당되는 단어들은 많기 때문에, `str_view()`에 `match` argument를 사용해서 매칭되는 단어들만 표시하도록 할 수 있다.
+2.  `stringr::words`에는 단어들이 잔뜩 있다. 다음의 각 조건을 맞는 단어들을 찾아보라. <br />    1번. "y"로 시작하는 단어들? <br />    2번. "x"로 끝나는 단어들? <br />    3번. 정확하게 3개의 알파벳으로 구성(`str_length()` 쓰지 말고!)된 단어들? <br />    4번. 7개 이상의 알파벳들로 구성된 단어들? <br /> 해당되는 단어들은 많기 때문에, `str_view()`에 `match` argument를 사용해서 매칭되는 단어들만 표시하도록 할 수 있다.
 
 <details> <summary>14.3.2.1 Exercises sol</summary> 1.
 
@@ -352,7 +350,7 @@ x <- c("$^$", "ab$^$sfas")
 str_view(x, "^\\$\\^\\$$")
 ```
 
-<img src="https://github.com/philyoun/portfolio/blob/master/docs/R%20for%20Data%20Science/14-Strings_files/14.3.2-5.png?raw=true" alt="14.3.2-5"> <br /> <br /> 2. 1번.
+<img src="https://github.com/philyoun/portfolio/blob/master/docs/R%20for%20Data%20Science/14-Strings_files/14.3.2-5.png?raw=true" alt="14.3.2-5"> <br /> <br /> 2. <br /> 1번.
 
 ``` r
 str_view(words, "^y", match = TRUE)
@@ -415,7 +413,7 @@ str_view(c("abc", "a.c", "a*c", "a c"), "a[ ]")
 
 대부분의 정규표현식 metacharacters에 대해(다는 아니고) 작동한다. `$`, `.`, `|`, `?`, `*`, `+`, `(`, `)`, `[`, `{` <br /> 하지만, 몇몇 캐릭터들은 character class 안에서도 특별한 뜻을 가져서, 백슬래쉬 escape와 함께 써줘야 한다. `]`, `\`, `^`, `=`
 
-하나 이상의 패턴 중에서 pick하고 싶다면, alternation을 쓸 수 있다. <br /> 예를 들어서, `abc|d..f`라고 하면, "abc"나 "deaf"를 match한다. <br /> `|` 의 우선순위가 낮아서, `abc|xyz`라고 하면, `abc` 혹은 `xyz`를 match하지, `abcyz` 혹은 `abxyz`를 match하는게 아니다. <br /> 수학적 표현과 마찬가지로, 우선순위가 좀 헷갈린다면, 괄호를 써서 명확하게 할 수 있다.
+하나 이상의 패턴 중에서 pick하고 싶다면, alternation을 쓸 수 있다. <br /> 예를 들어서, `abc|d..f`라고 하면, "abc"나 "deaf"를 match한다. <br /> `|` 는 우선순위가 낮아서, `abc|xyz`라고 하면, `abc` 혹은 `xyz`를 match하지, `abcyz` 혹은 `abxyz`를 match하는게 아니다. <br /> 수학적 표현과 마찬가지로, 우선순위가 좀 헷갈린다면, 괄호를 써서 명확하게 할 수 있다.
 
 ``` r
 str_view(c("grey", "gray"), "gr(e|a)y")
@@ -425,7 +423,7 @@ str_view(c("grey", "gray"), "gr(e|a)y")
 
 #### 14.3.3.1 Exercises
 
-<details> <summary>14.3.3.1 Exercises sol</summary> </details>
+<br /> <br /> <details> <summary>14.3.3.1 Exercises sol</summary> </details> <br /> <br /> <br />
 
 ### 14.3.4 Repetition
 
@@ -497,7 +495,7 @@ str_view(x, "C[LX]+?")
 
 #### 14.3.4.1 Exercises
 
-<details> <summary>14.3.4.1 Exercises sol</summary> </details>
+<br /> <br /> <details> <summary>14.3.4.1 Exercises sol</summary> </details> <br /> <br /> <br />
 
 ### 14.3.5 Grouping and backreferences
 
@@ -519,7 +517,21 @@ str_view(fruit, "(..)\\1", match = TRUE)
 
 #### 14.3.5.1 Exercises
 
-<details> <summary>14.3.5.1 Exercises sol</summary> </details>
+1.  다음의 expressions가 무엇을 match할지를 설명해보자. <br />    1번. `(.)\1\1`    2번. `"(.)(.)\\2\\1"`    3번. `(..)\1`    4번. `"(.).\\1.\\1"`    5번. `"(.)(.)(.).*\\3\\2\\1"`
+
+어떤건 `\1`이고 어떤건 `\\1`이다. 일부러 저자가 이렇게 써놨는데, 잘 생각해보자.
+
+1.  다음의 각 조건을 match해주는 정규표현식을 구성해보자. <br />    1번. 하나의 같은 문자로 시작하고 끝나야하려면?    2번. 반복되는 한 쌍의 문자를 갖고 있으려면? 예를 들어, "church"는 "ch"가 두 번 나온다.    3번. 똑같은 문자가 최소 3번 나오려면? 예를 들어, "eleven"에서 "e"는 3번 나온다.
+
+<br /> <br />
+
+<details> <summary>14.3.5.1 Exercises sol</summary> 1. <br /> 1번. 똑같은 문자가 3번 연속으로 나와야함. 예를 들어, "aaa" <br /> 2번. 한 쌍의 문자들이, 상반된 순서로 나와야한다. 그러니깐, "abba" 같이. <br /> 3번. 두 개의 문자들이 연속으로 2번 나와야함. "a1a1" <br /> 4번. 원하는 문자 하나 + any character + 처음 그 문자 하나 + any character + 처음 그 문자 하나. <br /> 예를 들어, "abaca", "b8b.b" <br /> 5번. 이제 이걸 이해하면 다 이해했다고 볼 수 있다. <br /> 처음 (.)은 <code>\\1</code>로, 두 번째 (.)는 <code>\\2</code>로, 세 번째 (.)는 <code>\\3</code>으로 refer되는 거다. <br /> 그리고 가운데는 .\*니깐 0 or more. <br /> 그래서 예를 들어보면, "abccba", "abc1cba" 혹은 "abcsgasgddsadgsdgcba" 다 되는 것.
+
+1.  <br /> 1번. <code>`^(.).*\1$`</code>라고 생각했는데, "a"는 포함이 안 된다. "a"도 조건에 만족하는 단어인데, 꼭 시작과 끝을 명시해놔서 안 잡히는듯. <br /> 정답은 <code>'^(.)((.\*$)|\\1?$)\`</code> <br /> 2번.
+
+<br />
+
+</details> <br /> <br /> <br />
 
 14.4 Tools
 ----------
