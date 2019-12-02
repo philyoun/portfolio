@@ -275,6 +275,16 @@ str_view(x, "\\\\")
 
 <br /> <br /> <br />
 
-<details> <summary>14.3.1.1 Exercises</summary> 1. 왜 다음의 각각은 <code>  </code> 를 match하지 못하는지를 설명해봐라. </details>
+<details> <summary>14.3.1.1 Exercises</summary> 1. 왜 다음의 각각은 <code> `\` </code> 를 match하지 못하는지를 생각해보자: <code>""</code>, <code> "\\" </code>, <code> "\\" </code>
+
+1.  <code>"'&lt;/code&gt;를 어떻게 match할 건지?
+
+``` r
+x <- "asdf\"'\\"
+writeLines(x)
+## asdf"'\
+```
+
+</details>
 
 <br /> <br /> <br /> <br />
