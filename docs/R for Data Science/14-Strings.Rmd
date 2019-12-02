@@ -562,18 +562,18 @@ str_view(fruit, "(..)\\1", match = TRUE)
 
 #### 14.3.5.1 Exercises
 1. 다음의 expressions가 무엇을 match할지를 설명해보자. <br />
-&emsp;&emsp;&emsp;1번. `(.)\1\1` 
-&emsp;&emsp;&emsp;2번. `"(.)(.)\\2\\1"`
-&emsp;&emsp;&emsp;3번. `(..)\1`
-&emsp;&emsp;&emsp;4번. `"(.).\\1.\\1"`
-&emsp;&emsp;&emsp;5번. `"(.)(.)(.).*\\3\\2\\1"`
+&emsp;&emsp;&emsp;1번. `(.)\1\1`  <br />
+&emsp;&emsp;&emsp;2번. `"(.)(.)\\2\\1"` <br />
+&emsp;&emsp;&emsp;3번. `(..)\1` <br />
+&emsp;&emsp;&emsp;4번. `"(.).\\1.\\1"` <br />
+&emsp;&emsp;&emsp;5번. `"(.)(.)(.).*\\3\\2\\1"` <br />
 
 어떤건 `\1`이고 어떤건 `\\1`이다. 일부러 저자가 이렇게 써놨는데, 잘 생각해보자.
 
-2. 다음의 각 조건을 match해주는 정규표현식을 구성해보자. <br />
-&emsp;&emsp;&emsp;1번. 하나의 같은 문자로 시작하고 끝나야하려면?
-&emsp;&emsp;&emsp;2번. 반복되는 한 쌍의 문자를 갖고 있으려면? 예를 들어, "church"는 "ch"가 두 번 나온다.
-&emsp;&emsp;&emsp;3번. 똑같은 문자가 최소 3번 나오려면? 예를 들어, "eleven"에서 "e"는 3번 나온다.
+2\. 다음의 각 조건을 match해주는 정규표현식을 구성해보자. <br />
+&emsp;&emsp;&emsp;1번. 하나의 같은 문자로 시작하고 끝나야하려면? <br />
+&emsp;&emsp;&emsp;2번. 반복되는 한 쌍의 문자를 갖고 있으려면? 예를 들어, "church"는 "ch"가 두 번 나온다. <br />
+&emsp;&emsp;&emsp;3번. 똑같은 문자가 최소 3번 나오려면? 예를 들어, "eleven"에서 "e"는 3번 나온다. <br />
 
  <br />
   <br />
@@ -594,6 +594,8 @@ str_view(fruit, "(..)\\1", match = TRUE)
 2. <br />
 1번. <code>`^(.).*\1$`</code>라고 생각했는데, "a"는 포함이 안 된다. "a"도 조건에 만족하는 단어인데, 꼭 시작과 끝을 명시해놔서 안 잡히는듯. <br />
 정답은 <code>'^(.)((.*\1$)|\1?$)`</code> <br />
+ <br />
+  <br />
 2번.
 
 <br />
