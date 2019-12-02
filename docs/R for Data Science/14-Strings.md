@@ -273,9 +273,15 @@ str_view(x, "\\\\")
 
 연습문제까지 다 해보진 않는데, 여기 chapter에서는 좀 해봐야될 것 같다.
 
+#### 14.3.1.1 Exercises
+
+1.  왜 다음의 각각은 `\`를 match하지 못하는지 생각해보자. : `"\"`, `"\\"`, `"\\\"` <br /> <br />
+2.  `"'\`를 어떻게 match할 수 있을지? <br /> <br />
+3.  어떤 패턴이 `\..\..\..`라는 정규표현식에 match가 될지? 그리고 이걸 어떻게 string으로 표현할건지?
+
 <br /> <br /> <br />
 
-<details> <summary>14.3.1.1 Exercises</summary> 1. 왜 다음의 각각은 <code> `\` </code> 를 match하지 못하는지를 생각해보자: <code>`"\"`</code>, <code> `"\\"` </code>, <code> `"\\\"` </code><br /> 뭐가 문제인지 모르겠는데, 백슬래쉬가 코드같이 표시되었다 말았다 한다. ticktack(<code> \` </code>)으로 감싸져있으면 코드라고 봐주시길 바란다. <br /> <br /> 2. <code> "' </code>를 어떻게 match할 건지?
+<details> <summary>14.3.1.1 Exercises sol</summary> 1. <br /> <br /> 2.
 
 ``` r
 x <- "asdf\"'\\"
@@ -288,7 +294,7 @@ str_view(x, "\"\'\\\\")
 # str_view(x, "\"'\\\\") 이것도 되네
 ```
 
-<img src="https://github.com/philyoun/portfolio/blob/master/docs/R%20for%20Data%20Science/14-Strings_files/14.3.1-5.png?raw=true" alt="14.3.1-5"> <br /> <br /> 3. 어떤 패턴이 <code>......</code>라는 정규표현식에 match가 될지? 이걸 어떻게 string으로 표현할건지? <br /> (진짜 .) + any character + (진짜 .) + any character + (진짜 .) + any character 같은 정규표현식을 match가능. <br /> <br /> string으로는 <code>"\\..\\..\\.."</code> 이렇게 써야겠지? <br />
+<img src="https://github.com/philyoun/portfolio/blob/master/docs/R%20for%20Data%20Science/14-Strings_files/14.3.1-5.png?raw=true" alt="14.3.1-5"> <br /> <br /> 3. (진짜 .) + any character + (진짜 .) + any character + (진짜 .) + any character 같은 정규표현식을 match가능. <br /> <br /> string으로는 <code>"\\..\\..\\.."</code> 이렇게 써야겠지? <br />
 
 ``` r
 str_view(".a.b.c", "\\..\\..\\..")
