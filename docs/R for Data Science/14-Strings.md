@@ -525,9 +525,9 @@ str_view(fruit, "(..)\\1", match = TRUE)
 
 <br /> <br />
 
-<details> <summary>14.3.5.1 Exercises sol</summary> 1. <br /> 1번. 똑같은 문자가 3번 연속으로 나와야함. 예를 들어, "aaa" <br /> 2번. 한 쌍의 문자들이, 상반된 순서로 나와야한다. 그러니깐, "abba" 같이. <br /> 3번. 두 개의 문자들이 연속으로 2번 나와야함. "a1a1" <br /> 4번. 원하는 문자 하나 + any character + 처음 그 문자 하나 + any character + 처음 그 문자 하나. <br /> 예를 들어, "abaca", "b8b.b" <br /> 5번. 이제 이걸 이해하면 다 이해했다고 볼 수 있다. <br /> 처음 (.)은 <code>\\1</code>로, 두 번째 (.)는 <code>\\2</code>로, 세 번째 (.)는 <code>\\3</code>으로 refer되는 거다. <br /> 그리고 가운데는 .\*니깐 0 or more. <br /> 그래서 예를 들어보면, "abccba", "abc1cba" 혹은 "abcsgasgddsadgsdgcba" 다 되는 것.
+<details> <summary>14.3.5.1 Exercises sol</summary> 1. <br /> 1번. 똑같은 문자가 3번 연속으로 나와야함. 예를 들어, "aaa" <br /> 2번. 한 쌍의 문자들이, 상반된 순서로 나와야한다. 그러니깐, "abba" 같이. <br /> 3번. 두 개의 문자들이 연속으로 2번 나와야함. "a1a1" <br /> 4번. 원하는 문자 하나 + any character + 처음 그 문자 하나 + any character + 처음 그 문자 하나. <br /> 예를 들어, "abaca", "b8b.b" <br /> 5번. 이제 이걸 이해하면 다 이해했다고 볼 수 있다. <br /> 처음 (.)은 <code>\\1</code>로, 두 번째 (.)는 <code>\\2</code>로, 세 번째 (.)는 <code>\\3</code>으로 refer되는 거다. <br /> 그리고 가운데는 .*니깐 0 or more. <br /> 그래서 예를 들어보면, "abccba", "abc1cba" 혹은 "abcsgasgddsadgsdgcba" 다 되는 것. <br /> <br /> 2. <br /> 1번. <code>`^(.).*\1$`</code>라고 생각했는데, "a"는 포함이 안 된다. "a"도 조건에 만족하는 단어인데, 꼭 시작과 끝을 명시해놔서 안 잡히는듯. <br /> 정답은 <code>'^(.)((.*$)|\\1?$)\`</code> <br />
 
-1.  <br /> 1번. <code>`^(.).*\1$`</code>라고 생각했는데, "a"는 포함이 안 된다. "a"도 조건에 만족하는 단어인데, 꼭 시작과 끝을 명시해놔서 안 잡히는듯. <br /> 정답은 <code>'^(.)((.\*$)|\\1?$)\`</code> <br /> <br /> <br /> 2번.
+2번. <code>`(..).*\1`</code>, 솔루션 페이지에는 <code>`"([A-Za-z][A-Za-z]).*\\1"`</code>라고 되어있음. 결과는 같음. <br /> 3번. <code>`(.).*\1.*\1`</code>
 
 <br />
 
