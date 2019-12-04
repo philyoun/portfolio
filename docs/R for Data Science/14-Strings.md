@@ -540,7 +540,7 @@ str_view(fruit, "(..)\\1", match = TRUE)
 이제 정규표현식의 기본들에 대해 다 배웠으니, 현실 문제에 적용해보자. <br /> 이 섹션에서는 stringr 함수들이 다음과 같은 많은 것들을 해준다는걸 볼 것이다.
 
 -   어떤 strings가 패턴을 match하는지를 알려줌. `str_detect()`
--   matches의 position을 찾아줌.
+-   matches의 position을 찾아줌. `str_locate()`
 -   matches의 내용물들을 추출해줌. `str_extract()`
 -   matches를 새로운 값들로 대체해줌. `str_replace()`
 -   match를 기준으로 string을 split해줌. `str_split()`
@@ -640,7 +640,7 @@ r\\]|\\.)*\](?:(?:\r\n)?[ \t])*)(?:\.(?:(?:\r\n)?[ \t])*(?:[^()<>@,;:\\".\[\]
 
 ### 14.4.1 Detect matches
 
-character vector가 패턴을 match하는지를 확인하기 위해서는, `str_detect()`를 사용하면 된다. input과 같은 길이인, logical vector를 return한다.
+character vector가 패턴을 match하는지를 확인하기 위해서는, `str_detect()`를 사용하면 된다. <br /> input과 같은 길이인, logical vector를 return한다.
 
 ``` r
 x <- c("apple", "banana", "pear")
@@ -648,7 +648,7 @@ str_detect(x, "e")
 ## [1]  TRUE FALSE  TRUE
 ```
 
-numeric한 문맥에 logical vector를 사용할 때에는, `FALSE`는 0으로, `TRUE`는 1이 된다는 걸 기억하자. 이렇기 때문에, `sum()`과 `mean()`은 유용해진다. 특히 큰 벡터에 matches가 얼마나 있는지를 파악할 때.
+numeric한 문맥에 logical vector를 사용할 때에는, `FALSE`는 0으로, `TRUE`는 1이 된다는 걸 기억하자. <br /> 이렇기 때문에, `sum()`과 `mean()`은 유용해진다. 특히 큰 벡터에 matches가 얼마나 있는지를 파악할 때.
 
 ``` r
 # t로 시작하는, 자주 사용하는 단어들은 몇 개나 될까?
@@ -664,9 +664,9 @@ mean(str_detect(words, "[aeiou]$"))
 ## [1] 0.2765306
 ```
 
-조금 복잡한 logical 조건들을 표현해야 할 때(예를 들어 a 나 b를 match하지만, d 하지 않은 이상 c는 match하지 않아야), 하나의 정규표현식으로 나타내려고 애쓰지 말고, 여러 개의 `str_detect()`을 결합하면 더 쉽다.
+조금 복잡한 logical 조건들을 표현해야 할 때(예를 들어 a 나 b를 match하지만, d 하지 않은 이상 c는 match하지 않아야), <br /> 하나의 정규표현식으로 나타내려고 애쓰지 말고, <br /> 여러 개의 `str_detect()`을 결합하면 더 쉽다.
 
-예를 들어, 아무런 모음도 포함하지 않은 words를 찾자고 할 때, 2가지 방법이 있다.
+예를 들어, <br /> 아무런 모음도 포함하지 않은 words를 찾자고 할 때, 2가지 방법이 있다.
 
 ``` r
 # 최소한 하나의 모음을 가진 words를 다 찾고, 부정하는 방법
@@ -677,9 +677,9 @@ identical(no_vowels_1, no_vowels_2)
 ## [1] TRUE
 ```
 
-이 둘의 결과는 같지만, 첫 번째 방법이 훨씬 이해하기 쉽다고 생각한다. 정규표현식이 너무 복잡해지면, 작은 조각들로 나누어볼 생각하고, 각 조각들에 이름을 붙여주고, logical operations를 통해 조각들을 연결하자.
+이 둘의 결과는 같지만, 첫 번째 방법이 훨씬 이해하기 쉽다고 생각한다. <br /> 정규표현식이 너무 복잡해지면, 작은 조각들로 나누어볼 생각하고, 각 조각들에 이름을 붙여주고, logical operations를 통해 조각들을 연결하자.
 
-`str_detect()`의 흔한 사용법으로는, 다음과 같이 패턴을 match하는 elements를 선택하는데 쓰는 것.
+`str_detect()`의 흔한 사용법으로는, 다음과 같1이 패턴을 match하는 elements를 선택하는데 쓰는 것.
 
 ``` r
 words[str_detect(words, "x$")]
@@ -712,7 +712,7 @@ df %>%
 ## 4 tax     841
 ```
 
-`str_detect()`의 다른 변형으로는 `str_count()`가 있다. 단순히 yes or no가 아니라, 하나의 string안에 몇 개의 matches가 있는지를 알려준다.
+`str_detect()`의 다른 변형으로는 `str_count()`가 있다. <br /> 단순히 yes or no가 아니라, 하나의 string안에 몇 개의 matches가 있는지를 알려준다.
 
 ``` r
 x <- c("apple", "banana", "pear")
@@ -752,7 +752,7 @@ df %>%
 ## # ... with 970 more rows
 ```
 
-matches는 절대로 overlap하지 않는다는 것을 인지하자. 예를 들어, "abababa"라는 string에 "aba"라는 패턴은 몇 번이나 match가 될까? 정규표현식은 3번이 아닌, 2번이라고 한다.
+matches는 절대로 overlap하지 않는다는 것을 인지하자. <br /> 예를 들어, "abababa"라는 string에 "aba"라는 패턴은 몇 번이나 match가 될까? <br /> 정규표현식은 3번이 아닌, 2번이라고 한다.
 
 ``` r
 str_count("abababa", "aba")
@@ -763,8 +763,314 @@ str_count("abababa", "aba")
 str_view_all("abababa", "aba")
 ```
 
-\[14.4.1\] `str_view_all()`의 사용법을 인지하자. 곧 배우게 될텐데, 많은 stringr 함수들은 짝을 짓는다. 하나는 single match, 다른 하나는 모든 matches. 그리고 후자는 `_all`이라는 suffix가 붙는다.
+![14.4.1-1](https://github.com/philyoun/portfolio/blob/master/docs/R%20for%20Data%20Science/14-Strings_files/14.4.1-1.png?raw=true)
+
+`str_view_all()`의 사용법을 인지하자. <br /> 곧 배우게 될텐데, 많은 stringr 함수들은 짝을 짓는다. <br /> 하나는 single match, 다른 하나는 모든 matches. <br /> 그리고 후자는 `_all`이라는 suffix가 붙는다.
 
 #### 14.4.1.1 Exercises
 
 ### 14.4.2 Extract matches
+
+match가 된 실제의 text를 추출하고 싶다면, `str_extract()`를 쓰자. <br /> 효과를 확실히 보기 위해서, 좀 더 복잡한 예를 써보자. <br /> VOIP 시스템을 테스트하기 위해 개발된, [Harvard sentences](https://en.wikipedia.org/wiki/Harvard_sentences)를 사용할 건데, 정규표현식 연습하기에도 유용. <br /> `stringr::sentences`로 제공되어 있다.
+
+``` r
+length(sentences)
+## [1] 720
+head(sentences)
+## [1] "The birch canoe slid on the smooth planks." 
+## [2] "Glue the sheet to the dark blue background."
+## [3] "It's easy to tell the depth of a well."     
+## [4] "These days a chicken leg is a rare dish."   
+## [5] "Rice is often served in round bowls."       
+## [6] "The juice of lemons makes fine punch."
+```
+
+sentences들 중에, colour를 포함하고 있는 모든 sentences를 찾고 싶다치자. <br /> 먼저 colour 이름들의 벡터를 만들고, 하나의 정규표현식으로 만들 수가 있을 것이다.
+
+``` r
+colours <- c("red", "orange", "yellow", "green", "blue", "purple")
+colour_match <- str_c(colours, collapse = "|")
+colour_match
+## [1] "red|orange|yellow|green|blue|purple"
+```
+
+이제 sentences에서 colour를 갖고 있는 것들을 선택할 수 있다. <br /> 그리고 어떤 colour인지를 확인할 수 있도록, 추출가능.
+
+``` r
+has_colour <- str_subset(sentences, colour_match)
+matches <- str_extract(has_colour, colour_match)
+head(matches)
+## [1] "blue" "blue" "red"  "red"  "red"  "blue"
+```
+
+`str_extract()`는 첫 번째 match만을 추출해내는 것을 인지하자. <br /> 1개 보다 많은 match를 가진 모든 문장들을 골라냄으로써 이걸 확인할 수 있다.
+
+``` r
+more <- sentences[str_count(sentences, colour_match) > 1]
+str_view_all(more, colour_match)
+```
+
+![14.4.2-1](https://github.com/philyoun/portfolio/blob/master/docs/R%20for%20Data%20Science/14-Strings_files/14.4.2-1.png?raw=true)
+
+``` r
+more <- sentences[str_count(sentences, colour_match) > 1]
+str_extract(more, colour_match)
+## [1] "blue"   "green"  "orange"
+```
+
+stringr 함수들의 흔한 패턴이다. <br /> 왜냐하면, 하나의 match와 작업하는건 더 단순한 데이터 구조를 사용하도록 허용해줌. <br /> 모든 matches를 얻고 싶다면, `str_extract_all()`을 사용하자. 이럼 리스트를 얻게 된다.
+
+``` r
+str_extract_all(more, colour_match)
+## [[1]]
+## [1] "blue" "red" 
+## 
+## [[2]]
+## [1] "green" "red"  
+## 
+## [[3]]
+## [1] "orange" "red"
+```
+
+lists와 iteration에서, 리스트들에 대해 더 배우게 될 것. <br /> `simplify = TRUE`라는 옵션을 사용하면, `str_extract_all()`은 최대한 가장 긴 길이로 매트릭스를 return한다.
+
+``` r
+str_extract_all(more, colour_match, simplify = TRUE)
+##      [,1]     [,2] 
+## [1,] "blue"   "red"
+## [2,] "green"  "red"
+## [3,] "orange" "red"
+x <- c("a", "a b", "a b c")
+str_extract_all(x, "[a-z]", simplify = TRUE)
+##      [,1] [,2] [,3]
+## [1,] "a"  ""   ""  
+## [2,] "a"  "b"  ""  
+## [3,] "a"  "b"  "c"
+```
+
+#### 14.4.2.1 Exercises
+
+### 14.4.3 Grouped matches
+
+이 chapter의 초반에서, 괄호들을 사용하는 법으로, 1. 우선순위를 명확히, 2. 역참조backreferences를 사용하는 법 <br /> complex match의 부분들을 추출하는데 있어 괄호들을 쓸 수도 있다. <br /> 예를 들어, sentences에서 명사nouns를 추출하고 싶다고 가정하자. <br /> 경험적으로, "a"나 "the" 다음에 나오는 단어를 생각해볼 수 있음.
+
+이 "단어word"라는 걸 정규표현식에서 정의하는건 약간 까다롭다. <br /> 그래서 약간 근사approx.를 썼다. <br /> "a"나 "the" 뒤에 나오는 공백이 아닌 하나 이상의 character들의 sequence.
+
+``` r
+noun <- "(a|the) ([^ ]+)"
+
+has_noun <- sentences %>% 
+    str_subset(noun) %>%
+    head(10)
+
+has_noun %>%
+    str_extract(noun)
+##  [1] "the smooth" "the sheet"  "the depth"  "a chicken"  "the parked"
+##  [6] "the sun"    "the huge"   "the ball"   "the woman"  "a helps"
+```
+
+`str_extract()`는 완전한 match를 준다. <br /> `str_match()`는 개별적인 component를 준다. <br /> 하나의 character vector 대신에, matrix를 return. <br /> 이 matrix는 하나의 칼럼엔 complete match, 그리고 각 칼럼에 each group.
+
+``` r
+has_noun %>%
+    str_match(noun)
+##       [,1]         [,2]  [,3]     
+##  [1,] "the smooth" "the" "smooth" 
+##  [2,] "the sheet"  "the" "sheet"  
+##  [3,] "the depth"  "the" "depth"  
+##  [4,] "a chicken"  "a"   "chicken"
+##  [5,] "the parked" "the" "parked" 
+##  [6,] "the sun"    "the" "sun"    
+##  [7,] "the huge"   "the" "huge"   
+##  [8,] "the ball"   "the" "ball"   
+##  [9,] "the woman"  "the" "woman"  
+## [10,] "a helps"    "a"   "helps"
+```
+
+(당연히, 우리가 사용한 명사noun 찾기 방법은 형편없다. smooth나 parked와 같은 형용사들도 나옴.)
+
+만약 data가 tibble안에 있다면, `tidyr::extract()`를 사용하는게 더 쉬울 수 있다. <br /> `str_match()`와 비슷하게 작동하는데, matches를 이름 붙여줄 필요가 있다. 새로운 칼럼들에 사용되는.
+
+``` r
+tibble(sentence = sentences) %>%
+    tidyr::extract(
+        sentence, c("article", "noun"), "(a|the) ([^ ]+)",
+        remove = FALSE
+    )
+## # A tibble: 720 x 3
+##    sentence                                    article noun   
+##    <chr>                                       <chr>   <chr>  
+##  1 The birch canoe slid on the smooth planks.  the     smooth 
+##  2 Glue the sheet to the dark blue background. the     sheet  
+##  3 It's easy to tell the depth of a well.      the     depth  
+##  4 These days a chicken leg is a rare dish.    a       chicken
+##  5 Rice is often served in round bowls.        <NA>    <NA>   
+##  6 The juice of lemons makes fine punch.       <NA>    <NA>   
+##  7 The box was thrown beside the parked truck. the     parked 
+##  8 The hogs were fed chopped corn and garbage. <NA>    <NA>   
+##  9 Four hours of steady work faced us.         <NA>    <NA>   
+## 10 Large size in stockings is hard to sell.    <NA>    <NA>   
+## # ... with 710 more rows
+```
+
+`str_extract()`와 마찬가지로, 각 string에 대해 모든 match들을 얻고 싶다면, `str_match_all()`을 사용하자.
+
+#### 14.4.3.1 Exercises
+
+### 14.4.4 Replacing matches
+
+matches를 새로운 strings로 대체하는데 쓰는 것, `str_replace()`, `str_replace_all()` <br /> 가장 쉬운 사용법은 pattern을 고정된 string으로 대체하는 것.
+
+``` r
+x <- c("apple", "pear", "banana")
+str_replace(x, "[aeiou]", "-")
+## [1] "-pple"  "p-ar"   "b-nana"
+str_replace_all(x, "[aeiou]", "-")
+## [1] "-ppl-"  "p--r"   "b-n-n-"
+```
+
+`str_replace_all()`을 사용할 때는, named vector를 줘서, 여러 개의 대체도 가능하다.
+
+``` r
+x <- c("1 house", "2 cars", "3 people")
+str_replace_all(x, c("1" = "one", "2" = "two", "3" = "three"))
+## [1] "one house"    "two cars"     "three people"
+```
+
+고정된 string을 대체하는 것 대신에, 역참조backreferences를 사용해 일치하는 구성요소components를 삽입할 수 있다. <br /> 다음의 코드에서, 2번째와 3번째 단어들의 순서를 바꿔 보았다.
+
+``` r
+sentences %>%
+  str_replace("([^ ]+) ([^ ]+) ([^ ]+)", "\\1 \\3 \\2") %>%
+    head(5)
+## [1] "The canoe birch slid on the smooth planks." 
+## [2] "Glue sheet the to the dark blue background."
+## [3] "It's to easy tell the depth of a well."     
+## [4] "These a days chicken leg is a rare dish."   
+## [5] "Rice often is served in round bowls."
+```
+
+#### 14.4.4.1 Exercises
+
+### 14.4.5 Splitting
+
+string을 조각들로 쪼개고split 싶다면, `str_split()`을 사용하자. <br /> 예를 들어, sentences를 words로 쪼갤 수 있다.
+
+``` r
+sentences %>%
+    head(5) %>%
+    str_split(" ")
+## [[1]]
+## [1] "The"     "birch"   "canoe"   "slid"    "on"      "the"     "smooth" 
+## [8] "planks."
+## 
+## [[2]]
+## [1] "Glue"        "the"         "sheet"       "to"          "the"        
+## [6] "dark"        "blue"        "background."
+## 
+## [[3]]
+## [1] "It's"  "easy"  "to"    "tell"  "the"   "depth" "of"    "a"     "well."
+## 
+## [[4]]
+## [1] "These"   "days"    "a"       "chicken" "leg"     "is"      "a"      
+## [8] "rare"    "dish."  
+## 
+## [[5]]
+## [1] "Rice"   "is"     "often"  "served" "in"     "round"  "bowls."
+```
+
+각각의 요소component들이 다른 수의 조각들을 갖고 있을 수 있기 때문에, list를 return한다. <br /> 만약 여러 개가 아니고 하나의 vector만을 쪼갤거라면, list의 첫 번째 element만 추출하는게 가장 쉬울 것이다.
+
+``` r
+"a|b|c|d" %>%
+    str_split("\\|") %>%
+    .[[1]]
+## [1] "a" "b" "c" "d"
+```
+
+또, 다른 stringr 함수들과 마찬가지로, `simplify = TRUE` 옵션을 사용해서 list 대신 matrix가 return되도록 할 수도 있다.
+
+``` r
+sentences %>%
+    head(5) %>%
+    str_split(" ", simplify = TRUE)
+##      [,1]    [,2]    [,3]    [,4]      [,5]  [,6]    [,7]    
+## [1,] "The"   "birch" "canoe" "slid"    "on"  "the"   "smooth"
+## [2,] "Glue"  "the"   "sheet" "to"      "the" "dark"  "blue"  
+## [3,] "It's"  "easy"  "to"    "tell"    "the" "depth" "of"    
+## [4,] "These" "days"  "a"     "chicken" "leg" "is"    "a"     
+## [5,] "Rice"  "is"    "often" "served"  "in"  "round" "bowls."
+##      [,8]          [,9]   
+## [1,] "planks."     ""     
+## [2,] "background." ""     
+## [3,] "a"           "well."
+## [4,] "rare"        "dish."
+## [5,] ""            ""
+```
+
+조각들의 최대 개수를 요청할 수도 있다.
+
+``` r
+fields <- c("Name: Hadley", "Country: NZ", "Age: 35")
+fields %>% str_split(": ", n = 2, simplify = TRUE)
+##      [,1]      [,2]    
+## [1,] "Name"    "Hadley"
+## [2,] "Country" "NZ"    
+## [3,] "Age"     "35"
+```
+
+strings를 pattern으로 쪼개는 것 대신, character, line, sentence, word로 쪼갤 수도 있다.
+
+``` r
+x <- "This is a sentence. This is another sentence."
+str_view_all(x, boundary("word"))
+```
+
+![14.4.5-1](https://github.com/philyoun/portfolio/blob/master/docs/R%20for%20Data%20Science/14-Strings_files/14.4.5-1.png?raw=true)
+
+``` r
+str_split(x, " ")[[1]]
+## [1] "1"     "house"
+str_split(x, boundary("word"))[[1]]
+## [1] "1"     "house"
+```
+
+character, line, sentence로 하나하나씩 해보면서 각각 뭐하는 역할인지 확인해보자.
+
+#### 14.4.5.1 Exercises
+
+### 14.4.6 Find matches
+
+`str_locate()`와 `str_locate_all()`은 각 match의 시작 포인트, 끝나는 포인트를 알려준다. <br /> 이건 특히나, 다른 어떤 함수들도 원하는걸 해주지 않을 때 유용하다. `str_locate()`로 matching pattern을 찾을 수도 있고, `str_sub()`로 그걸 추출하거나 수정할 수도 있다.
+
+``` r
+sentences[[1]]
+## [1] "The birch canoe slid on the smooth planks."
+sentences[[2]]
+## [1] "Glue the sheet to the dark blue background."
+```
+
+``` r
+str_locate(sentences[[1]], "i")
+##      start end
+## [1,]     6   6
+str_locate_all(sentences[[1]], "i")
+## [[1]]
+##      start end
+## [1,]     6   6
+## [2,]    19  19
+
+# pattern으로 match
+str_locate(sentences[[1]], "[^ ]+")
+##      start end
+## [1,]     1   3
+```
+
+14.5 Other types of pattern
+---------------------------
+
+14.6 Other uses of regular expressions
+--------------------------------------
+
+14.7 Stringi
+------------
