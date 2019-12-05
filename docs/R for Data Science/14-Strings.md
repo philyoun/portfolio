@@ -1041,7 +1041,7 @@ character, line, sentence로 하나하나씩 해보면서 각각 뭐하는 역�
 
 ### 14.4.6 Find matches
 
-`str_locate()`와 `str_locate_all()`은 각 match의 시작 포인트, 끝나는 포인트를 알려준다. <br /> 이건 특히나, 다른 어떤 함수들도 원하는걸 해주지 않을 때 유용하다. `str_locate()`로 matching pattern을 찾을 수도 있고, `str_sub()`로 그걸 추출하거나 수정할 수도 있다.
+`str_locate()`와 `str_locate_all()`은 각 match의 시작 포인트, 끝나는 포인트를 알려준다. <br /> 이건 특히나, 다른 어떤 함수들도 원하는걸 해주지 않을 때 유용하다. <br /> `str_locate()`로 matching pattern을 찾을 수도 있고, `str_sub()`로 그걸 추출하거나 수정할 수도 있다.
 
 ``` r
 sentences[[1]]
@@ -1069,8 +1069,189 @@ str_locate(sentences[[1]], "[^ ]+")
 14.5 Other types of pattern
 ---------------------------
 
+pattern을, string의 형식으로 사용할 때, 사실 `regex()`를 자동으로 사용하고 있는 것이다. <br /> 그러니까 `str_view(fruit, "nana")`라고 하면, 이건 사실 `str_view(fruit, regex("nana"))`를 쓰고 있는 것.
+
+match의 디테일을 위해, `regex()`의 다른 인자들arguments을 사용할 수도 있다.
+
+-   `ignore_case = TRUE`라고 하면, 대문자든 소문자든 다 match해줌. <br /> 이건 current locale을 사용하고 있어서, 뭐 필요하면 명시를해줘야 하는듯.
+
+``` r
+bananas <- c("banana", "Banana", "BANANA")
+str_view(bananas, "banana")
+```
+
+![14.5-1](https://github.com/philyoun/portfolio/blob/master/docs/R%20for%20Data%20Science/14-Strings_files/14.5-1.png?raw=true)
+
+``` r
+str_view(bananas, regex("banana", ignore_case = TRUE))
+```
+
+![14.5-2](https://github.com/philyoun/portfolio/blob/master/docs/R%20for%20Data%20Science/14-Strings_files/14.5-2.png?raw=true)
+
+-   `multiline = TRUE`라고 하면, 각 라인에서 start와 end를 match해줌. complete string이 아니라.
+
+``` r
+x <- "Line 1\nLine 2\nLine 3"
+str_extract_all(x, "^Line")[[1]]
+## [1] "Line"
+str_extract_all(x, regex("^Line", multiline = TRUE))[[1]]
+## [1] "Line" "Line" "Line"
+```
+
+-   `comments = TRUE`라고 하면, 복잡한 정규표현식을 만들 때, comments랑 공백들을 사용할 수 있도록 해줌. <br /> 공백들은 무시되고, \# 다음에 나오는 것들도 무시됨. <br /> 만약 literal 하게 space를 match하고 싶다면, escape해야한다. `"\\ "` 이렇게
+
+``` r
+phone <- regex("
+  \\(?     # optional opening parens
+  (\\d{3}) # area code
+  [) -]?   # optional closing parens, space, or dash
+  (\\d{3}) # another three numbers
+  [ -]?    # optional space or dash
+  (\\d{3}) # three more numbers
+  ", comments = TRUE)
+
+str_match("514-791-8141", phone)
+##      [,1]          [,2]  [,3]  [,4] 
+## [1,] "514-791-814" "514" "791" "814"
+```
+
+근데 이 예에서는 띄어쓰기를 escape하지 않았다. <br /> 그런데 escape해도 결과는 같게 나옴. 직접 해보셈.
+
+-   `dotall = TRUE`라고 하면, `.`가 `\n`도 포함한 모든걸 match하게 된다. <br /> 예를 들어,
+
+``` r
+"a\nb\nc"
+## [1] "a\nb\nc"
+writeLines("a\nb\nc")
+## a
+## b
+## c
+str_extract_all("a\nb\nc", regex("a.", dotall= TRUE))
+## [[1]]
+## [1] "a\n"
+```
+
+`regex()` 대신에 쓸 수 있는 함수들이 총 3개가 있다. <br /> `fixed()`, `coll()`, `boundary()`
+
+-   `fixed()`: 명시된 sequence of bytes만을 정확하게 match함. <br /> 다른 특별한 정규표현식들은 다 무시하고, 매우 낮은 레벨에서 작동한다. <br /> 그래서 복잡한 escaping을 피할 수 있도록 해주고, 다른 것들보다 훨씬 빠르다. <br /> microbenchmark는 3x 배 정도 더 빠르다는 것을 보여준다.
+
+``` r
+microbenchmark::microbenchmark(
+  fixed = str_detect(sentences, fixed("the")),
+  regex = str_detect(sentences, "the"),
+  times = 20
+)
+## Unit: microseconds
+##   expr   min     lq    mean median    uq    max neval
+##  fixed  88.3  91.95 152.930   98.4 104.2 1168.1    20
+##  regex 253.4 257.30 314.425  271.1 321.3  601.3    20
+```
+
+non-English 데이터에 대해 `fixed()`를 사용할 때는 조심하자. <br /> 가끔, 같은 캐릭터를 표현하는데 있어 여러가지 방법이 있기 때문. <br /> 예를 들어, “á”를 정의하는데 있어 2가지 방법이 있다. <br /> single character로 정의하거나, 혹은 "a"에다 accent를 더해서 정의하거나.
+
+``` r
+a1 <- "\u00e1"
+a2 <- "a\u0301"
+c(a1, a2)
+## [1] "a" "a<U+0301>"
+a1 == a2
+## [1] FALSE
+```
+
+똑같은걸 제공하는데, 다르게 정의가 되었기 때문에, `fixed()`는 match를 찾지 못한다. <br /> 대신, 다음에 나오는 `coll()`을 사용할 수 있다. 얘는 respect human character comparison rules.
+
+``` r
+str_detect(a1, fixed(a2))
+## [1] FALSE
+str_detect(a1, coll(a2))
+## [1] TRUE
+```
+
+-   `coll()`은 standard 대조**collation** rules를 사용해서 strings를 비교한다. <br /> 대소 문자를 구분하지 않는 match를 찾는데 유용. <br /> `coll()`은 locale 파라미터를 받고, 이게 character 비교를 하는데 있어 룰이 됨.
+
+``` r
+i <- c("I", "İ", "i", "ı")
+i
+## [1] "I"        "<U+0130>" "i"        "ı"
+str_subset(i, coll("i", ignore_case = TRUE))
+## [1] "I" "i"
+str_subset(i, coll("i", ignore_case = TRUE, locale = "tr"))
+## [1] "i"
+```
+
+터키에선 i의 대문자가 İ.
+
+`fixed()`와 `regex()` 둘 다 `ignore_case`라는 인자argument를 갖는다. <br /> 하지만, locale을 정할 수는 없다. <br /> 항상 디폴트 locale을 써야함. 위의 `coll()`과는 다르게.
+
+이 locale이 뭔지를 `stringi::stri_locale_info()`를 통해 알 수 있다.
+
+``` r
+stringi::stri_locale_info()
+## $Language
+## [1] "ko"
+## 
+## $Country
+## [1] "KR"
+## 
+## $Variant
+## [1] ""
+## 
+## $Name
+## [1] "ko_KR"
+```
+
+`coll()`의 단점은 스피드. <br /> 어떤 캐릭터들이 같은지를 인지하는 법칙은 복잡하기 때문에, `coll()`은 `regex()`나 `fixed()`에 비해 느리다.
+
+-   `str_split()`에서 봤듯이, `boundary()`로 경계boundaries를 match할 수 있었다. <br /> 이걸 다른 함수들에도 사용할 수 있다.
+
+``` r
+x <- "This is a sentence."
+str_view_all(x, boundary("word"))
+```
+
+![14.5-3](https://github.com/philyoun/portfolio/blob/master/docs/R%20for%20Data%20Science/14-Strings_files/14.5-3.png?raw=true)
+
+``` r
+str_extract_all(x, boundary("word"))
+## [[1]]
+## [1] "Line" "1"    "Line" "2"    "Line" "3"
+```
+
+### 14.5.1 Exercises
+
 14.6 Other uses of regular expressions
 --------------------------------------
 
+base R에서 정규표현식을 사용하는 2가지 유용한 함수들이 있다. <br /> `apropos()`, `dir()`
+
+1.  `apropos()`는 global env에서 사용가능한 오브젝트들을 다 찾아준다. <br /> 함수 이름을 까먹었을 때 상당히 유용할 듯.
+
+``` r
+apropos("replace")
+## [1] "%+replace%"       "replace"          "replace_na"      
+## [4] "setReplaceMethod" "str_replace"      "str_replace_all" 
+## [7] "str_replace_na"   "theme_replace"
+```
+
+1.  `dir()`는 디렉터리의 모든 파일들을 찾아준다. <br /> 여기서 `pattern` 인자argument가 정규표현식을 받고, 이 pattern과 match되는 파일 이름들을 return한다. <br /> 예를 들어, 다음과 같이 현재 디렉터리의 모든 Rmd(R markdown)파일들을 찾을 수 있다.
+
+``` r
+setwd("C:\\Users\\Phil2\\Documents\\portfolio\\docs\\R for Data Science")
+head(dir(pattern = "\\.Rmd$"))
+## [1] "03-Data Visualisation.Rmd" "11-Data Import.Rmd"       
+## [3] "12-Tidy data.Rmd"          "13-Relational data.Rmd"   
+## [5] "14-Strings.Rmd"            "15-Factors.Rmd"
+```
+
+`*.Rmd`와 같이 "globs"를 쓰는게 더 편하다면, `glob2rx()`를 사용해서 정규표현식을 바꿀 수 있다. <br /> 예를 들어, 위의 코드를 `head(dir(pattern = glob2rx("*.Rmd$")))`로도 할 수 있는 것.
+
 14.7 Stringi
 ------------
+
+stringr은 **stringi** 패키지를 바탕으로 만들어졌다. <br /> stringr는 가장 일반적인 문자열 조작 기능을 처리하기 위해, 신중하게 선택된 최소한의 기능을 제공. <br /> 그래서 학습시 유용하다.
+
+그에 비해 stringi는 포괄적일 수 있도록 디자인되었다. <br /> 니가 필요할 거의 모든 함수를 다 가지고 있다. <br /> stringi는 234개, stringr은 46개의 함수들을 가지고 있음.
+
+stringr로 하다가 잘 안 될 때에는 stringi를 확인해볼만 하다. <br /> 이 패키지들은 매우 유사하게 작동하고, stringr에서 했던대로 하면 된다. <br /> 가장 큰 차이점은 접두사prefix의 차이다. `str_` 대신에 `stri_`
+
+### 14.7.1 Exercises
