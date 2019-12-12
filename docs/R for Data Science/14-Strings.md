@@ -82,7 +82,7 @@ c("one", "two", "three")
 
 base R에는 strings를 작업할 수 있는 여러가지 함수들이 있다. <br /> 근데 이것들은 일관적이지 않아서inconsistent 기억을 하기가 힘들다. <br /> 그렇기 때문에 사용하지 않을거다.
 
-대신에 stringr에 있는 함수들을 쓸 것이다. <br /> 이 함수들은 전부다 str\_로 시작하기 때문에 직관적인 이름들을 가지고 있다. <br /> 예를 들어, `str_length()`는 해당 string의 길이가 얼마나 되는지를 알려준다.
+대신에 stringr에 있는 함수들을 쓸 것이다. <br /> 이 함수들은 전부다 `str_`로 시작하기 때문에 직관적인 이름들을 가지고 있다. <br /> 예를 들어, `str_length()`는 해당 string의 길이가 얼마나 되는지를 알려준다.
 
 ``` r
 str_length(c("a", "R for data science", NA))
@@ -109,7 +109,7 @@ str_c("x", "y", sep = ", ")
 ## [1] "x, y"
 ```
 
-R의 다른 대부분의 함수들과 마찬가지로, 결측값missing values는 위험할 수 있다. <br /> 그냥 `"NA"` 그대로 프린트하고 싶다면, `str_replace_na()`을 사용하자.
+R의 다른 대부분의 함수들과 마찬가지로, 결측값missing values는 위험할 수 있다. <br /> 그냥 `"NA"` 그대로 프린트되길 원한다면, `str_replace_na()`을 사용하자.
 
 ``` r
 x <- c("abc", NA)
@@ -215,7 +215,7 @@ Regexps(이하 정규표현식)는 string에 있는 패턴을 묘사할 수 있�
 
 regular expressions(이하 정규표현식)를 배우기 위해서, `str_view()`와 `str_view_all()`를 사용할거다. <br /> 이 함수들은 character vector와 정규표현식을 받고, 어떻게 매치가 되는지를 보여줄거다.
 
-매우 간단한 정규표현식에서 시작해서, 점점 더 복잡해져갈 것이다. <br /> 이 패턴 매칭을 마스터하고 나면, 다양한 stringr 함수들에 어떻게 적용을 해야하는지 알 수 있다.
+매우 간단한 정규표현식에서 시작해서, 점점 더 복잡해져갈 것이다. <br /> 이 패턴 매칭을 마스터하고 나면, 다양한 stringr 함수들에 어떻게 적용을 해야하는지 알 수 있게 됨.
 
 ### 14.3.1 Basic matches
 
@@ -238,7 +238,7 @@ str_view(x, ".a.")
 
 하지만 만약 "`.`"이 any character을 매치시켜주는거라 할 때, 진짜 `.`을 매치하고 싶다면? <br /> escape을 사용하면 된다. <br /> strings와 마찬가지로, 정규표현식도 특별한 행동을 escape하기 위해, `\`라는 백슬래쉬를 쓴다.
 
-그래서 `.`을 매치하고 싶다면, `\.`을 사용하면 된다. 하지만 이러면 문제가 생긴다. <br /> 정규표현식을 표현하기 위해서 strings를 사용했는데, `\`는 strings에서 symbol을 escape하는데도 사용. <br /> 그래서 `\.`라는 정규표현식을 만들고 싶다면, `\\.`을 사용.
+그래서 `.`을 매치하고 싶다면, `\.`을 사용하면 된다. 하지만 이러면 문제가 생긴다. <br /> 정규표현식을 표현하기 위해서 문자열strings을 사용했는데, `\`는 strings에서 symbol을 escape하는데도 사용. <br /> 그래서 `\.`라는 정규표현식을 만들고 싶다면, `"\\."`라는 strings가 필요하다.
 
 ``` r
 dot <- "\\."
@@ -279,7 +279,7 @@ str_view(x, "\\\\")
 2.  `"'\`를 어떻게 match할 수 있을지? <br /> <br />
 3.  어떤 패턴이 `\..\..\..`라는 정규표현식에 match가 될지? 그리고 이걸 어떻게 string으로 표현할건지?
 
-<details> <summary>14.3.1.1 Exercises sol</summary> 1. <br /> <br /> 2.
+<details> <summary>14.3.1.1 Exercises sol</summary> 1. 패스 <br /> <br /> 2.
 
 ``` r
 x <- "asdf\"'\\"
@@ -300,7 +300,7 @@ str_view(".a.b.c", "\\..\\..\\..")
 
 <img src="https://github.com/philyoun/portfolio/blob/master/docs/R%20for%20Data%20Science/14-Strings_files/14.3.1-6.png?raw=true" alt="14.3.1-6"> <br /> </details>
 
-<br /> <br /> <br /> <br />
+<br /> <br />
 
 ### 14.3.2 Anchors
 
@@ -336,12 +336,12 @@ str_view(x, "^apple$")
 
 ![14.3.2-4](https://github.com/philyoun/portfolio/blob/master/docs/R%20for%20Data%20Science/14-Strings_files/14.3.2-4.png?raw=true)
 
-`\b`로 boundary 매치를 시킬수도 있다. <br /> 나는(Hadley는) R에서 이걸 자주 사용하지는 않는데, RStudio에서는 검색할 때 가끔 사용한다. <br /> 예를 들어, `\bsum\b`를 사용해서, `summarise`, `summary`, `rowsum` 등등이 검색되는걸 피할 수 있다.
+`\b`로 경계boundary 매치를 시킬수도 있다. <br /> 나는(Hadley는) R에서 이걸 자주 사용하지는 않는데, RStudio에서는 검색할 때 가끔 사용한다. <br /> 예를 들어, `\bsum\b`를 사용해서, `summarise`, `summary`, `rowsum` 등등이 검색되는걸 피할 수 있다.
 
 #### 14.3.2.1 Exercises
 
-1.  `"$^$"` 이 자체를 match하고 싶다면? string 사이에 <code>$^$</code>가 있을수도 있는건데, 그게 아니라 딱 이것만을 match하고 싶다면 string으로 어떻게 써야할까? <br /> <br />
-2.  `stringr::words`에는 단어들이 잔뜩 있다. 다음의 각 조건을 맞는 단어들을 찾아보라. <br />    1번. "y"로 시작하는 단어들? <br />    2번. "x"로 끝나는 단어들? <br />    3번. 정확하게 3개의 알파벳으로 구성(`str_length()` 쓰지 말고!)된 단어들? <br />    4번. 7개 이상의 알파벳들로 구성된 단어들? <br /> 해당되는 단어들은 많기 때문에, `str_view()`에 `match` argument를 사용해서 매칭되는 단어들만 표시하도록 할 수 있다.
+1.  `"$^$"` 이 자체를 match하고 싶다면? <br /> string 사이에 `$^$`가 있을수도 있는건데, 그게 아니라 딱 이것만을 match하고 싶다면 string으로 어떻게 써야할까? <br /> <br />
+2.  `stringr::words`에는 단어들이 잔뜩 있다. 다음의 각 조건을 맞는 단어들을 찾아보라. <br />    1번. "y"로 시작하는 단어들? <br />    2번. "x"로 끝나는 단어들? <br />    3번. 정확하게 3개의 알파벳으로 구성(`str_length()` 쓰지 말고!)된 단어들? <br />    4번. 7개 이상의 알파벳들로 구성된 단어들? <br /> 해당되는 단어들은 많기 때문에, `str_view()`에 `match` 인자argument를 사용해서 매칭되는 단어들만 표시하도록 할 수 있다.
 
 <details> <summary>14.3.2.1 Exercises sol</summary> 1.
 
@@ -397,7 +397,7 @@ str_view(words, ".......", match = TRUE)
 str_view(c("abc", "a.c", "a*c", "a c"), "a[.]c")
 ```
 
-![14.3.3-1](https://github.com/philyoun/portfolio/blob/master/docs/R%20for%20Data%20Science/14-Strings_files/14.3.3-1.png?raw=true)
+![14.3.3-1](https://github.com/philyoun/portfolio/blob/master/docs/R%20for%20Data%20Science/14-Strings_files/14.3.3-1.png?raw=true) 원래는 `str_view(c("abc", "a.c", "a*c", "a c"), "a\\.c")`라고 썼어야했는데, character class를 써서 더 읽기가 쉬워짐.
 
 ``` r
 str_view(c("abc", "a.c", "a*c", "a c"), ".[*]c")
@@ -423,7 +423,7 @@ str_view(c("grey", "gray"), "gr(e|a)y")
 
 #### 14.3.3.1 Exercises
 
-<br /> <br /> <details> <summary>14.3.3.1 Exercises sol</summary> </details> <br /> <br /> <br />
+<br /> <br /> <details> <summary>14.3.3.1 Exercises sol</summary> </details> <br /> <br />
 
 ### 14.3.4 Repetition
 
@@ -511,28 +511,33 @@ str_view(fruit, "(..)\\1", match = TRUE)
 
 ![14.3.5-1](https://github.com/philyoun/portfolio/blob/master/docs/R%20for%20Data%20Science/14-Strings_files/14.3.5-1.png?raw=true)
 
-그러니깐 뒤에 나오는 `\\1`은 앞에 나온 `(..)`를 refer하는거다. <br /> 그래서 즉, repeated pair of letters가 있는 걸 찾아준다.
+문자 두 개가 반복되는 걸 찾아준다. repeated pair of letters <br /> 그러니깐 뒤에 나오는 `\\1`은 앞에 나온 `(..)`를 refer하는거다.
 
-이건 특히나 exercises를 보면서 예제들을 보며 이해를 해보자.
+이건 특히나 exercises의 다른 예제들을 보며 이해를 해보자.
 
 #### 14.3.5.1 Exercises
 
 1.  다음의 expressions가 무엇을 match할지를 설명해보자. <br />    1번. `(.)\1\1` <br />    2번. `"(.)(.)\\2\\1"` <br />    3번. `(..)\1` <br />    4번. `"(.).\\1.\\1"` <br />    5번. `"(.)(.)(.).*\\3\\2\\1"` <br />
 
+1, 2번만 더 해보겠다. 3, 4, 5번은 해보셈. <br /> 1번은 `\1`이 `(.)`을 refer하는 것. <br /> 즉, 같은 어떤 문자가 3번 연속으로 나와야된다는 뜻. "aaa" 같이.
+
+2번은 `\1`은 첫 번째 `(.)`을, `\2`는 두 번째 `(.)`를 refer한다. <br /> 그래서 "abba"와 같이. 한 쌍의 문자들이, 상반된 순서로.
+
 어떤건 `\1`이고 어떤건 `\\1`이다. 일부러 저자가 이렇게 써놨는데, 잘 생각해보자.
 
-<!-- -->
 1.  다음의 각 조건을 match해주는 정규표현식을 구성해보자. <br />    1번. 하나의 같은 문자로 시작하고 끝나야하려면? <br />    2번. 반복되는 한 쌍의 문자를 갖고 있으려면? 예를 들어, "church"는 "ch"가 두 번 나온다. <br />    3번. 똑같은 문자가 최소 3번 나오려면? 예를 들어, "eleven"에서 "e"는 3번 나온다. <br />
 
 <br /> <br />
 
-<details> <summary>14.3.5.1 Exercises sol</summary> 1. <br /> 1번. 똑같은 문자가 3번 연속으로 나와야함. 예를 들어, "aaa" <br /> 2번. 한 쌍의 문자들이, 상반된 순서로 나와야한다. 그러니깐, "abba" 같이. <br /> 3번. 두 개의 문자들이 연속으로 2번 나와야함. "a1a1" <br /> 4번. 원하는 문자 하나 + any character + 처음 그 문자 하나 + any character + 처음 그 문자 하나. <br /> 예를 들어, "abaca", "b8b.b" <br /> 5번. 이제 이걸 이해하면 다 이해했다고 볼 수 있다. <br /> 처음 (.)은 <code>\\1</code>로, 두 번째 (.)는 <code>\\2</code>로, 세 번째 (.)는 <code>\\3</code>으로 refer되는 거다. <br /> 그리고 가운데는 .*니깐 0 or more. <br /> 그래서 예를 들어보면, "abccba", "abc1cba" 혹은 "abcsgasgddsadgsdgcba" 다 되는 것. <br /> <br /> 2. <br /> 1번. <code>`^(.).*\1$`</code>라고 생각했는데, "a"는 포함이 안 된다. "a"도 조건에 만족하는 단어인데, 꼭 시작과 끝을 명시해놔서 안 잡히는듯. <br /> 정답은 <code>'^(.)((.*$)|\\1?$)\`</code> <br />
+<details> <summary>14.3.5.1 Exercises sol</summary> 1. <br />    1번. 똑같은 문자가 3번 연속으로 나와야함. 예를 들어, "aaa" <br />    2번. 한 쌍의 문자들이, 상반된 순서로 나와야한다. 그러니깐, "abba" 같이. <br />    3번. 두 개의 문자들이 연속으로 2번 나와야함. "a1a1" <br />    4번. 원하는 문자 하나 + any character + 처음 그 문자 하나 + any character + 처음 그 문자 하나. <br />    예를 들어, "abaca", "b8b.b" <br />    5번. 이제 이걸 이해하면 다 이해했다고 볼 수 있다. <br />    처음 (.)은 <code>\\1</code>로, 두 번째 (.)는 <code>\\2</code>로, 세 번째 (.)는 <code>\\3</code>으로 refer되는 거다. <br />    그리고 가운데는 .*니깐 0 or more. <br />    그래서 예를 들어보면, "abccba", "abc1cba" 혹은 "abcsgasgddsadgsdgcba" 다 되는 것. <br /> <br /> 2. <br />    1번. <code>`^(.).*\1$`</code>라고 생각했는데, "a"라는 단어는 포함이 안 된다. <br />    "a"도 조건에 만족하는 단어인데, 꼭 시작과 끝을 명시해놔서 안 잡히는듯. <br />    정답은 <code>'^(.)((.*$)|\\1?$)\`</code> <br />
 
-2번. <code>`(..).*\1`</code>, 솔루션 페이지에는 <code>`"([A-Za-z][A-Za-z]).*\\1"`</code>라고 되어있음. 결과는 같음. <br /> 3번. <code>`(.).*\1.*\1`</code>
+   2번. <code>`(..).*\1`</code>, 솔루션 페이지에는 <code>`"([A-Za-z][A-Za-z]).*\\1"`</code>라고 되어있음. 결과는 같음. <br />    3번. <code>`(.).*\1.*\1`</code>
 
 <br />
 
-</details> <br /> <br /> <br />
+</details> <br /> <br />
+
+------------------------------------------------------------------------
 
 14.4 Tools
 ----------
@@ -648,7 +653,7 @@ str_detect(x, "e")
 ## [1]  TRUE FALSE  TRUE
 ```
 
-numeric한 문맥에 logical vector를 사용할 때에는, `FALSE`는 0으로, `TRUE`는 1이 된다는 걸 기억하자. <br /> 이렇기 때문에, `sum()`과 `mean()`은 유용해진다. 특히 큰 벡터에 matches가 얼마나 있는지를 파악할 때.
+numeric한 문맥에 logical vector를 사용할 때에는, `FALSE`는 0으로, `TRUE`는 1이 된다는 걸 기억하자. <br /> 이렇기 때문에, `sum()`과 `mean()`은 유용해진다. <br /> 특히 큰 벡터에 matches가 얼마나 있는지를 파악할 때.
 
 ``` r
 # t로 시작하는, 자주 사용하는 단어들은 몇 개나 될까?
@@ -679,14 +684,14 @@ identical(no_vowels_1, no_vowels_2)
 
 이 둘의 결과는 같지만, 첫 번째 방법이 훨씬 이해하기 쉽다고 생각한다. <br /> 정규표현식이 너무 복잡해지면, 작은 조각들로 나누어볼 생각하고, 각 조각들에 이름을 붙여주고, logical operations를 통해 조각들을 연결하자.
 
-`str_detect()`의 흔한 사용법으로는, 다음과 같1이 패턴을 match하는 elements를 선택하는데 쓰는 것.
+`str_detect()`의 흔한 사용법으로는, 다음과 같이 패턴을 match하는 elements를 선택하는데 쓰는 것.
 
 ``` r
 words[str_detect(words, "x$")]
 ## [1] "box" "sex" "six" "tax"
 ```
 
-이걸 그냥 편한 wrapper인 str\_subset()으로 한 번에 할 수도 있음.
+이걸 그냥 편한 wrapper인 `str_subset()`으로 한 번에 할 수도 있음.
 
 ``` r
 str_subset(words, "x$")
@@ -889,7 +894,7 @@ has_noun %>%
 
 (당연히, 우리가 사용한 명사noun 찾기 방법은 형편없다. smooth나 parked와 같은 형용사들도 나옴.)
 
-만약 data가 tibble안에 있다면, `tidyr::extract()`를 사용하는게 더 쉬울 수 있다. <br /> `str_match()`와 비슷하게 작동하는데, matches를 이름 붙여줄 필요가 있다. 새로운 칼럼들에 사용되는.
+만약 data가 tibble안에 있다면, `tidyr::extract()`를 사용하는게 더 쉬울 수 있다. <br /> `str_match()`와 비슷하게 작동하는데, 새로운 칼럼들에 사용될 matches를 이름 붙여줄 필요가 있다.
 
 ``` r
 tibble(sentence = sentences) %>%
@@ -1066,6 +1071,8 @@ str_locate(sentences[[1]], "[^ ]+")
 ## [1,]     1   3
 ```
 
+------------------------------------------------------------------------
+
 14.5 Other types of pattern
 ---------------------------
 
@@ -1142,9 +1149,9 @@ microbenchmark::microbenchmark(
   times = 20
 )
 ## Unit: microseconds
-##   expr   min     lq    mean median    uq    max neval
-##  fixed  88.3  91.95 152.930   98.4 104.2 1168.1    20
-##  regex 253.4 257.30 314.425  271.1 321.3  601.3    20
+##   expr     min      lq     mean   median       uq     max neval
+##  fixed  88.602  91.450 104.4859  94.3010  95.5510 297.301    20
+##  regex 252.702 255.351 261.4810 258.5005 261.5005 311.401    20
 ```
 
 non-English 데이터에 대해 `fixed()`를 사용할 때는 조심하자. <br /> 가끔, 같은 캐릭터를 표현하는데 있어 여러가지 방법이 있기 때문. <br /> 예를 들어, “á”를 정의하는데 있어 2가지 방법이 있다. <br /> single character로 정의하거나, 혹은 "a"에다 accent를 더해서 정의하거나.
@@ -1219,6 +1226,8 @@ str_extract_all(x, boundary("word"))
 
 ### 14.5.1 Exercises
 
+------------------------------------------------------------------------
+
 14.6 Other uses of regular expressions
 --------------------------------------
 
@@ -1244,6 +1253,8 @@ head(dir(pattern = "\\.Rmd$"))
 ```
 
 `*.Rmd`와 같이 "globs"를 쓰는게 더 편하다면, `glob2rx()`를 사용해서 정규표현식을 바꿀 수 있다. <br /> 예를 들어, 위의 코드를 `head(dir(pattern = glob2rx("*.Rmd$")))`로도 할 수 있는 것.
+
+------------------------------------------------------------------------
 
 14.7 Stringi
 ------------
