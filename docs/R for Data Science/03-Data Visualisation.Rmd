@@ -21,7 +21,7 @@ ggplot2와 함께라면, 하나의 시스템만을 배워서 더 빠르게, 그�
 이 chapter에서는, tidyverse의 핵심 멤버 중 하나인, ggplot2에 집중할 것이다. <br />
 데이터셋을 접근하고, 필요한 함수를 사용하기 위해서, tidyverse를 로드하자.
 
-```{r warning=FALSE}
+```{r warning=FALSE, message=FALSE}
 library(tidyverse)
 ```
 
@@ -47,9 +47,16 @@ library(tidyverse)
 ___
 
 ## 3.2 
+다음의 질문을 대답하는데 있어, 첫 번째 그래프를 사용해 볼 것이다.
+큰 엔진을 사용하는 차들이, 작은 엔진을 사용하는 차들보다 기름을 많이 먹을까?>
+Do cars with big engines use more fuel than cars with small engines?
+이미 답을 알고 있을수도 있지만, 더 정확하게 답을 해보자.
+엔진 사이즈와 연비(fuel efficiency)는 어떤 관계가 있을까? 양의 관계? 음의 관계? 선형? 비선형?
 
 
 
+
+## 3.4 Common problems
 
 
 
