@@ -261,3 +261,220 @@ table2 %>%
 이 때까지는 `table2`, `table4`를 tidy하는 법에 대해 배웠다. `table3`은 안 했다. <br /> 얘는 약간 다른 문제를 가지고 있기 때문. 얘는 하나의 칼럼이 2개의 변수를 가지고 있다. <br /> `rate`라는 칼럼이 `cases`와 `population`라는 변수를 가지고 있음.
 
 이 문제를 해결하기 위해서, `separate()`라는 함수가 필요하다. 이것의 complement인 `unite()`도 배울 것. <br /> 이건 만약 하나의 변수가 multiple columns에 퍼져있을 때 쓰는 것.
+
+### 12.4.1 Separate
+
+`separate()`는 하나의 칼럼을 끄집어내서 여러 개의 칼럼에다가 넣는다. <br /> 이 경우에 있어서는, `rate`에서 `cases`와 `population`을. <br /> 식별자separator character를 기준으로 쪼개서. `table3`을 보자.
+
+`rate`란 칼럼이 `cases`와 `population`이라는 변수를 가지고 있다. 그리고 이걸 쪼개야 됨. <br /> `separate()`는 쪼개질 칼럼의 이름, 그리고 쪼개진 걸 어떻게 받을건지, 이름을 정해줘야한다. <br /> Figure 12.4에 어떤 식으로 작동하고 있는지가 나와있다.
+
+``` r
+table3 %>%
+    separate(rate, into = c("cases", "population"))
+## # A tibble: 6 x 4
+##   country      year cases  population
+##   <chr>       <int> <chr>  <chr>     
+## 1 Afghanistan  1999 745    19987071  
+## 2 Afghanistan  2000 2666   20595360  
+## 3 Brazil       1999 37737  172006362 
+## 4 Brazil       2000 80488  174504898 
+## 5 China        1999 212258 1272915272
+## 6 China        2000 213766 1280428583
+```
+
+![Figure 12.4](https://d33wubrfki0l68.cloudfront.net/f6fca537e77896868fedcd85d9d01031930d76c9/637d9/images/tidy-17.png)
+
+디폴트로, `separate()`는 알파벳이나 숫자가 아닌 문자를 기준으로 값들을 쪼개준다. <br /> 만약에 지정해주고 싶다면, `separate()`의 `sep` 인자argument로 넘겨줄 수 있다. <br /> 예를 들어서, 위의 코드를 다음과 같이 쓸 수 있다.
+
+``` r
+table3 %>%
+    separate(rate, into = c("cases", "population"), sep = "/")
+## # A tibble: 6 x 4
+##   country      year cases  population
+##   <chr>       <int> <chr>  <chr>     
+## 1 Afghanistan  1999 745    19987071  
+## 2 Afghanistan  2000 2666   20595360  
+## 3 Brazil       1999 37737  172006362 
+## 4 Brazil       2000 80488  174504898 
+## 5 China        1999 212258 1272915272
+## 6 China        2000 213766 1280428583
+```
+
+(형식적으로, `sep`은 정규식이다. 이건 [strings](https://blog-for-phil.readthedocs.io/en/latest/R%20for%20Data%20Science/14-Strings/)에서 배우게 된다.)
+
+잘 보면, 이걸 하고 난 다음 얻는 tibble은 `cases`와 `population`값들을 캐릭터로 받았다. <br /> 이건 `separate()`의 디폴트가 그렇기 때문. <br /> 원래 칼럼의 타입을 그대로 남겨둔다. 원래 `rate` 칼럼이 character라... <br /> 이걸 숫자로 인식하도록 하려면,
+
+``` r
+table3 %>%
+    separate(rate, into = c("cases", "population"), convert = TRUE)
+## # A tibble: 6 x 4
+##   country      year  cases population
+##   <chr>       <int>  <int>      <int>
+## 1 Afghanistan  1999    745   19987071
+## 2 Afghanistan  2000   2666   20595360
+## 3 Brazil       1999  37737  172006362
+## 4 Brazil       2000  80488  174504898
+## 5 China        1999 212258 1272915272
+## 6 China        2000 213766 1280428583
+```
+
+`sep` 인자 부분에다가 숫자나 문자가 아닌 거 말고, 숫자를 넣을 수도 있다. <br /> 숫자는 포지션으로 인식할 것이다. 양수는 왼쪽에서부터 시작하고, 음수는 오른쪽에서부터 시작. <br /> 당연하게, 숫자를 쓸 때는, `sep`에 넣을 숫자는 쪼갤 문자의 길이보다 하나 적어야.
+
+이걸 이용해서, 저 `year`부분을 century와 year로 쪼개보자.
+
+``` r
+table3 %>%
+    separate(year, into = c("century", "year"), sep = 2)
+## # A tibble: 6 x 4
+##   country     century year  rate             
+##   <chr>       <chr>   <chr> <chr>            
+## 1 Afghanistan 19      99    745/19987071     
+## 2 Afghanistan 20      00    2666/20595360    
+## 3 Brazil      19      99    37737/172006362  
+## 4 Brazil      20      00    80488/174504898  
+## 5 China       19      99    212258/1272915272
+## 6 China       20      00    213766/1280428583
+```
+
+### 12.4.2 Unite
+
+`unite()`는 `separate()`의 반대다. 이건 여러 개의 칼럼들을 하나의 칼럼으로 합친다. <br /> `separate()`보다는 훨씬 덜 쓸 일이 없겠지만, 알아두면 좋음.
+
+위에서 century와 year로 쪼갰던 걸 `unite()`로 합칠수도 있다. 위에 것을 `table5`로 저장해뒀다. <br /> 물론 `unite()`도 `select()`와 비슷한 문법으로.
+
+``` r
+table5 %>%
+    unite(new, century, year)
+## # A tibble: 6 x 3
+##   country     new   rate             
+##   <chr>       <chr> <chr>            
+## 1 Afghanistan 19_99 745/19987071     
+## 2 Afghanistan 20_00 2666/20595360    
+## 3 Brazil      19_99 37737/172006362  
+## 4 Brazil      20_00 80488/174504898  
+## 5 China       19_99 212258/1272915272
+## 6 China       20_00 213766/1280428583
+```
+
+디폴트로 얘는 합칠 때 `_`를 넣어서 합쳐준다. 하지만 여기서 우리는 식별자를 원하지 않으니깐 `""`로.
+
+``` r
+table5 %>%
+    unite(new, century, year, sep = "")
+## # A tibble: 6 x 3
+##   country     new   rate             
+##   <chr>       <chr> <chr>            
+## 1 Afghanistan 1999  745/19987071     
+## 2 Afghanistan 2000  2666/20595360    
+## 3 Brazil      1999  37737/172006362  
+## 4 Brazil      2000  80488/174504898  
+## 5 China       1999  212258/1272915272
+## 6 China       2000  213766/1280428583
+```
+
+### 12.4.3 Exercises
+
+------------------------------------------------------------------------
+
+12.5 Missing values
+-------------------
+
+데이터셋의 표현을 바꾸는 건, missing 값들의 미묘함에 대한 문제를 불러 일으킨다. <br /> 놀랍게도, 한 가지가 아닌, 두 가지 방법 중 하나로 missing이 일어난다. <br /> 1. explicitly. `NA`로 표현 <br /> 2. implicitly. 데이터에는 나타나지 않는 것.
+
+이걸 간단한 데이터셋으로 표현해보자.
+
+``` r
+stocks <- tibble(
+  year   = c(2015, 2015, 2015, 2015, 2016, 2016, 2016),
+  qtr    = c(   1,    2,    3,    4,    2,    3,    4),
+  return = c(1.88, 0.59, 0.35,   NA, 0.92, 0.17, 2.66)
+)
+```
+
+2015년 4분기는 `NA`라고 되어있으니, explicitly missing, <br /> 2016년 1분기는 데이터셋에는 나타나지 않으니, implicitly missing이다.
+
+저자는 불교의 선禪의 개념으로 차이를 설명한다. <br /> explicit missing은 부재의 존재, implicit은 존재의 부재.(;;)
+
+데이터셋이 어떻게 표현되느냐에 따라, implicit한 값들을 explicit하게 만들할 수 있다. <br /> 예를 들어서, `year`라는 칼럼을 만들어서, implicit한 값을 explicit하게 만들 수 있음.
+
+``` r
+stocks %>% 
+  spread(year, return)
+## # A tibble: 4 x 3
+##     qtr `2015` `2016`
+##   <dbl>  <dbl>  <dbl>
+## 1     1   1.88  NA   
+## 2     2   0.59   0.92
+## 3     3   0.35   0.17
+## 4     4  NA      2.66
+```
+
+그런데 경우에 따라선 이러한 explicit missing이 중요하지 않을 수 있기 때문에, <br />     `gather()`에서의 `na.rm = T`를 이용해서 explicit한 missing을 implicit하게 만들 수 있다.
+
+``` r
+stocks %>% 
+  spread(year, return) %>% 
+  gather(year, return, `2015`:`2016`, na.rm = TRUE)
+## # A tibble: 6 x 3
+##     qtr year  return
+##   <dbl> <chr>  <dbl>
+## 1     1 2015    1.88
+## 2     2 2015    0.59
+## 3     3 2015    0.35
+## 4     2 2016    0.92
+## 5     3 2016    0.17
+## 6     4 2016    2.66
+```
+
+다른 중요한 툴로, explicit한 missing values를 만들 수 있다. `complete()`
+
+``` r
+stocks %>% 
+  complete(year, qtr)
+## # A tibble: 8 x 3
+##    year   qtr return
+##   <dbl> <dbl>  <dbl>
+## 1  2015     1   1.88
+## 2  2015     2   0.59
+## 3  2015     3   0.35
+## 4  2015     4  NA   
+## 5  2016     1  NA   
+## 6  2016     2   0.92
+## 7  2016     3   0.17
+## 8  2016     4   2.66
+```
+
+`complete()`는 모든 칼럼의 셋을 받아서, 가능한 모든 조합들을 찾는다. <br /> 그리고 난 다음에 기존의 데이터셋의 값들을 다 받아서 넣어놓고, 필요한 곳에 `NA`를 explicit하게 넣는다.
+
+missing values에 대한 작업을 할 때, 니가 알아야할 다른 중요한 툴이 있다. <br /> 가끔, 데이터 소스가 누락된 건, 이전에 입력된 값을 이월시켜서 쓴다는 걸 의미할 때가 있다. <br /> 이건 `fill()`을 이용해서 채울 수 있다. 가장 최근의 값들로 missing을 채운다는 걸 의미.
+
+``` r
+treatment <- tribble(
+  ~ person,           ~ treatment, ~response,
+  "Derrick Whitmore", 1,           7,
+  NA,                 2,           10,
+  NA,                 3,           9,
+  "Katherine Burke",  1,           4
+)
+```
+
+이렇게 되어있는 걸,
+
+``` r
+treatment %>% 
+  fill(person)
+## # A tibble: 4 x 3
+##   person           treatment response
+##   <chr>                <dbl>    <dbl>
+## 1 Derrick Whitmore         1        7
+## 2 Derrick Whitmore         2       10
+## 3 Derrick Whitmore         3        9
+## 4 Katherine Burke          1        4
+```
+
+### 12.5.1 Exercises
+
+------------------------------------------------------------------------
+
+12.6 Case Study
+---------------
