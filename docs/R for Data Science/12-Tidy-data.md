@@ -497,3 +497,231 @@ treatment %>%
 
 12.6 Case Study
 ---------------
+
+이 챕터를 끝내기 전에, 배운걸 다 써서 현실적인 data tidy 문제를 해결해보자. <br /> `tidyr::who` 데이터셋은 결핵tuberculosis(TB) 케이스들을 가지고 있다. <br /> year, country, age, gender 그리고 diagnosis method를 갖고 있음. <br /> 2014 World Health Organization Global Tuberculosis Report 에서 데이터를 얻었으며, <br /> \[<http://www.who.int/tb/country/data/download/en/>\]에서 접근할 수 있다.
+
+이 데이터셋에는 병리학적epidemiological 정보들이 풍부한데, 제공된 형식으로는 작업하기가 힘들다.
+
+``` r
+who
+## # A tibble: 7,240 x 60
+##    country iso2  iso3   year new_sp_m014 new_sp_m1524 new_sp_m2534
+##    <chr>   <chr> <chr> <int>       <int>        <int>        <int>
+##  1 Afghan~ AF    AFG    1980          NA           NA           NA
+##  2 Afghan~ AF    AFG    1981          NA           NA           NA
+##  3 Afghan~ AF    AFG    1982          NA           NA           NA
+##  4 Afghan~ AF    AFG    1983          NA           NA           NA
+##  5 Afghan~ AF    AFG    1984          NA           NA           NA
+##  6 Afghan~ AF    AFG    1985          NA           NA           NA
+##  7 Afghan~ AF    AFG    1986          NA           NA           NA
+##  8 Afghan~ AF    AFG    1987          NA           NA           NA
+##  9 Afghan~ AF    AFG    1988          NA           NA           NA
+## 10 Afghan~ AF    AFG    1989          NA           NA           NA
+## # ... with 7,230 more rows, and 53 more variables: new_sp_m3544 <int>,
+## #   new_sp_m4554 <int>, new_sp_m5564 <int>, new_sp_m65 <int>,
+## #   new_sp_f014 <int>, new_sp_f1524 <int>, new_sp_f2534 <int>,
+## #   new_sp_f3544 <int>, new_sp_f4554 <int>, new_sp_f5564 <int>,
+## #   new_sp_f65 <int>, new_sn_m014 <int>, new_sn_m1524 <int>,
+## #   new_sn_m2534 <int>, new_sn_m3544 <int>, new_sn_m4554 <int>,
+## #   new_sn_m5564 <int>, new_sn_m65 <int>, new_sn_f014 <int>,
+## #   new_sn_f1524 <int>, new_sn_f2534 <int>, new_sn_f3544 <int>,
+## #   new_sn_f4554 <int>, new_sn_f5564 <int>, new_sn_f65 <int>,
+## #   new_ep_m014 <int>, new_ep_m1524 <int>, new_ep_m2534 <int>,
+## #   new_ep_m3544 <int>, new_ep_m4554 <int>, new_ep_m5564 <int>,
+## #   new_ep_m65 <int>, new_ep_f014 <int>, new_ep_f1524 <int>,
+## #   new_ep_f2534 <int>, new_ep_f3544 <int>, new_ep_f4554 <int>,
+## #   new_ep_f5564 <int>, new_ep_f65 <int>, newrel_m014 <int>,
+## #   newrel_m1524 <int>, newrel_m2534 <int>, newrel_m3544 <int>,
+## #   newrel_m4554 <int>, newrel_m5564 <int>, newrel_m65 <int>,
+## #   newrel_f014 <int>, newrel_f1524 <int>, newrel_f2534 <int>,
+## #   newrel_f3544 <int>, newrel_f4554 <int>, newrel_f5564 <int>,
+## #   newrel_f65 <int>
+```
+
+이게 전형적인 현실적인 데이터셋의 예다. <br /> 보다시피 쓸모없는 칼럼들도 있고, 이상한 변수들이 코드되어 있고, 결측값들이 많다. <br /> 한 마디로 말해서, `who`는 messy하다. <br /> 그리고 이걸 tidy하기 위해서는 여러 스텝들이 필요하다. <br /> dplyr와 마찬가지로, tidyr도 하나의 함수가 하나의 작업을 잘 하도록 설계되었다. <br /> 그래서 현실에서는 pipeline(`%>%`)을 여러 줄 이용해서 작업해야 할 것이다.
+
+시작점으로 가장 좋은 것은, 변수가 아닌 칼럼들은 gather하는 것이다. <br /> 뭐가 있는지 한 번 살펴보자.
+
+-   `country`, `iso2`, `iso3`는 쓸데없이 어떤 나라인지를 명시해놓았다. <br />
+-   `year`은 확실히 변수 <br />
+-   다른 칼럼들은 뭔지 아직 모르지만, 변수 이름의 구조를 보았을 때(`new_sp_m014`, `new_ep_m014`, `new_ep_f014`), <br />     변수가 아닌 값이라고 생각해볼 수 있다.
+
+그래서 `new_sp_m014` 부터 `newrel_f65`까지의 칼럼들을 gather하면 된다. <br /> 이 값들이 무엇을 표현하는지는 모르지만, 이것들의 일반적인 이름으로 `"key"`를 주겠다. <br /> 그리고 각 cell이 한 번 일어났다는 것을 표현하는 것이기 때문에, 이걸 `cases`라는 변수로 둘 것이다. <br /> 마지막으로, 이 표현에서는 결측값들이 많기 때문에, `na.rm`을 사용해서, 존재하는 것들에만 집중할 것이다.
+
+``` r
+who1 <- who %>% 
+  gather(new_sp_m014:newrel_f65, key = "key", value = "cases", na.rm = TRUE)
+who1
+## # A tibble: 76,046 x 6
+##    country     iso2  iso3   year key         cases
+##    <chr>       <chr> <chr> <int> <chr>       <int>
+##  1 Afghanistan AF    AFG    1997 new_sp_m014     0
+##  2 Afghanistan AF    AFG    1998 new_sp_m014    30
+##  3 Afghanistan AF    AFG    1999 new_sp_m014     8
+##  4 Afghanistan AF    AFG    2000 new_sp_m014    52
+##  5 Afghanistan AF    AFG    2001 new_sp_m014   129
+##  6 Afghanistan AF    AFG    2002 new_sp_m014    90
+##  7 Afghanistan AF    AFG    2003 new_sp_m014   127
+##  8 Afghanistan AF    AFG    2004 new_sp_m014   139
+##  9 Afghanistan AF    AFG    2005 new_sp_m014   151
+## 10 Afghanistan AF    AFG    2006 new_sp_m014   193
+## # ... with 76,036 more rows
+```
+
+이러고나면, 새로운 key 칼럼의 수를 세어봄으로써, 값들의 구조에 대한 힌트를 좀 얻을 수 있다.
+
+``` r
+who1 %>%
+    count(key)
+## # A tibble: 56 x 2
+##    key              n
+##    <chr>        <int>
+##  1 new_ep_f014   1032
+##  2 new_ep_f1524  1021
+##  3 new_ep_f2534  1021
+##  4 new_ep_f3544  1021
+##  5 new_ep_f4554  1017
+##  6 new_ep_f5564  1017
+##  7 new_ep_f65    1014
+##  8 new_ep_m014   1038
+##  9 new_ep_m1524  1026
+## 10 new_ep_m2534  1020
+## # ... with 46 more rows
+```
+
+이걸 직접 parse해봄으로써 어떤 의미를 갖고 있는지 직접 알아볼 수 있지만, <br />     답을 알려주겠다. 어떤 의미냐면,
+
+1.  처음 3개의 단어는 새로운 결핵인지 이전의 결핵인지를 알려준다. <br /> 근데 이 데이터셋에서는, 사실 모든 케이스가 new 케이스다.
+
+2.  다음 2개 단어는 결핵의 타입을 알려준다. <br /> `rel`은 재발relapse한 것. <br /> `ep`는 폐 외부extrapulmonary의 케이스. <br /> `sn`은 폐를 진찰해서는 알 수 없었던 케이스. smear negative <br /> `sp`는 폐를 진찰해서 알 수 있었던 케이스. smear positive
+
+3.  6번째 단어는 결핵 환자의 성별을 알려준다. 남성(`m`)인지 여성(`f`)인지.
+
+4.  마지막 숫자들은 age group을 알려준다. 7개로 나누어져있는데,
+
+-   `014` = 0 - 14살 <br />
+-   `1524` = 14 - 24살 <br />
+-   `2534` = 25 - 34살 <br />
+-   `3544` = 35 - 44살 <br />
+-   `4554` = 45 - 54살 <br />
+-   `5564` = 55 - 64살 <br />
+-   `65` = 65살 이상
+
+그리고 또 에러도 고쳐야된다. <br /> 이름이 새로운 케이스에 대해 재발을 한 경우라면, `new_rel` 이렇게 되어야 하는데, `newrel` 이렇게 되어있다. <br /> (여기서는 알아차리기가 힘든데 안 고쳐놓으면 계속 에러가 발생한다. 보통 EDA를 통해서 알아차리지.)
+
+[strings](https://blog-for-phil.readthedocs.io/en/latest/R%20for%20Data%20Science/14-Strings/)에서 `str_replace()`에 대해 배우게 될 건데, 기본적인 아이디어는 간단하다. <br /> "newrel"이라는 캐릭터를 "new\_rel"로 바꾸는 것이다. <br /> 이러면 변수 이름들을 일관성consistent 있게 만들 수 있다.
+
+``` r
+who2 <- who1 %>%
+    mutate(key = stringr::str_replace(key, "newrel", "new_rel"))
+who2
+## # A tibble: 76,046 x 6
+##    country     iso2  iso3   year key         cases
+##    <chr>       <chr> <chr> <int> <chr>       <int>
+##  1 Afghanistan AF    AFG    1997 new_sp_m014     0
+##  2 Afghanistan AF    AFG    1998 new_sp_m014    30
+##  3 Afghanistan AF    AFG    1999 new_sp_m014     8
+##  4 Afghanistan AF    AFG    2000 new_sp_m014    52
+##  5 Afghanistan AF    AFG    2001 new_sp_m014   129
+##  6 Afghanistan AF    AFG    2002 new_sp_m014    90
+##  7 Afghanistan AF    AFG    2003 new_sp_m014   127
+##  8 Afghanistan AF    AFG    2004 new_sp_m014   139
+##  9 Afghanistan AF    AFG    2005 new_sp_m014   151
+## 10 Afghanistan AF    AFG    2006 new_sp_m014   193
+## # ... with 76,036 more rows
+```
+
+각 코드의 값들을 `separate()`를 이용해서 분리separate할 수 있다. <br /> 먼저, 밑줄(`_`)을 기준으로 코드를 스플릿.
+
+``` r
+who3 <- who2 %>%
+    separate(key, c("new", "type", "sexage"), sep = "_")
+who3
+## # A tibble: 76,046 x 8
+##    country     iso2  iso3   year new   type  sexage cases
+##    <chr>       <chr> <chr> <int> <chr> <chr> <chr>  <int>
+##  1 Afghanistan AF    AFG    1997 new   sp    m014       0
+##  2 Afghanistan AF    AFG    1998 new   sp    m014      30
+##  3 Afghanistan AF    AFG    1999 new   sp    m014       8
+##  4 Afghanistan AF    AFG    2000 new   sp    m014      52
+##  5 Afghanistan AF    AFG    2001 new   sp    m014     129
+##  6 Afghanistan AF    AFG    2002 new   sp    m014      90
+##  7 Afghanistan AF    AFG    2003 new   sp    m014     127
+##  8 Afghanistan AF    AFG    2004 new   sp    m014     139
+##  9 Afghanistan AF    AFG    2005 new   sp    m014     151
+## 10 Afghanistan AF    AFG    2006 new   sp    m014     193
+## # ... with 76,036 more rows
+```
+
+근데 모든 케이스들이 new니깐, `new` 칼럼을 그냥 drop시켜도 될 것이다. <br /> 칼럼들을 drop하는김에, `iso2`, `iso3` 칼럼도 쓸모없으니깐 그냥 drop하자.
+
+``` r
+who3 %>%
+    count(new)
+## # A tibble: 1 x 2
+##   new       n
+##   <chr> <int>
+## 1 new   76046
+who4 <- who3 %>%
+    select(-new, -iso2, iso3)
+```
+
+이제 sexage라는걸 sex와 age로 분리separate하자.
+
+``` r
+who5 <- who4 %>%
+    separate(sexage, c("sex", "age"), sep = 1)
+who5
+## # A tibble: 76,046 x 7
+##    country     iso3   year type  sex   age   cases
+##    <chr>       <chr> <int> <chr> <chr> <chr> <int>
+##  1 Afghanistan AFG    1997 sp    m     014       0
+##  2 Afghanistan AFG    1998 sp    m     014      30
+##  3 Afghanistan AFG    1999 sp    m     014       8
+##  4 Afghanistan AFG    2000 sp    m     014      52
+##  5 Afghanistan AFG    2001 sp    m     014     129
+##  6 Afghanistan AFG    2002 sp    m     014      90
+##  7 Afghanistan AFG    2003 sp    m     014     127
+##  8 Afghanistan AFG    2004 sp    m     014     139
+##  9 Afghanistan AFG    2005 sp    m     014     151
+## 10 Afghanistan AFG    2006 sp    m     014     193
+## # ... with 76,036 more rows
+```
+
+이제 `who` 데이터셋은 tidy해졌다! <br /> 각 단계를 한 번씩 보여줬다. 결과물을 따로 따로 저장해가면서, <br /> 뭐 물론 실전에서는 이렇게 하지 않고, 한 번에 다 쌓아도 된다.
+
+``` r
+who %>% 
+  gather(new_sp_m014:newrel_f65, key = "key", value = "cases", na.rm = TRUE) %>% 
+  mutate(key = str_replace(key, "newrel", "new_rel")) %>% 
+  separate(key, c("new", "type", "sexage"), sep = "_") %>% 
+  select(-iso2, -iso3, -new) %>% 
+  separate(sexage, c("sex", "age"), sep = 1)
+## # A tibble: 76,046 x 6
+##    country      year type  sex   age   cases
+##    <chr>       <int> <chr> <chr> <chr> <int>
+##  1 Afghanistan  1997 sp    m     014       0
+##  2 Afghanistan  1998 sp    m     014      30
+##  3 Afghanistan  1999 sp    m     014       8
+##  4 Afghanistan  2000 sp    m     014      52
+##  5 Afghanistan  2001 sp    m     014     129
+##  6 Afghanistan  2002 sp    m     014      90
+##  7 Afghanistan  2003 sp    m     014     127
+##  8 Afghanistan  2004 sp    m     014     139
+##  9 Afghanistan  2005 sp    m     014     151
+## 10 Afghanistan  2006 sp    m     014     193
+## # ... with 76,036 more rows
+```
+
+### 12.6.1 Exercises
+
+------------------------------------------------------------------------
+
+12.7 Non-tidy data
+------------------
+
+넘어가기 전에, non-tidy 데이터에 대해서 간략하게 얘기할 필요가 있다. <br /> 이 단원을 시작할 때, non-tidy data를 표현하기 위해서 경멸적으로 messy라고 표현했다. <br /> 사실 이건, 지나치게 단순화시킨 표현이다.
+
+세상엔 유용하고 잘 만든 데이터 구조이지만 tidy data가 아닌게 많다. <br /> 다른 데이터 구조를 이용하는데에는 2가지 이유가 있다. <br />   1. 다른 표현이 굉장히 좋은 퍼포먼스나 space 이득을 얻기 때문. <br />   2. 분야에 있어서, 데이터를 저장하는 그들만의 관습이 tidy data의 관습과는 다르기 때문.
+
+이러한 경우에 있어서는, tibble말고 다른게 필요할 수 있다. <br /> 그렇지 않고, natural한 관측치와 변수로 이루어진 rectangular 구조가 필요하다면, <br />     tidy data가 너의 디폴트 선택이 되어야 할 것이다. <br /> 하지만 다른 구조를 쓰는 좋은 이유도 있다. tidy data만이 답은 아니다. <br /> non-tidy data에 대해서 좀 더 알아보고 싶다면, 다음을 읽어볼 것. <br /> \[<http://simplystatistics.org/2016/02/17/non-tidy-data/>\]
