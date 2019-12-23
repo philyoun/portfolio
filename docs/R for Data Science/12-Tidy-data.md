@@ -379,7 +379,7 @@ table5 %>%
 12.5 Missing values
 -------------------
 
-데이터셋의 표현을 바꾸는 건, missing 값들의 미묘함에 대한 문제를 불러 일으킨다. <br /> 놀랍게도, 한 가지가 아닌, 두 가지 방법 중 하나로 missing이 일어난다. <br /> 1. explicitly. `NA`로 표현 <br /> 2. implicitly. 데이터에는 나타나지 않는 것.
+데이터셋의 표현을 바꾸는 건, missing 값들의 미묘함에 대한 문제를 불러 일으킨다. <br /> 놀랍게도, 한 가지가 아닌, 두 가지 방법 중 하나로 missing이 일어난다. <br />     1. explicitly. `NA`로 표현 <br />     2. implicitly. 데이터에는 나타나지 않는 것.
 
 이걸 간단한 데이터셋으로 표현해보자.
 
@@ -389,11 +389,22 @@ stocks <- tibble(
   qtr    = c(   1,    2,    3,    4,    2,    3,    4),
   return = c(1.88, 0.59, 0.35,   NA, 0.92, 0.17, 2.66)
 )
+stocks
+## # A tibble: 7 x 3
+##    year   qtr return
+##   <dbl> <dbl>  <dbl>
+## 1  2015     1   1.88
+## 2  2015     2   0.59
+## 3  2015     3   0.35
+## 4  2015     4  NA   
+## 5  2016     2   0.92
+## 6  2016     3   0.17
+## 7  2016     4   2.66
 ```
 
 2015년 4분기는 `NA`라고 되어있으니, explicitly missing, <br /> 2016년 1분기는 데이터셋에는 나타나지 않으니, implicitly missing이다.
 
-저자는 불교의 선禪의 개념으로 차이를 설명한다. <br /> explicit missing은 부재의 존재, implicit은 존재의 부재.(;;)
+저자는 불교 선禪의 개념으로 차이를 설명한다. <br /> explicit missing은 부재의 존재, implicit은 존재의 부재.(;;)
 
 데이터셋이 어떻게 표현되느냐에 따라, implicit한 값들을 explicit하게 만들할 수 있다. <br /> 예를 들어서, `year`라는 칼럼을 만들어서, implicit한 값을 explicit하게 만들 수 있음.
 
@@ -409,7 +420,7 @@ stocks %>%
 ## 4     4  NA      2.66
 ```
 
-그런데 경우에 따라선 이러한 explicit missing이 중요하지 않을 수 있기 때문에, <br />     `gather()`에서의 `na.rm = T`를 이용해서 explicit한 missing을 implicit하게 만들 수 있다.
+그런데 경우에 따라선, 이러한 explicit missing이 중요하지 않을 수 있기 때문에, <br />     `gather()`에서의 `na.rm = T`를 이용해서 explicit한 missing을 implicit하게 만들 수 있다.
 
 ``` r
 stocks %>% 
@@ -444,7 +455,7 @@ stocks %>%
 ## 8  2016     4   2.66
 ```
 
-`complete()`는 모든 칼럼의 셋을 받아서, 가능한 모든 조합들을 찾는다. <br /> 그리고 난 다음에 기존의 데이터셋의 값들을 다 받아서 넣어놓고, 필요한 곳에 `NA`를 explicit하게 넣는다.
+`complete()`는 모든 칼럼의 셋을 받아서, 가능한 모든 조합들을 찾음. <br /> 그리고 난 다음에 기존의 데이터셋의 값들을 다 받아서 넣어놓고, 필요한 곳에 `NA`를 explicit하게 넣는다.
 
 missing values에 대한 작업을 할 때, 니가 알아야할 다른 중요한 툴이 있다. <br /> 가끔, 데이터 소스가 누락된 건, 이전에 입력된 값을 이월시켜서 쓴다는 걸 의미할 때가 있다. <br /> 이건 `fill()`을 이용해서 채울 수 있다. 가장 최근의 값들로 missing을 채운다는 걸 의미.
 
@@ -456,6 +467,14 @@ treatment <- tribble(
   NA,                 3,           9,
   "Katherine Burke",  1,           4
 )
+treatment
+## # A tibble: 4 x 3
+##   person           treatment response
+##   <chr>                <dbl>    <dbl>
+## 1 Derrick Whitmore         1        7
+## 2 <NA>                     2       10
+## 3 <NA>                     3        9
+## 4 Katherine Burke          1        4
 ```
 
 이렇게 되어있는 걸,
