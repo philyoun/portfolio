@@ -498,7 +498,7 @@ treatment %>%
 12.6 Case Study
 ---------------
 
-이 챕터를 끝내기 전에, 배운걸 다 써서 현실적인 data tidy 문제를 해결해보자. <br /> `tidyr::who` 데이터셋은 결핵tuberculosis(TB) 케이스들을 가지고 있다. <br /> year, country, age, gender 그리고 diagnosis method를 갖고 있음. <br /> 2014 World Health Organization Global Tuberculosis Report 에서 데이터를 얻었으며, <br /> \[<http://www.who.int/tb/country/data/download/en/>\]에서 접근할 수 있다.
+이 챕터를 끝내기 전에, 배운걸 다 써서 현실적인 data tidy 문제를 해결해보자. <br /> `tidyr::who` 데이터셋은 결핵tuberculosis(TB) 케이스들을 가지고 있다. <br /> year, country, age, gender 그리고 diagnosis method를 갖고 있음. <br /> 2014 World Health Organization Global Tuberculosis Report 에서 데이터를 얻었으며, <br /> <http://www.who.int/tb/country/data/download/en/>에서 접근할 수 있다.
 
 이 데이터셋에는 병리학적epidemiological 정보들이 풍부한데, 제공된 형식으로는 작업하기가 힘들다.
 
@@ -593,7 +593,7 @@ who1 %>%
 
 1.  처음 3개의 단어는 새로운 결핵인지 이전의 결핵인지를 알려준다. <br /> 근데 이 데이터셋에서는, 사실 모든 케이스가 new 케이스다.
 
-2.  다음 2개 단어는 결핵의 타입을 알려준다. <br /> `rel`은 재발relapse한 것. <br /> `ep`는 폐 외부extrapulmonary의 케이스. <br /> `sn`은 폐를 진찰해서는 알 수 없었던 케이스. smear negative <br /> `sp`는 폐를 진찰해서 알 수 있었던 케이스. smear positive
+2.  다음 2개 단어는 결핵의 타입을 알려준다. <br /> `rel`은 재발relapse한 것. <br /> `ep`는 폐 외부extrapulmonary의 케이스. <br /> `sn`은 폐를 진찰해서는 알 수 없었던 케이스. 음성반응smear negative <br /> `sp`는 폐를 진찰해서 알 수 있었던 케이스. 양성반응smear positive
 
 3.  6번째 단어는 결핵 환자의 성별을 알려준다. 남성(`m`)인지 여성(`f`)인지.
 
@@ -724,4 +724,4 @@ who %>%
 
 세상엔 유용하고 잘 만든 데이터 구조이지만 tidy data가 아닌게 많다. <br /> 다른 데이터 구조를 이용하는데에는 2가지 이유가 있다. <br />   1. 다른 표현이 굉장히 좋은 퍼포먼스나 space 이득을 얻기 때문. <br />   2. 분야에 있어서, 데이터를 저장하는 그들만의 관습이 tidy data의 관습과는 다르기 때문.
 
-이러한 경우에 있어서는, tibble말고 다른게 필요할 수 있다. <br /> 그렇지 않고, natural한 관측치와 변수로 이루어진 rectangular 구조가 필요하다면, <br />     tidy data가 너의 디폴트 선택이 되어야 할 것이다. <br /> 하지만 다른 구조를 쓰는 좋은 이유도 있다. tidy data만이 답은 아니다. <br /> non-tidy data에 대해서 좀 더 알아보고 싶다면, 다음을 읽어볼 것. <br /> \[<http://simplystatistics.org/2016/02/17/non-tidy-data/>\]
+이러한 경우에 있어서는, tibble말고 다른게 필요할 수 있다. <br /> 그렇지 않고, natural한 관측치와 변수로 이루어진 rectangular 구조가 필요하다면, <br />     tidy data가 너의 디폴트 선택이 되어야 할 것이다. <br /> 하지만 다른 구조를 쓰는 좋은 이유도 있다. tidy data만이 답은 아니다. <br /> non-tidy data에 대해서 좀 더 알아보고 싶다면, 다음을 읽어볼 것. <br /> <http://simplystatistics.org/2016/02/17/non-tidy-data/>
