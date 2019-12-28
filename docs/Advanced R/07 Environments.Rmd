@@ -650,31 +650,35 @@ package env랑 namespace env가 둘 다 `sd`에 binding을 갖고 있는데, `sd
 
 
 <details>
-<summary>...</summary>
-하, 근데 이걸 위에서 했던, `g()`라는 함수와 e라는 env의 예에 대입시켜보면 매치가 안 된다.
-그 그림에서, 
-&emsp;&emsp;①`g()`는 global env를 binds하기에, global env에서 `g()`를 찾음.
-&emsp;&emsp;②`g`는 e에 bound되어 있어, its variable을 e에서 찾는다는데, 
+<summary>나는 이게 이해가 안 돼요.</summary>
+하, 근데 이걸 위에서 했던, <code>g()</code>라는 함수와 e라는 env의 예에 대입시켜보면 매치가 안 된다. <br />
+그 그림에서, <br />
+&emsp;&emsp;①<code>g()</code>는 global env를 binds하기에, global env에서 <code>g()</code>를 찾음. <br />
+&emsp;&emsp;②<code>g</code>는 e에 bound되어 있어, its variable을 e에서 찾는다는데, 
 
-바로 위 그림을 보면, 
-&emsp;&emsp;①`sd()`라는 함수는 namespace env를 binds하고 있다는데, 얘는 package env에서 찾는다고 했음.
-&emsp;&emsp;②`sd`는 package env에 bound되어 있으니, its variable은 여기서 찾아야 하는데, namespace env에서 찾는게 맞음.
+바로 위 그림을 보면, <br />
+&emsp;&emsp;①<code>sd()</code>라는 함수는 namespace env를 binds하고 있다는데, 얘는 package env에서 찾는다고 했음. <br />
+&emsp;&emsp;②<code>sd</code>는 package env에 bound되어 있으니, its variable은 여기서 찾아야 하는데, namespace env에서 찾는게 맞음.
 
 그러니깐 내 생각엔, binds하는 곳에서 변수를 찾는거고, bound되는 곳에서 이 함수를 찾을 수 있는거라고 이해하겠다.
 
 정말 오랫동안 생각했는데, 이게 맞는거 같다.
+
+원문의 7.4.3 Namespaces 직전에 나오는 문장, <br />
+The distinction between binding and being bound by is subtle but important, the difference is how we find <code>g</code> versus how <code>g</code> finds its variables. <br />
+이 문장이 잘못된거 같다.
 </details>
 <br />
 <br />
 
 다음으로, 모든 namespace env는 같은 set의 ancestors를 갖는다. <br />
 
-- 각 namespace는 imports env를 갖는다. <br />
+- 각 namespace는 **imports** env를 갖는다. <br />
 패키지에 이용된 모든 함수들에 대한 bindings를 갖고 있는 env. <br />
-imports env는 패키지 개발자에 의해, NAMESPACE 파일로 컨트롤된다.
+imports env는 패키지 개발자에 의해, `NAMESPACE` 파일로 컨트롤된다.
 
 - 모든 base 함수들을 explicit하게 importing하는 것은 귀찮다. <br />
-그래서 imports env의 parent는 base namespace. <br />
+그래서 imports env의 parent는 base **namespace**. <br />
 base namespace는 base env와 같은 bindings를 갖고 있는데, 다른 parent를 갖는다.
 
 - base namespace의 parent는 global env다. 이 말인즉슨, binding이 imports env에서 정의되지 않았다면, 패키지는 평소와 같은 방법으로 찾아볼 거라는 것. <br />
@@ -691,7 +695,20 @@ S3 메소드 디스패치가 작동하는 방법 때문에 필요했던 역사�
 그래서 `sd()`가 `var`의 값을 찾아볼 때, 항상 패키지 user가 아닌, 패키지 developer가 결정해놓은 env의 sequence들을 찾아가게 된다. <br />
 그래서 package 코드는 user가 어떤 패키지들을 attach시켜놨던간에 항상 같은 방식으로 작동하도록 보장받는 것이다.
 
-위 그림을 보면 알다시피 패키지와 namespace env간에 직접적이 링크direct link는 없다. function env를 통해서만 링크는 정의된다.
+<details>
+<summary>개인적인 정리</summary>
+그러니깐, <code>sd()</code>라는 함수를 밖에서 호출할 때는, bound되어 있는 package env에서 찾게 되고, 얘는 Global env의 parent env임. <br />
+그래서, 내가 <code>var()</code>이라는 함수를 외부에서 어떻게 정의를 해놓던간에 얘를 찾아보지 않게 되는 것임. <br />
+그래서 내가 임의로어떻게 정의가 되었던간에, 일관적인 결과를 얻게됨. <br />
+가끔 package들을 로드시켰는데 이름이 같아서 문제가 될 때도 있다. <br />
+R많이 써본 사람이면 한번쯤 겪었을텐데, <code>select()</code>였나..? <code>filter()</code>였나 뭐 하나가 충돌이 되어서 이상한 결과값이나 에러를 얻었던 적이 있다. <br />
+이건 이제 진짜 로드되는 순서에 따라 원하는 결과가 나올수도 있고, 아닐수도 있는거지. 흠 이해가 된다.
+</details>
+<br />
+<br />
+
+위 그림을 보면 알다시피 패키지와 namespace env간에 직접적이 연관direct link은 없다. <br />
+function env를 통해서만 연관은 정의된다.
 
 
 ### 7.4.4 Execution environments
@@ -759,7 +776,8 @@ env_print(e)
 fn_env(h2)
 ```
 
-여기서도 `h2`의 execution env의 parent가 global env라는 걸 볼 수 있다. function env가 global env이기 때문.
+여기서도 `h2`의 execution env의 parent가 global env라는 걸 볼 수 있다. <br />
+function env가 global env이기 때문.
 
 두 번째 방법은 함수같이, env가 binding된 object를 return하도록 하는 것. <br />
 Another way to capture it is to return an object with a binding to that environment, like a function. <br />
@@ -783,16 +801,25 @@ plus_one
 What happens when we call plus_one()? <br />
 Its execution environment will have / the captured execution env of plus() as its parent. <br />
 그래서 `plus()`의 execution env가 더 오래 남아있다.
-![그림10](https://d33wubrfki0l68.cloudfront.net/66676485e6a22c807c19b0c54c8fda6bd1292531/3526e/diagrams/environments/closure-call.png)
+![그림10](https://d33wubrfki0l68.cloudfront.net/66676485e6a22c807c19b0c54c8fda6bd1292531/3526e/diagrams/environments/closure-call.png){ width=50% }
 
 function factory에 대해서는 Section 10.2에서 자세하게 배운다.
 
+### 7,4,5 Exercises
+___
 
 ## 7.5 Call stacks
-마지막으로 설명해야할 env는, caller env. <br />
-rlang::caller_env()로 access할 수 있다. <br />
-함수가 호출되는 곳의 env를 공급해준다. 그래서 함수가 어떻게 만들어지에 따라 달라지는게 아니고, 함수가 어떻게 호출되어지느냐에 따라 달라진다. <br />
+마지막으로 설명해야할 env는, **caller** env. <br />
+`rlang::caller_env()`로 access할 수 있다. <br />
+함수가 호출되는 곳의 env를 공급해준다. 그래서 함수가 어떻게 호출되어지느냐에 따라 달라진다. 함수가 어떻게 만들어지에 따라 달라지는게 아니고. <br />
 위에서 봤듯이, env를 argument로 받는 함수를 작성할 때, 유용한 디폴트이다. 
+
+
+<p class="comment">
+<strong>base R에서는</strong> <br />
+<code>parent.frame()</code>이랑 <code>caller_env()</code>와 같은 것이다. 이름은 frame인데, frame이 아니라 env를 return한다.
+</p>
+
 
 <details>
 <summary>base R</summary>
@@ -801,15 +828,23 @@ rlang::caller_env()로 access할 수 있다. <br />
  <br /> <br /> <br /> <br />
 
 
-caller env를 충분히 이해하기 위해서는, 2개의 연관된 개념들concepts을 다루어야 한다. **frame**으로 만들어진 **call stack**. <br />
+caller env를 충분히 이해하기 위해서는, 2개의 연관된 개념들concepts을 다루어야 한다. <br />
+①**frame**으로 만들어진 ②**call stack**. <br />
+
 함수를 실행하는 것은, 2가지 타입들의 context를 만든다. <br />
 Executing a function creates two types of context. <br />
 이미 하나는 배웠다. execution env. <br />
 이건 function env의 child. 그리고 이건 함수를 어디에 만들어지는지에 따라 결정된다. <br />
 또 다른 하나는 call stack. 얘는 함수를 어디에 호출되어지는지에 따라 결정됨.
 
+그러니깐, 함수를 실행하는데 있어, 어디서 호출하는지, 그리고 어디에 호출하는지에 따라, <br />
+전자는 call stack을, 후자는 execution env를. 이렇게 2가지의 타입의 context가 만들어짐.
+
+
 ### 7.5.1 Simple call stacks
 간단한 sequence of calls를 illustrate해보자: f()는 g()를, g()는 h()를 call한다. <br />
+f() calls g() calls h().
+
 ```{r}
 f <- function(x) {
   g(x = 2)
@@ -824,13 +859,135 @@ h <- function(x) {
 }
 ```
 
-R에서 call stack을 가장 흔하게 보는 방법은, error가 발생했을때 traceback()을 살펴보는 것이다.
-```{r eval = FALSE}
+R에서 call stack을 가장 흔하게 보는 경우는, error가 발생했을때 `traceback()`을 살펴보는 것이다.
+```{r error=TRUE, collapse=TRUE}
 f(x = 1)
-```
-```{r}
 traceback()
 ```
+
+call stack을 이해하기 위해서, <br />
+&emsp;&emsp;`stop()` + `traceback()`을 쓰기보다는, `lobstr::cst()`를 사용할 것이다. <br />
+여기서 cst는 **c**all **s**tack **t**ree의 줄임말.
+
+```{r collapse=TRUE}
+h <- function(x) {
+	lobstr::cst()
+}
+
+f(x = 1)
+```
+
+이걸 보면, `cst()`는 `h()`로부터 호출되었고, `h()`는 `g()`로부터 호출되었고, <br />
+	&emsp;&emsp;`g()`는 `f()`로부터 호출되었음을 알 수 있다.
+
+`traceback()`에 나온 것과는 역순이라는 것을 인지할 것. <br />
+call stacks가 복잡해질수록, <br />
+	&emsp;&emsp;sequence가 끝나는 지점이 아니라 시작하는 지점으로부터 따지는게 더 쉽다고 생각한다. <br />
+즉, "`f()`가 `g()`를 호출한다"가 "`g()`가 `f()`에 의해 호출된다"보다 쉬움.
+
+### 7.5.2 Lazy evaluation
+위의 call stack은 간단하다. <br />
+tree-like 구조가 관련되어 있다는 힌트가 있고, 모든게 하나의 branch에서 일어난다. <br />
+while you get a hint that there's some tree-like structure involved, everything happens on a single branch. <br />
+이게, 모든 arguments들이 eagerly evaluated되었을 때 call stack의 전형.
+
+lazy evaluation이 연관된 좀 더 복잡한 예를 만들어보자. <br />
+함수들의 sequence를 만들어 볼 건데, `a()`, `b()`, `c()`는 모두 `x`라는 argument를 차례로 넘겨준다.pass along
+
+```{r collapse=TRUE}
+a <- function(x) b(x)
+b <- function(x) c(x)
+c <- function(x) x
+
+a(f())
+```
+
+`x`는 lazily evaluated되기 때문에, tree가 2개의 branches를 갖는다. <br />
+첫 번째 branch에서는, `a()`가 `b()`를 호출하고, `b()`가 `c()`를 호출함. <br />
+두 번째 branch에서는, `c()`가 argument인 `x`를 evaluate할 때 시작됨. <br />
+이 argument는 새로운 branch에서 evaluate되는데, <br />
+	&emsp;&emsp;이게 evaluate되는 env가 global env이지, `c()`의 env가 아니기 때문이다.
+	
+### 7.5.3 Frames
+call stack의 각 element는 **frame**이다. evaluation context라고도 알려져 있음. <br />
+frame은 매우 중요한 내부 데이터 구조internal data structure인데, R 코드는 데이터 구조의 작은 부분만 access할 수 있다. <br />
+왜냐하면 간섭tampering하면 R과 충돌하기 때문. it will break R. <br />
+하나의 프레임은 3개의 key components가 있다.
+
+1) 함수 호출을 하는 expression(`expr`으로 라벨됨). `traceback()`이 프린트하는게 이것. <br />
+2) environment(`env`라고 라벨됨), 보통 함수의 execution env. <br />
+2개의 주요한 예외가 있다. <br />
+	&emsp;&emsp;global frame의 env는 global env. <br />
+	&emsp;&emsp;그리고 `eval()`을 호출하는 것도 frame을 만드는데, env는 아무것이나 될 수 있다. <br />
+3) parent, call stack의 이전 call(회색 화살표로 생긴거)
+
+Figure 7.2는 Section 7.5.1에서 `f(x = 1)`을 호출하는데 stack을 illustrate해준다. <br />
+![Figure 7.2: The graphical depcition of a simple call stack](https://d33wubrfki0l68.cloudfront.net/a6ab607182133f595455649cb7d969b482da93a9/e5ce5/diagrams/environments/calling.png){ width=50% }
+
+(calling environment에 focus할 수 있도록, global env에서 `f`, `g`, `h`로의 bindings는 생략)
+
+프레임은, `on.exit()`으로 만들어진, exit handler도 가지고 있다. <br />
+얘는 컨디션 시스템을 재시작하고 조절하며, 함수가 완료되었을 때 `return()`을 한다. <br />
+(하 번역이 안 된다.) <br />
+원문: <br />
+The frame also holds exit handler created with on.exit(), <br />
+restarts and handlers for the condition system, and which context to return() to when a function completes. <br />
+이건 R 코드로는 접근할 수 없는 중요한 내부 디테일이다.
+
+
+### 7.5.4 Dynamic scope
+enclosing env이 아닌, calling stack에서 변수들을 찾아보는 것을 dynamic scoping이라고 부른다. <br />
+소수의 언어들만이, dynamic scoping을 implement해놨다.(Emacs Lisp는 주목할만한 예외notable execption) <br />
+왜냐하면 dynamic scoping은, 어떻게 함수가 작동하는지 추론reason about하기 힘들게끔 만들기 때문이다. <br />
+어떻게 그게 정의되었는지 뿐만 아니라, 그것이 호출되는 문맥context도 알아야한다. <br />
+Dynamic scoping은 interactive data analysis를 지원하는 함수를 개발하는데 우선적으로 유용. <br />
+이건 20장에서 다룰 주제다.
+
+### 7.5.5 Exercises
+
+## 7.6 As data structures
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
