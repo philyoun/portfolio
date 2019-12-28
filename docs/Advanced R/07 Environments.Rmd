@@ -384,6 +384,108 @@ active bindings는 R6의 active fields를 implement할 때 사용된다. Section
 
 ___
 ## 7.3 Recursing over environments
+하나의 env의 모든 ancestors를 조작operate하고 싶다면, 보통 recursive 함수를 작성하는게 편리하다. <br />
+이 섹션에서는 env에 대해 새롭게 배운 지식을 적용해서, <br />
+	&emsp;&emsp;name을 받는 함수를 작성하는데, 그 name이 어디에 정의되어있는지 env를 찾는 것을, <br />
+	&emsp;&emsp;R의 regular scoping rules를 이용해 `where()`로 찾아본다. <br />
+This section shows you how, applying your new knowledge of environments to write a function <br />
+that given a name, finds the environment where() that name is defined, using R's regular scoping rules. <br />
+이해가 안 되어도 쭉쭉 읽어보고 다시 읽어보자.
+
+
+`where()`의 정의는 단순straightforward하다. <br />
+2개의 arguments를 가지며, 하나는 찾아볼 name(문자열string으로), <br />
+			&emsp;&emsp;다른 하나는 어떤 env에서부터 찾아볼지. <br />
+(여기 나오는 `caller_env()`가 왜 좋은 디폴트인지 7.5에서 배우게 될 것)
+
+```{r collapse=TRUE}
+where <- function(name, env = caller_env()){
+  if (identical(env, empty_env())) {
+    # Base case
+    stop("Can't find ", name, call. = FALSE)
+  } else if (env_has(env, name)) {
+    # Success case
+    env
+  } else {
+    # Recursive case
+    where (name, env_parent(env))
+  }
+}
+```
+
+3가지 케이스가 있다.
+
+- base case: empty env까지 다다랐는데 binding을 못 찾은 것. <br />
+	더 갈 곳이 없어서 error가 나옴. <br />
+- successful case: env에 name이 존재해서, env를 return <br />
+- recursive case: env에서 이름이 발견되지 않아서, parent를 시도해봄. <br />
+
+이 3가지 케이스들을, 3개의 예시와 함께 illustrate해보자.
+
+```{r collapse=TRUE, error=TRUE}
+where("yyy")
+x <- 5
+where("x")
+where("mean")
+```
+
+그림을 통해 보면 좀 더 이해가 쉬울 수도 있다. <br />
+다음의 코드와 다이어그램 같이, 2개의 envs가 있다고 상상해보자. 
+```{r collapse=TRUE}
+e4a <- env(empty_env(), a = 1, b = 2)
+e4b <- env(e4a, x = 10, a = 11)
+```
+![Figure 7.5](https://d33wubrfki0l68.cloudfront.net/9fab27eb096eb643a391f207daeabbb023813c30/7e894/diagrams/environments/where-ex.png){ width=50% }
+
+- `where("a", e4b)`는 `e4b`에서 `a`를 찾을 것. <br />
+- `where("b", e4b)`는 `e4b`에서 `b`를 못 찾아서, parent인 `e4a`에서 찾아볼 것이고, 거기서 찾음. <br />
+- `where('c", e4b)`는  `e4b`에서 찾아보고, `e4a`에서 찾아보고, empty env에 다다라서 error를 throw.
+
+envs들에 대해서는 반복적으로recursively 작업하는 것은 자연스럽다. <br />
+그래서 `where()`을 유용한 템플릿으로 쓸 수 있다. <br />
+`where()`에서 특정한 것들만 빼면 구조를 좀 더 명확하게 볼 수 있다.
+
+```{r eval=FALSE}
+f <- function(..., env = caller_env()) {
+  if (identical(env, empty_env())) {
+    # Base case
+  } else if (success) {
+    # Success case
+  } else {
+    # Recursive case
+    f (..., env = env_parent(env))
+  }
+}
+```
+
+<p class="comment">
+<strong>Iteration versus recursion</strong> <br />
+위에 한 recursion 대신에 루프를 쓰는 것도 가능하다. <br />
+내 생각에는 recursive version이 더 쉬운 것 같은데, <br />
+만약에 recursive functions를 많이 안 써봤다면 이게 더 쉽게 이해될 수도 있기에, 해보았다. <br />
+<code>
+f2 <- function(..., env = caller_env()) {
+	while (!identical(env, empty_env())) {
+		if (success) {
+			# success case
+			return()
+		}
+	  # inspect parent
+	  env <- env_parent(env)
+	}
+
+	# base case
+}
+</code>
+</p>
+
+### 7.3.1 Exercises
+
+
+
+
+
+
 
 ___
 ## 7.4 Special Environments

@@ -97,14 +97,14 @@ env를 프린팅해보면 그냥 메모리 주소memory address만 표시된다.
 
 ``` r
 e1
-## <environment: 0x0000000014da9f28>
+## <environment: 0x0000000013c71c38>
 ```
 
 대신에 `env_print()`를 사용하면 좀 더 정보를 준다.
 
 ``` r
 env_print(e1)
-## <environment: 0000000014DA9F28>
+## <environment: 0000000013C71C38>
 ## parent: <environment: global>
 ## bindings:
 ##  * a: <lgl>
@@ -161,7 +161,7 @@ env의 parent를 `env_parent()`를 통해서 찾을 수 있다.
 
 ``` r
 env_parent(e2b)
-## <environment: 0x0000000018b8ea28>
+## <environment: 0x0000000018ba0ed0>
 env_parent(e2a)
 ## <environment: R_GlobalEnv>
 ```
@@ -181,17 +181,17 @@ e2d <- env(e2c, a = 1, b = 2, c = 3)
 
 ``` r
 env_parents(e2b)
-## [[1]]   <env: 0000000018B8EA28>
+## [[1]]   <env: 0000000018BA0ED0>
 ## [[2]] $ <env: global>
 env_parent(e2d)
-## <environment: 0x0000000019053238>
+## <environment: 0x00000000190656e0>
 ```
 
 디폴트로, `env_parents()`는 global env에 다다르면 멈춘다. <br /> global env의 ancestors는 모든 attach된 패키지를 포함하고 있기 때문에, 이게 유용하다. <br /> `env_parents()`의 디폴트를, empty env까지 찾게끔 바꿔보면 이걸 확인해볼 수 있다. <br /> Section 7.4.1에서 이 env들을 다시 확인해볼 것이다.
 
 ``` r
 env_parents(e2b, last = empty_env())
-##  [[1]]   <env: 0000000018B8EA28>
+##  [[1]]   <env: 0000000018BA0ED0>
 ##  [[2]] $ <env: global>
 ##  [[3]] $ <env: package:rlang>
 ##  [[4]] $ <env: package:stats>
@@ -341,9 +341,9 @@ delayed bindings의 가장 중요한 사용은 `autoload()`에서 이루어진�
 ``` r
 env_bind_active(current_env(), z1 = function(val) runif(1))
 z1
-## [1] 0.5417594
+## [1] 0.8666842
 z1
-## [1] 0.4149112
+## [1] 0.3391171
 ```
 
 active bindings는 R6의 active fields를 implement할 때 사용된다. Section 14.3.2에서 배우게 됨.
@@ -357,6 +357,80 @@ active bindings는 R6의 active fields를 implement할 때 사용된다. Section
 
 7.3 Recursing over environments
 -------------------------------
+
+하나의 env의 모든 ancestors를 조작operate하고 싶다면, 보통 recursive 함수를 작성하는게 편리하다. <br /> 이 섹션에서는 env에 대해 새롭게 배운 지식을 적용해서, <br />   name을 받는 함수를 작성하는데, 그 name이 어디에 정의되어있는지 env를 찾는 것을, <br />   R의 regular scoping rules를 이용해 `where()`로 찾아본다. <br /> This section shows you how, applying your new knowledge of environments to write a function <br /> that given a name, finds the environment where() that name is defined, using R's regular scoping rules. <br /> 이해가 안 되어도 쭉쭉 읽어보고 다시 읽어보자.
+
+`where()`의 정의는 단순straightforward하다. <br /> 2개의 arguments를 가지며, 하나는 찾아볼 name(문자열string으로), <br />   다른 하나는 어떤 env에서부터 찾아볼지. <br /> (여기 나오는 `caller_env()`가 왜 좋은 디폴트인지 7.5에서 배우게 될 것)
+
+``` r
+where <- function(name, env = caller_env()){
+  if (identical(env, empty_env())) {
+    # Base case
+    stop("Can't find ", name, call. = FALSE)
+  } else if (env_has(env, name)) {
+    # Success case
+    env
+  } else {
+    # Recursive case
+    where (name, env_parent(env))
+  }
+}
+```
+
+3가지 케이스가 있다.
+
+-   base case: empty env까지 다다랐는데 binding을 못 찾은 것. <br /> 더 갈 곳이 없어서 error가 나옴. <br />
+-   successful case: env에 name이 존재해서, env를 return <br />
+-   recursive case: env에서 이름이 발견되지 않아서, parent를 시도해봄. <br />
+
+이 3가지 케이스들을, 3개의 예시와 함께 illustrate해보자.
+
+``` r
+where("yyy")
+## Error: Can't find yyy
+x <- 5
+where("x")
+## <environment: R_GlobalEnv>
+where("mean")
+## <environment: base>
+```
+
+그림을 통해 보면 좀 더 이해가 쉬울 수도 있다. <br /> 다음의 코드와 다이어그램 같이, 2개의 envs가 있다고 상상해보자.
+
+``` r
+e4a <- env(empty_env(), a = 1, b = 2)
+e4b <- env(e4a, x = 10, a = 11)
+```
+
+<img src="https://d33wubrfki0l68.cloudfront.net/9fab27eb096eb643a391f207daeabbb023813c30/7e894/diagrams/environments/where-ex.png" alt="Figure 7.5" style="width:50.0%" />
+
+-   `where("a", e4b)`는 `e4b`에서 `a`를 찾을 것. <br />
+-   `where("b", e4b)`는 `e4b`에서 `b`를 못 찾아서, parent인 `e4a`에서 찾아볼 것이고, 거기서 찾음. <br />
+-   `where('c", e4b)`는 `e4b`에서 찾아보고, `e4a`에서 찾아보고, empty env에 다다라서 error를 throw.
+
+envs들에 대해서는 반복적으로recursively 작업하는 것은 자연스럽다. <br /> 그래서 `where()`을 유용한 템플릿으로 쓸 수 있다. <br /> `where()`에서 특정한 것들만 빼면 구조를 좀 더 명확하게 볼 수 있다.
+
+``` r
+f <- function(..., env = caller_env()) {
+  if (identical(env, empty_env())) {
+    # Base case
+  } else if (success) {
+    # Success case
+  } else {
+    # Recursive case
+    f (..., env = env_parent(env))
+  }
+}
+```
+
+<p class="comment">
+<strong>Iteration versus recursion</strong> <br /> 위에 한 recursion 대신에 루프를 쓰는 것도 가능하다. <br /> 내 생각에는 recursive version이 더 쉬운 것 같은데, <br /> 만약에 recursive functions를 많이 안 써봤다면 이게 더 쉽게 이해될 수도 있기에, 해보았다. <br /> <code> f2 &lt;- function(..., env = caller\_env()) { while (!identical(env, empty\_env())) { if (success) { \# success case return() } \# inspect parent env &lt;- env\_parent(env) }
+
+    # base case
+
+} </code>
+</p>
+### 7.3.1 Exercises
 
 ------------------------------------------------------------------------
 
@@ -441,7 +515,7 @@ sd
 ## function (x, na.rm = FALSE) 
 ## sqrt(var(if (is.vector(x) || is.factor(x)) x else as.double(x), 
 ##     na.rm = na.rm))
-## <bytecode: 0x0000000013b5f260>
+## <bytecode: 0x0000000018c98918>
 ## <environment: namespace:stats>
 ```
 
@@ -562,7 +636,7 @@ h2 <- function(x) {
 
 e <- h2(x = 10)
 env_print(e)
-## <environment: 0000000019713008>
+## <environment: 0000000018ABB688>
 ## parent: <environment: global>
 ## bindings:
 ##  * a: <dbl>
@@ -586,7 +660,7 @@ plus <- function(x) {
 plus_one <- plus(1)
 plus_one
 ## function(y) x + y
-## <environment: 0x000000001a4d2bd0>
+## <environment: 0x00000000185c1950>
 ```
 
 다이어그램을 보면, `plus_one()`의 enclosing env가 `plus()`의 execution env라서 조금 복잡하다. <img src="https://d33wubrfki0l68.cloudfront.net/853b74c3293fae253c978b73c55f3d0531d746c5/6ffd5/diagrams/environments/closure.png" alt="그림9" style="width:50.0%" />
