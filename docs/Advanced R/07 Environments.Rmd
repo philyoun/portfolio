@@ -647,6 +647,26 @@ user가 내부 구현internal implementation을 감출 수 있는 것hide이다.
 ![그림5](https://d33wubrfki0l68.cloudfront.net/d4fc3ef4f21f2cb0cd065933cba3005cc4b0ea3c/4c4b3/diagrams/environments/namespace-bind.png){ width=50% }
 
 package env랑 namespace env가 둘 다 `sd`에 binding을 갖고 있는데, `sd()` 함수는 namespace env를 binds.
+
+
+<details>
+<summary>...</summary>
+하, 근데 이걸 위에서 했던, `g()`라는 함수와 e라는 env의 예에 대입시켜보면 매치가 안 된다.
+그 그림에서, 
+&emsp;&emsp;①`g()`는 global env를 binds하기에, global env에서 `g()`를 찾음.
+&emsp;&emsp;②`g`는 e에 bound되어 있어, its variable을 e에서 찾는다는데, 
+
+바로 위 그림을 보면, 
+&emsp;&emsp;①`sd()`라는 함수는 namespace env를 binds하고 있다는데, 얘는 package env에서 찾는다고 했음.
+&emsp;&emsp;②`sd`는 package env에 bound되어 있으니, its variable은 여기서 찾아야 하는데, namespace env에서 찾는게 맞음.
+
+그러니깐 내 생각엔, binds하는 곳에서 변수를 찾는거고, bound되는 곳에서 이 함수를 찾을 수 있는거라고 이해하겠다.
+
+정말 오랫동안 생각했는데, 이게 맞는거 같다.
+</details>
+<br />
+<br />
+
 다음으로, 모든 namespace env는 같은 set의 ancestors를 갖는다. <br />
 
 - 각 namespace는 imports env를 갖는다. <br />

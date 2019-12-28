@@ -97,14 +97,14 @@ env를 프린팅해보면 그냥 메모리 주소memory address만 표시된다.
 
 ``` r
 e1
-## <environment: 0x0000000013c6c4d8>
+## <environment: 0x0000000014545480>
 ```
 
 대신에 `env_print()`를 사용하면 좀 더 정보를 준다.
 
 ``` r
 env_print(e1)
-## <environment: 0000000013C6C4D8>
+## <environment: 0000000014545480>
 ## parent: <environment: global>
 ## bindings:
 ##  * a: <lgl>
@@ -161,7 +161,7 @@ env의 parent를 `env_parent()`를 통해서 찾을 수 있다.
 
 ``` r
 env_parent(e2b)
-## <environment: 0x0000000018bbc990>
+## <environment: 0x0000000018bbaae0>
 env_parent(e2a)
 ## <environment: R_GlobalEnv>
 ```
@@ -181,17 +181,17 @@ e2d <- env(e2c, a = 1, b = 2, c = 3)
 
 ``` r
 env_parents(e2b)
-## [[1]]   <env: 0000000018BBC990>
+## [[1]]   <env: 0000000018BBAAE0>
 ## [[2]] $ <env: global>
 env_parent(e2d)
-## <environment: 0x00000000190811a0>
+## <environment: 0x0000000019081210>
 ```
 
 디폴트로, `env_parents()`는 global env에 다다르면 멈춘다. <br /> global env의 ancestors는 모든 attach된 패키지를 포함하고 있기 때문에, 이게 유용하다. <br /> `env_parents()`의 디폴트를, empty env까지 찾게끔 바꿔보면 이걸 확인해볼 수 있다. <br /> Section 7.4.1에서 이 env들을 다시 확인해볼 것이다.
 
 ``` r
 env_parents(e2b, last = empty_env())
-##  [[1]]   <env: 0000000018BBC990>
+##  [[1]]   <env: 0000000018BBAAE0>
 ##  [[2]] $ <env: global>
 ##  [[3]] $ <env: package:rlang>
 ##  [[4]] $ <env: package:stats>
@@ -341,9 +341,9 @@ delayed bindings의 가장 중요한 사용은 `autoload()`에서 이루어진�
 ``` r
 env_bind_active(current_env(), z1 = function(val) runif(1))
 z1
-## [1] 0.08132911
+## [1] 0.1237466
 z1
-## [1] 0.9597318
+## [1] 0.5338641
 ```
 
 active bindings는 R6의 active fields를 implement할 때 사용된다. Section 14.3.2에서 배우게 됨.
@@ -518,7 +518,7 @@ sd
 ## function (x, na.rm = FALSE) 
 ## sqrt(var(if (is.vector(x) || is.factor(x)) x else as.double(x), 
 ##     na.rm = na.rm))
-## <bytecode: 0x0000000019426a10>
+## <bytecode: 0x0000000018f0cb28>
 ## <environment: namespace:stats>
 ```
 
@@ -562,7 +562,17 @@ R은 앞서 설명한 함수 대(對) binding env를 이용해서, 이러한 문
 
 이걸 그림으로 나타내보면, <br /> <img src="https://d33wubrfki0l68.cloudfront.net/d4fc3ef4f21f2cb0cd065933cba3005cc4b0ea3c/4c4b3/diagrams/environments/namespace-bind.png" alt="그림5" style="width:50.0%" />
 
-package env랑 namespace env가 둘 다 `sd`에 binding을 갖고 있는데, `sd()` 함수는 namespace env를 binds. 다음으로, 모든 namespace env는 같은 set의 ancestors를 갖는다. <br />
+package env랑 namespace env가 둘 다 `sd`에 binding을 갖고 있는데, `sd()` 함수는 namespace env를 binds.
+
+<details> <summary>...</summary> 하, 근데 이걸 위에서 했던, `g()`라는 함수와 e라는 env의 예에 대입시켜보면 매치가 안 된다. 그 그림에서,   ①`g()`는 global env를 binds하기에, global env에서 `g()`를 찾음.   ②`g`는 e에 bound되어 있어, its variable을 e에서 찾는다는데,
+
+바로 위 그림을 보면,   ①`sd()`라는 함수는 namespace env를 binds하고 있다는데, 얘는 package env에서 찾는다고 했음.   ②`sd`는 package env에 bound되어 있으니, its variable은 여기서 찾아야 하는데, namespace env에서 찾는게 맞음.
+
+그러니깐 내 생각엔, binds하는 곳에서 변수를 찾는거고, bound되는 곳에서 이 함수를 찾을 수 있는거라고 이해하겠다.
+
+정말 오랫동안 생각했는데, 이게 맞는거 같다. </details> <br /> <br />
+
+다음으로, 모든 namespace env는 같은 set의 ancestors를 갖는다. <br />
 
 -   각 namespace는 imports env를 갖는다. <br /> 패키지에 이용된 모든 함수들에 대한 bindings를 갖고 있는 env. <br /> imports env는 패키지 개발자에 의해, NAMESPACE 파일로 컨트롤된다.
 
@@ -639,7 +649,7 @@ h2 <- function(x) {
 
 e <- h2(x = 10)
 env_print(e)
-## <environment: 0000000018AD6FF8>
+## <environment: 0000000018AD87D0>
 ## parent: <environment: global>
 ## bindings:
 ##  * a: <dbl>
@@ -663,7 +673,7 @@ plus <- function(x) {
 plus_one <- plus(1)
 plus_one
 ## function(y) x + y
-## <environment: 0x00000000185dd2c0>
+## <environment: 0x00000000185d8d48>
 ```
 
 다이어그램을 보면, `plus_one()`의 enclosing env가 `plus()`의 execution env라서 조금 복잡하다. <img src="https://d33wubrfki0l68.cloudfront.net/853b74c3293fae253c978b73c55f3d0531d746c5/6ffd5/diagrams/environments/closure.png" alt="그림9" style="width:50.0%" />
