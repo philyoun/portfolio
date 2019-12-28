@@ -1,25 +1,31 @@
 7.1 Introduction
 ----------------
 
-env는 scoping을 지원powers하는 데이터 구조이다. 이 챕터에서는 env에 대해 깊게 알아볼 것.   그 구조에 대해 깊이 있게 설명describe해보며,   이걸 이용해서, Section 6.4에서 설명된 4개의 scoping rules에 대한 이해를 증가improve
+env는 scoping을 지원powers하는 데이터 구조이다. <br /> 이 챕터에서는 env에 대해 깊게 알아볼 것. <br />   그 구조에 대해 깊이 있게 설명describe해보며, <br />   이걸 이용해서, Section 6.4에서 설명된 4개의 scoping rules에 대한 이해를 증가improve
 
-R을 그날그날 사용하는 사람들에게는, env를 이해하는 것이 중요하지 않다. 하지만 이해하는 것은 중요하다. 왜냐하면 env가 1. lexical scoping, namespaces, R6 classes과 같은 많은 R의 특징들features을 가능케power하고, 2. evaluation과 상호 작용하게해서interact with,   dplyr나 ggplot2와 같은 domain specific languages을 만드는데 강력한 도구를 주기 때문.
+R을 그날그날 사용하는 사람들에게는, env를 이해하는 것이 중요하지 않다. <br /> 하지만 이해하는 것은 중요하다. <br /> 왜냐하면 env가, <br /> 1. lexical scoping, namespaces, R6 classes과 같은 많은 R의 특징들features을 가능케power하고, <br /> 2. evaluation과 상호 작용하게해서interact with, <br />   dplyr나 ggplot2와 같은 domain specific languages을 만드는데 강력한 도구를 주기 때문.
 
 ### Quiz
 
-만약 다음의 질문들을 올바르게 대답할 수 있다면, 이미 이 챕터의 중요한 부분들을 아는 것이나 다름없다. 답은 Section 7.7의 마지막 부분에서 확인 가능. 1. env가 list와 다른 점을 최소한 3가지 이상 나열해보라. 2. global env의 parent는 무엇인가? parent가 없는 유일한 env는 무엇? 3. 함수의 enclosing env란 무엇인가? 왜 중요한가? 4. 함수가 호출되어진 env를 어떻게 결정할 수 있는지? 5. `<-` 와 `<<-`는 어떻게 다른지?
+만약 다음의 질문들을 올바르게 대답할 수 있다면, 이미 이 챕터의 중요한 부분들을 아는 것이나 다름없다. <br /> 답은 Section 7.7의 마지막 부분에서 확인 가능.
+
+1.  env가 list와 다른 점을 최소한 3가지 이상 나열해보라. <br />
+2.  global env의 parent는 무엇인가? parent가 없는 유일한 env는 무엇? <br />
+3.  함수의 enclosing env란 무엇인가? 왜 중요한가? <br />
+4.  함수가 호출되어진 env를 어떻게 결정할 수 있는지? <br />
+5.  `<-` 와 `<<-`는 어떻게 다른지?
 
 ### Outline
 
 -   7.2에서는 env의 기본적인 특성basic properties들을 소개하고, 어떻게 너만의 것을 만들 수 있는지 보여줌
 
--   7.3에서는 env와 계산하는 함수 템플릿function template를 제공하고, 유용한 함수와 함께 이 아이디어를 illustrate.
+-   7.3에서는 env와 계산하는 함수 템플릿function template를 제공하고, <br />   유용한 함수와 함께 이 아이디어를 illustrate.
 
--   7.4에서는 특별한 목적을 위해 사용되는 env를 설명describe. 목적이라함은, packages를 위해서, 함수 내에서, namespaces를 위해서, 함수 실행function execution을 위해서
+-   7.4에서는 특별한 목적을 위해 사용되는 env를 설명describe. <br />   목적이라함은, packages를 위해서, 함수 내에서, namespaces를 위해서, 함수 실행function execution을 위해서
 
--   7.5에서는 마지막으로 중요한 env에 대해 설명. the caller environment. 이건, 어떻게 함수가 호출되는지를 묘사describe하는 call stack에 대해 배울 것을 요구. debugging을 하기위해 `traceback()`을 호출해봤다면, call stack을 본 적이 있을 것.
+-   7.5에서는 마지막으로 중요한 env에 대해 설명. the caller environment. <br />   이건, 어떻게 함수가 호출되는지를 묘사describe하는 call stack에 대해 배울 것을 요구. <br />   debugging을 하기위해 `traceback()`을 호출해봤다면, call stack을 본 적이 있을 것.
 
--   7.6에서는 env가 다른 문제들을 해결하는데 유용한 데이터 구조인, 3가지 경우에 대해 간략히 다룸. briefly discusses three places where envs are useful data structures for solving other problems.
+-   7.6에서는 env가 다른 문제들을 해결하는데 유용한 데이터 구조인, 3가지 경우에 대해 간략히 다룸. <br />   briefly discusses three places where envs are useful data structures for solving other problems.
 
 ### Prerequisites
 
@@ -29,26 +35,28 @@ R을 그날그날 사용하는 사람들에게는, env를 이해하는 것이 �
 library(rlang)
 ```
 
-rlang 패키지에 있는 `env_` 함수들은 pipe로 작업할 수 있게 설계되었다. env를 첫 번째 인자argument로 받으며, 많은 것들이 env를 return한다. 여기서는 최대한 간단하게 보일 수 있도록 pipe를 사용하지 않을 것이나, 너만의 코드를 작성할 때는, 쓰는 것을 고려해보자.
+rlang 패키지에 있는 `env_` 함수들은 pipe로 작업할 수 있게 설계되었다. <br /> env를 첫 번째 인자argument로 받으며, 많은 것들이 env를 return한다. <br /> 여기서는 최대한 간단하게 보일 수 있도록 pipe를 사용하지 않을 것이나, 너만의 코드를 작성할 때는, 쓰는 것을 고려해보자.
+
+------------------------------------------------------------------------
 
 7.2 Environment basics
 ----------------------
 
-일반적으로, env는 네이밍된 리스트named list와 비슷하다. 하지만 4가지의 중요한 예외가 있음.
+일반적으로, env는 네이밍된 리스트named list와 비슷하다. <br /> 하지만 4가지의 중요한 예외가 있음.
 
-1.  모든 이름은 unique해야 함. Every name must be unique
+1.  모든 이름은 unique해야 함. <br /> Every name must be unique
 
-2.  env에 있는 이름들은 정렬되지 않음. The names in an environment are not ordered.
+2.  env에 있는 이름들은 정렬되지 않음. <br /> The names in an environment are not ordered.
 
-3.  env는 parent가 있음. An environment has a parent.
+3.  env는 parent가 있음. <br /> An environment has a parent.
 
-4.  env는 수정된다고 해서 copy되지는 않음.(reference semantics) Environments are not copied when modified.
+4.  env는 수정된다고 해서 copy되지는 않음.(reference semantics) <br /> Environments are not copied when modified.
 
 코드, 그림들과 함께 이 아이디어를 자세히 알아보자.
 
 ### 7.2.1 Basics
 
-env를 만들기 위해서는, `rlang::env()`를 사용한다. `list()` 같이 작동하는데, name-value 짝들을 세트로 받는다. It works like list(), taking a set of name-value pairs
+env를 만들기 위해서는, `rlang::env()`를 사용한다. <br /> `list()` 같이 작동하는데, name-value 짝들을 세트로 받는다. <br /> It works like list(), taking a set of name-value pairs
 
 ``` r
 e1 <- env(
@@ -60,8 +68,289 @@ e1 <- env(
 ```
 
 <p class="comment">
-<strong>base R에서는</strong> <br /> 새로운 env를 만들기 위해서는 <code>new.env()</code>를 사용한다. <code>hash</code>나 <code>size</code>같은 parameter는 무시해라. 필요없다. 값을 정의하고 생성하는 걸 동시에 할 수는 없다. 밑에 나온대로, <code>$&lt;-</code>를 사용해라.
+<strong>base R에서는</strong> <br /> 새로운 env를 만들기 위해서는 <code>new.env()</code>를 사용한다. <br /> <code>hash</code>나 <code>size</code>같은 parameter는 무시해라. 필요없다. <br /> 값을 정의하고 생성하는 걸 동시에 할 수는 없다. 밑에 나온대로, <code>$&lt;-</code>를 사용해라.
 </p>
+env의 일은, names 셋에다가 values 셋을 associate, 혹은 **bind**하는 것. <br /> env라는 것을, 정렬되지 않은 이름들의 가방으로 생각할 수 있다. <br /> You can think of an environment / as a bag of names, with no implied order <br /> (env의 첫 번째 element가 무엇이냐고 묻는 것은 말이 안 됨) <br /> (it doesn't make sense to ask / which is the first element in an environment)
+
+이러한 이유에서, env를 다음과 같이 그려볼 것이다. <br /> <img src="https://d33wubrfki0l68.cloudfront.net/f5dbd02f5235283e78decdd4f18692b40f1ddf42/c5683/diagrams/environments/bindings.png" alt="Figure 7.1" style="width:50.0%" />
+
+Section 2.5.2에서 다룬 것과 같이, env는 reference semantics를 가지고 있다. <br /> environments have reference semantics. <br /> 대부분의 R 오브젝트들과는 달리, 이걸 수정하면, copy를 만들지 않고, 즉시 수정됨. <br /> when you modify them, you modify them in place, and don't create a copy.
+
+이게 무엇을 암시하냐면, envs가 그들 자체themselves를 contain할 수 있다는 것. <br /> One important implication is that environments can contatin themselves.
+
+``` r
+e1$d <- e1
+```
+
+<img src="https://d33wubrfki0l68.cloudfront.net/0d41862821d3226c38b73f78a530117349b7344a/abb88/diagrams/environments/loop.png" alt="Figure 7.2" style="width:50.0%" />
+
+env를 프린팅해보면 그냥 메모리 주소memory address만 표시된다. 별로 쓸모가 없음.
+
+``` r
+e1
+## <environment: 0x0000000013b29008>
+```
+
+대신에 `env_print()`를 사용하면 좀 더 정보를 준다.
+
+``` r
+env_print(e1)
+## <environment: 0000000013B29008>
+## parent: <environment: global>
+## bindings:
+##  * a: <lgl>
+##  * b: <chr>
+##  * c: <dbl>
+##  * d: <env>
+```
+
+`env_names()`를 사용하면, 현재의 bindings를 주고 있는 캐릭터 벡터character vector를 얻을 수 있다. <br /> You can use env\_names() to get a character vector / giving the current bindings
+
+``` r
+env_names(e1)
+## [1] "a" "b" "c" "d"
+```
+
+<p class="comment">
+<strong>base R에서는</strong> <br /> 3.2.0 이후 버전에서는 <code>names()</code>를 사용하면, env의 bindings의 리스트를 준다. <br /> 3.1.0 혹은 그 이전 버전에서는, <code>ls()</code>에다가 <code>all.names = TRUE</code>라고 옵션을 줘야 모든 bindings를 보여줌. <br /> 이게 가끔 하던 <code>rm(list = ls())</code>의 의미였군.. 변수들 다 없앨 때 쓰던..
+</p>
+### 7.2.2 Important environments
+
+Section 7.4에서 특별한 env에 대해서 자세하게 다뤄볼 것인데, 여기서는 2개만 미리 하겠다. <br /> current env, 혹은 `current_env()`는, 코드가 현재 실행되고 있는 env다. <br />   is the environment in which code is currently executing. <br /> experimenting interactively할 때에는, 보통 그건 global env.이다. 혹은 `global_env()` <br /> (역자: 어떻게 해석해야할지 모르겠음. 그러니깐 그냥 우리가 평소 쓰는 그것이 global env라는 것 같은데. <br /> 원문: When you're experimenting interactively, that's usually the global environment, or global\_env().) <br /> global env는 가끔 workspace라고 불린다. 왜냐하면 이 곳에서 모든 interactive 계산이 일어나기 때문. <br /> interactive( = outside of a function)
+
+그러니깐 내가 이해를 해본대로 써보자면, <br /> 우리가 이 때까지 늘상 해왔던 단순한 계산, 할당 이런 것들이 다 interactive computation인데, <br /> 이게 일어나는 곳이 global env이고, worskpace임.
+
+env들을 비교하기 위해서는, `==`가 아닌, `identical()`을 이용해야 한다. <br /> 왜냐하면 `==`는 벡터화된 연산자vectorised operator인데, env는 벡터가 아니기 때문이다.
+
+``` r
+identical(global_env(), current_env())
+## [1] TRUE
+
+global_env() == current_env()
+## Error in global_env() == current_env(): atomic과 리스트 타입들에 대해서만 비교(1)가 가능합니다
+```
+
+<p class="comment">
+<strong>base R에서는</strong> <br /> global env는 <code>globalenv()</code>를 통해서, current env는 <code>environment()</code>를 통해서 접근 가능. <br /> global env는 <code>Rf\_GlobalEnv</code> 혹은 <code>.GlobalEnv</code>로 프린트된다.
+</p>
+### 7.2.3 Parents
+
+모든 env는 **parent**를 가지고 있다. 또다른 env임. <br /> 다이어그램에서, parent는 작은 옅은 파란색 원으로 표시되고, 또다른 env를 화살표로 가리키고 있다. <br /> In diagrams, the parent is shown as a small pale blue circle and arrow that points to another env.
+
+parent는 lexical scoping을 implement하기 위해 사용된 것. <br /> 만약에 env 안에서 name이 발견되지 않는다면, R은 그것의 parent를 확인해볼 것이다. <br /> `env()`에서 unnamed argument를 공급해줌으로써, parent env를 설정할 수 있다. <br /> 만약에 공급해주지 않는다면, 디폴트로 current env가 된다. current env가 parent env가 된다는 뜻 <br /> 아래의 코드에서, `e2b`의 parent는 `e2a`이다.
+
+``` r
+e2a <- env(d = 4, e = 5)
+e2b <- env(e2a, a = 1, b = 2, c = 3)
+```
+
+<img src="https://d33wubrfki0l68.cloudfront.net/336e61bf494a6424484b8b2685a440a7db1566bf/59bce/diagrams/environments/parents.png" alt="Figure 7.3" style="width:50.0%" />
+
+공간을 아끼기 위해, ancestors를 다 그리진 않을거다. <br /> 그냥 옅은 파란색 원을 볼 때마다, parent env가 어딘가에 있다는 것만 기억해라. <br /> 화살표가 향한 곳이, parent env.
+
+env의 parent를 `env_parent()`를 통해서 찾을 수 있다.
+
+``` r
+env_parent(e2b)
+## <environment: 0x0000000018b929a8>
+env_parent(e2a)
+## <environment: R_GlobalEnv>
+```
+
+그런데 딱히 `e2a`라고 딱 나오는게 아니고, 주소가 같게 나온다. <br /> `env_print()`에서 찾을 수 있던 주소. <br /> 그거랑 같게 나옴.
+
+parent가 없는 단 하나의 env가 있다. **empty** env. <br /> 텅 비어있는 파란색 원을 가지고 있는 애인데, 얘가 `R_EmptyEnv`다. 이건 R이 사용하는 이름임. <br /> 공간이 허락할 때만 이 empty env를 그려놓겠다.
+
+``` r
+e2c <- env(empty_env(), d = 4, e = 5)
+e2d <- env(e2c, a = 1, b = 2, c = 3)
+```
+
+<img src="https://d33wubrfki0l68.cloudfront.net/ff7bec1ccb1455917a6c9d0f44f114ef5c78519f/39793/diagrams/environments/parents-empty.png" alt="Figure 7.4" style="width:50.0%" />
+
+모든 env의 ancestors는 결국에는, empty env와 함께 종료된다. <br /> `env_parents()`를 이용해서 모든 ancestors를 볼 수 있다.
+
+``` r
+env_parents(e2b)
+## [[1]]   <env: 0000000018B929A8>
+## [[2]] $ <env: global>
+env_parent(e2d)
+## <environment: 0x00000000190571b8>
+```
+
+디폴트로, `env_parents()`는 global env에 다다르면 멈춘다. <br /> global env의 ancestors는 모든 attach된 패키지를 포함하고 있기 때문에, 이게 유용하다. <br /> `env_parents()`의 디폴트를, empty env까지 찾게끔 바꿔보면 이걸 확인해볼 수 있다. <br /> Section 7.4.1에서 이 env들을 다시 확인해볼 것이다.
+
+``` r
+env_parents(e2b, last = empty_env())
+##  [[1]]   <env: 0000000018B929A8>
+##  [[2]] $ <env: global>
+##  [[3]] $ <env: package:rlang>
+##  [[4]] $ <env: package:stats>
+##  [[5]] $ <env: package:graphics>
+##  [[6]] $ <env: package:grDevices>
+##  [[7]] $ <env: package:utils>
+##  [[8]] $ <env: package:datasets>
+##  [[9]] $ <env: package:methods>
+## [[10]] $ <env: Autoloads>
+## [[11]] $ <env: package:base>
+## [[12]] $ <env: empty>
+```
+
+<p class="comment">
+<strong>base R에서는</strong> <br /> <code>parent.env()</code>를 사용해서 env의 parent를 찾는다. <br /> 모든 ancestors를 return해주는 그런 base 함수는 없음.
+</p>
+### 7.2.4 Super assignment, `<<-`
+
+env의 ancestors는, `<<-`와 중요한 관계가 있다. <br /> The ancestors of an environment / have an important relationship to &lt;&lt;-.
+
+보통의 할당regular assignment, `<-`는, 항상 current env에서 변수를 생성create한다. <br /> Regular assignment, &lt;-, always creates a variable in the current env.
+
+Super assignment, `<<-`는 절대 current env에서 변수를 생성하지는 않고, <br />   대신에 parent env에서 발견된, 존재하는 변수를 수정한다. <br />   but instead modifies an existing variable / found in a parent env.
+
+``` r
+x <- 0
+f <- function() {
+    x <<- 1
+}
+f()
+x
+## [1] 1
+```
+
+만약, `<<-`가 존재하는 변수를 찾지 못한다면, global env에서 하나 만들 것이다. <br /> 이건 보통 원치 않은 것인데, 왜냐하면 global 변수는 함수들 간의 뚜렷하지 않은 의존성을 유발하기 때문. <br /> This is usually undesirable, because global variables introduce non-obvious dependencies btw functions.
+
+`<<-`는 대부분 보통 function factory와 함께 사용될 것이다. Section 10.2.4에서 다룸.
+
+### 7.2.5 Getting and setting
+
+리스트 때와 같은 방법으로, $와 \[\[를 이용해서 env의 elements를 get, set할 수 있다.
+
+``` r
+e3 <- env(x = 1, y =2)
+e3$x
+## [1] 1
+e3$z <- 3
+e3[["z"]]
+## [1] 3
+```
+
+하지만 `[[`를 숫자 인덱스와는 쓸 수 없고, `[`도 사용할 수는 없다. <br /> (env에서는 order가 없다고 했으니깐 뭐)
+
+``` r
+e3[[1]]
+## Error in e3[[1]]: wrong arguments for subsetting an environment
+e3[c("x", "y")]
+## Error in e3[c("x", "y")]: 객체의 타입 'environment'는 부분대입할 수 없습니다
+```
+
+`$`와 `[[`는 만약 binding이 존재하지 않는다면, `NULL`을 return할 것이다. <br /> 에러를 얻길 원한다면, `env_get()`를 사용해라.
+
+``` r
+e3$xyz
+## NULL
+env_get(e3, "xyz")
+## Error in env_get(e3, "xyz"): 객체 'xyz'를 찾을 수 없습니다
+```
+
+binding이 존재하지 않는 경우에, 디폴트값을 얻도록 설정해놓을 수도 있다. <br /> default 인자argument를 사용해라.
+
+``` r
+env_get(e3, "xyz", default = NA)
+## [1] NA
+```
+
+env에다가 bindings를 추가할 수 있는 2가지 방법이 있다. <br /> 1) `env_poke()`는 name(string으로 주어야함)과 value를 받는다.
+
+``` r
+env_poke(e3, "a", 100)
+e3$a
+## [1] 100
+```
+
+1.  `env_bind()`는 여러 개의 값들을 bind할 수 있도록 해준다.
+
+``` r
+env_bind(e3, a = 10, b = 20)
+env_names(e3)
+## [1] "x" "y" "z" "a" "b"
+```
+
+env가 binding을 갖고 있는지를 `env_has()`를 통해서 확인할 수 있다.
+
+``` r
+env_has(e3, "a")
+##    a 
+## TRUE
+```
+
+리스트와는 다르게, element를 `NULL`로 설정한다고 해서 제거가 되는건 아니다. <br /> 왜냐하면 가끔씩 `NULL`을 refer하는 이름을 원할 수 있기 때문에. <br /> 이럴 때는 `env_unbind()`를 사용해라.
+
+``` r
+e3$a <- NULL
+env_has(e3, "a")
+##    a 
+## TRUE
+
+env_unbind(e3, "a")
+env_has(e3, "a")
+##     a 
+## FALSE
+```
+
+name을 unbinding하는 것은, 오브젝트를 삭제하지는 않는다. <br /> 그건 garbage collector의 일이고, 이름이 묶여있지 않은 오브젝트들은 자동적으로 삭제하는 애들. <br /> 이 작업은 Section 2.6에 자세하게 설명되어 있다.
+
+<p class="comment">
+<strong>base R에서는</strong> <br /> <code>get()</code>, <code>assign()</code>, <code>exists()</code>, <code>rm()</code>을 봐보아라. <br /> 이것들은 current env와 interactively하게 사용할 수 있도록 디자인되어 있다. <br /> 그래서 다른 env들과 작업할 때는 좀 투박하다. <br /> 그리고 <code>inherits</code> 인자argument에 대해서 알아두어라. <br /> 이건 디폴트로 <code>TRUE</code>인데, 기본 환경base equivalents에서, <br />   제공supplied된 env와 이 env의 모든 ancestors를 검색inspect할 것이라는 뜻.
+</p>
+### 7.2.6 Advanced bindings
+
+`env_bind()`의 이색적 변형exotic variants가 2개 더 있다.
+
+1.  `env_bind_lazy()`는 **delayed bindings**를 만든다. <br /> 접근이 처음으로 되었을 때, evaluated되는 애들. <br /> 더 자세하게 살펴보면, delayed bindings는 promises를 만드는데, 그래서 함수 인자들과 같이 행동behave한다. <br /> Behind the scenes, delayed bindings create promises, so behave in the same way as function arguments.
+
+그러니깐 호출이 되어서 정말 필요할 때까지는 evaluate하지는 않는 것임.
+
+``` r
+env_bind_lazy(current_env(), b = {Sys.sleep(1); 1})
+
+system.time(print(b))
+## [1] 1
+##    user  system elapsed 
+##    0.00    0.00    1.02
+system.time(print(b))
+## [1] 1
+##    user  system elapsed 
+##       0       0       0
+```
+
+그러니깐 처음에는 접근하는데 Sys.sleep()의 값만큼 시간이 걸렸는데, 한 번 evaluated이 되고 난 이후에는 <br /> 바로바로 접근access이 가능.
+
+delayed bindings의 가장 중요한 사용은 `autoload()`에서 이루어진다. <br /> R 패키지가 데이터셋을 제공할 수 있도록 해주는 것이 `autoload()`. <br /> 메모리에 로드되어있는 것처럼 행동behave하는데, 사실은 필요할 때에만 디스크에서 로드되는 것.
+
+1.  `env_bind_active()`는 **active bindings**를 만든다. 얘들은 접근될 때마다 re-computed
+
+``` r
+env_bind_active(current_env(), z1 = function(val) runif(1))
+z1
+## [1] 0.1963889
+z1
+## [1] 0.4950598
+```
+
+active bindings는 R6의 active fields를 implement할 때 사용된다. Section 14.3.2에서 배우게 됨.
+
+<p class="comment">
+<strong>base R에서는</strong> <br /> <code>?delayedAssign()</code>과 <code>?makeActiveBinding()</code>을 보아라.
+</p>
+### 7.2.7 Exercises
+
+------------------------------------------------------------------------
+
+7.3 Recursing over environments
+-------------------------------
+
+------------------------------------------------------------------------
+
 7.4 Special Environments
 ------------------------
 
@@ -143,7 +432,7 @@ sd
 ## function (x, na.rm = FALSE) 
 ## sqrt(var(if (is.vector(x) || is.factor(x)) x else as.double(x), 
 ##     na.rm = na.rm))
-## <bytecode: 0x0000000014496880>
+## <bytecode: 0x00000000145801b0>
 ## <environment: namespace:stats>
 ```
 
@@ -264,7 +553,7 @@ h2 <- function(x) {
 
 e <- h2(x = 10)
 env_print(e)
-## <environment: 00000000193F2D68>
+## <environment: 0000000019E70D68>
 ## parent: <environment: global>
 ## bindings:
 ##  * a: <dbl>
@@ -288,7 +577,7 @@ plus <- function(x) {
 plus_one <- plus(1)
 plus_one
 ## function(y) x + y
-## <environment: 0x0000000019e1d6a8>
+## <environment: 0x000000001a036868>
 ```
 
 다이어그램을 보면, `plus_one()`의 enclosing env가 `plus()`의 execution env라서 조금 복잡하다. <img src="https://d33wubrfki0l68.cloudfront.net/853b74c3293fae253c978b73c55f3d0531d746c5/6ffd5/diagrams/environments/closure.png" alt="그림9" style="width:50.0%" />
