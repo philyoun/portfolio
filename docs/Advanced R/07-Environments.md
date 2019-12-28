@@ -97,14 +97,14 @@ env를 프린팅해보면 그냥 메모리 주소memory address만 표시된다.
 
 ``` r
 e1
-## <environment: 0x0000000013c71c38>
+## <environment: 0x0000000013c6c4d8>
 ```
 
 대신에 `env_print()`를 사용하면 좀 더 정보를 준다.
 
 ``` r
 env_print(e1)
-## <environment: 0000000013C71C38>
+## <environment: 0000000013C6C4D8>
 ## parent: <environment: global>
 ## bindings:
 ##  * a: <lgl>
@@ -161,7 +161,7 @@ env의 parent를 `env_parent()`를 통해서 찾을 수 있다.
 
 ``` r
 env_parent(e2b)
-## <environment: 0x0000000018ba0ed0>
+## <environment: 0x0000000018bbc990>
 env_parent(e2a)
 ## <environment: R_GlobalEnv>
 ```
@@ -181,17 +181,17 @@ e2d <- env(e2c, a = 1, b = 2, c = 3)
 
 ``` r
 env_parents(e2b)
-## [[1]]   <env: 0000000018BA0ED0>
+## [[1]]   <env: 0000000018BBC990>
 ## [[2]] $ <env: global>
 env_parent(e2d)
-## <environment: 0x00000000190656e0>
+## <environment: 0x00000000190811a0>
 ```
 
 디폴트로, `env_parents()`는 global env에 다다르면 멈춘다. <br /> global env의 ancestors는 모든 attach된 패키지를 포함하고 있기 때문에, 이게 유용하다. <br /> `env_parents()`의 디폴트를, empty env까지 찾게끔 바꿔보면 이걸 확인해볼 수 있다. <br /> Section 7.4.1에서 이 env들을 다시 확인해볼 것이다.
 
 ``` r
 env_parents(e2b, last = empty_env())
-##  [[1]]   <env: 0000000018BA0ED0>
+##  [[1]]   <env: 0000000018BBC990>
 ##  [[2]] $ <env: global>
 ##  [[3]] $ <env: package:rlang>
 ##  [[4]] $ <env: package:stats>
@@ -341,9 +341,9 @@ delayed bindings의 가장 중요한 사용은 `autoload()`에서 이루어진�
 ``` r
 env_bind_active(current_env(), z1 = function(val) runif(1))
 z1
-## [1] 0.8666842
+## [1] 0.08132911
 z1
-## [1] 0.3391171
+## [1] 0.9597318
 ```
 
 active bindings는 R6의 active fields를 implement할 때 사용된다. Section 14.3.2에서 배우게 됨.
@@ -434,16 +434,18 @@ f <- function(..., env = caller_env()) {
 
 ------------------------------------------------------------------------
 
-7.4 Special Environments
+7.4 Special environments
 ------------------------
 
-대부분의 env들은 너가 만드는게 아니라, R이 만든다. <br /> 이 섹션에서는 package env부터 시작해서 중요한 env들에 대해 배운다. <br /> 그리고 함수function가 만들어질 때 함수에 bound되는, function env에 대해 배우고, <br /> 함수가 호출될 때마다 생겼다가 없어지는, ephemeral execution env에 대해 배운다. <br /> 1. package env, 2. function env, 3. execution env
+대부분의 env는, 니가 만드는게 아니고, R에 의해 만들어진다. <br /> 이 섹션에서는, 대부분의 중요한 env에 대해서 배울 것이다. <br /> 위에서는 이미 current env랑 global env를 배워봤었고.
 
-마지막으로, package와 function env가 namespaces를 지원support하기 위해 어떻게 interact하는지, <br />     namespaces는 user가 어떤 다른 패키지들을 load했던 간에 패키지가 항상 같은 방식으로 행동하게끔 한다.
+패키지 env에서부터 시작해서, <br /> 그러고나서 함수가 만들어졌을 때, 함수에 bound되는 function env에 대해서 배울 것이다. <br /> You'll learn about the function environment bound to the function when it is created, <br /> 그리고 function이 호출될 때마다 만들어지는, ephemeral execution env에 대해서 배울 것. <br /> and the ephemeral execution environment created every time the function is called. <br /> 1. package env, 2. function env, 3. execution env
+
+마지막으로, package와 function env가 namespaces를 지원support하기 위해 어떻게 interact하는지, <br /> 이걸로, 유저가 어떤 다른 패키지를 로드하던 간에,   패키지가 항상 같은 방식으로 작동behave한다는 걸 보장받을 수 있다.
 
 ### 7.4.1 Package env와 search path
 
-`library()`나 `require()`를 통해서 attach한 패키지들은 global env의 parents가 된다.<br /> immediate parent는 가장 최근에 attach한 패키지, 그리고 그 바로 위 parent는 2번 째로 최근에 attach한 패키지..이런 식 ![그림1](https://d33wubrfki0l68.cloudfront.net/038b2da4f5db1d2a8acaf4ee1e7d08d04ab36ebc/ac22a/diagrams/environments/search-path.png)
+`library()`나 `require()`를 통해서 attach한 패키지들은 global env의 parents들 중 하나가 된다. <br /> immediate parent는 가장 최근에 attach한 패키지, 그리고 그 바로 위 parent는 2번 째로 최근에 attach한 패키지..이런 식 ![그림1](https://d33wubrfki0l68.cloudfront.net/038b2da4f5db1d2a8acaf4ee1e7d08d04ab36ebc/ac22a/diagrams/environments/search-path.png)
 
 이런 식으로 parents를 거슬러 올라가다보면, 패키지들이 attach된 순서를 볼 수 있다. <br /> 이걸 **search path**라고 부르는데, <br />   이 env들에 있는 모든 오브젝트들을 top-level interactive workspace에서부터 찾을 수 있기 때문.<br />   because all objects in these environments / can be found from the top-level interactive workspace.
 
@@ -471,9 +473,9 @@ search_envs()
 ## [[10]] $ <env: package:base>
 ```
 
-search path의 마지막 2개 env들은 항상 같다. Autoloads 그리고 package:base
+search path의 마지막 2개 env들은 항상 같다. `Autoloads` 그리고 `package:base`
 
--   Autoloads env는 delayed bindings를 이용해서 메모리를 save한다. <br /> 어떻게? 패키지 오브젝트들(예를 들어, 큰 데이터셋)을 필요할 때만 로딩하는 방식으로.
+-   `Autoloads` env는 delayed bindings를 이용해서 메모리를 save한다. <br /> 어떻게? 패키지 오브젝트들(예를 들어, 큰 데이터셋)을 필요할 때만 로딩하는 방식으로.
 
 -   `package:base` 혹은 그냥 base라고 하는 base env는, base 패키지의 env다. <br /> 이건 다른 패키지들의 로딩을 시동걸 수 있어야하기 때문에 특별하다. <br /> It is special because / it has to be able to bootstrap / the loading of all other packages. <br /> 이 base env는, `base_env()`를 통해 직접적으로 access할 수 있다.
 
@@ -492,15 +494,16 @@ fn_env(f)
 ## <environment: R_GlobalEnv>
 ```
 
-<details> <summary>base R에서는</summary> 함수 <code>f</code>의 env를 access하고 싶다면 <code>environment(f)</code>를 사용해라. </details> <br /> <br /> <br /> <br />
-
-다이어그램에서는, 함수를 다음과 같이 env를 bind하고 있는 '반원이 붙은 네모'로 그릴 것이다. <br /> In diagrams, I'll draw a function as a rectangle with a rounded end that binds an environment. <img src="https://d33wubrfki0l68.cloudfront.net/cd8208b418ecbaf6ace1b6453b93fdf628173e01/68d59/diagrams/environments/binding.png" alt="그림3" style="width:50.0%" />
+<p class="comment">
+<strong>base R에서는</strong> <br /> 함수 <code>f</code>의 env를 access하고 싶다면 <code>environment(f)</code>를 사용해라.
+</p>
+다이어그램에서는, 함수를 다음과 같이 env를 bind하고 있는 '반원이 붙은 네모'로 그릴 것이다. <br /> In diagrams, I'll draw a function as a rectangle with a rounded end that binds an environment. <br /> <img src="https://d33wubrfki0l68.cloudfront.net/cd8208b418ecbaf6ace1b6453b93fdf628173e01/68d59/diagrams/environments/binding.png" alt="그림3" style="width:50.0%" />
 
 이 경우에 `f()`는, `f`라는 이름을 함수에 bind하는 env를(왼쪽으로 향한 화살표), bind한다.(오른쪽으로 향한 화살표) <br /> In this case, `f()` binds the environment that binds the name `f` to the function. <br /> (이 부분 이해하는게 여간 어려운 일이 아니다...화이팅해보자)
 
-하지만 항상 이런건 아니다. 다음의 예를 보자. <br /> `g()`는 global env를 binds하고 있고, `g`는 새로운 env `e`에 bound되어 있다. <br /> (아래로 향한 화살표), (왼쪽으로 향한 화살표) <img src="https://d33wubrfki0l68.cloudfront.net/cd32bb2bc59dcfa579b0415ebac271f24c6a85fd/cde86/diagrams/environments/binding-2.png" alt="그림4" style="width:50.0%" />
+하지만 항상 이런건 아니다. 다음의 예를 보자. <br /> `g()`는 global env를 binds하고 있고, `g`는 새로운 env `e`에 bound되어 있다. <br /> (아래로 향한 화살표), (왼쪽으로 향한 화살표) <br /> <img src="https://d33wubrfki0l68.cloudfront.net/cd32bb2bc59dcfa579b0415ebac271f24c6a85fd/cde86/diagrams/environments/binding-2.png" alt="그림4" style="width:50.0%" />
 
-binding하는 것과 bound되는 것은 미묘하지만 분명한 차이가 있다. <br /> 전자는 우리가 `g`를 어떻게 찾느냐 하는 것이고, 후자는 `g`가 그것의 변수들을 어떻게 찾느냐 하는 것임.
+bind하는 것과 bound되는 것은 미묘하지만 분명한 차이가 있다. <br /> 전자는 우리가 `g`를 어떻게 찾느냐 하는 것이고, 후자는 `g`가 그것의 변수들을 어떻게 찾느냐 하는 것임.
 
 함수 `g`는 global env에서 우리가 찾는 것이고, `g`의 변수들이 있다면 e라는 env안에서 찾는 것.
 
@@ -515,7 +518,7 @@ sd
 ## function (x, na.rm = FALSE) 
 ## sqrt(var(if (is.vector(x) || is.factor(x)) x else as.double(x), 
 ##     na.rm = na.rm))
-## <bytecode: 0x0000000018c98918>
+## <bytecode: 0x0000000019426a10>
 ## <environment: namespace:stats>
 ```
 
@@ -543,23 +546,23 @@ sd(1:2)
 ## [1] 0.7071068
 ```
 
-</details> <br /> <br /> <br /> <br />
+</details> <br /> <br />
 
 R은 앞서 설명한 함수 대(對) binding env를 이용해서, 이러한 문제를 피한다. <br /> R avoids this problem by taking advantage of the function versus binding env described above.
 
 패키지에 있는 모든 함수들은, 한 쌍의 env와 결합associate되어 있다. <br /> package env와 namespace env.
 
-1.  package env는 패키지에 대한 external interface. <br /> The package env is th external interface to the package. <br /> R user가 어떻게 attach된 패키지에서, 혹은 ::를 이용해서 함수를 찾는지. <br /> It's how you, the R user, find a function in an attached package or with `::`. <br /> package env의 parents는 search path에 의해 결정된다. <br />     즉, 패키지가 어떤 순서로 attach되었는지에 따라, package env의 parents가 결정된다.
+1.  package env는 패키지에 대한 외부 인터페이스. <br /> The package env is th external interface to the package. <br /> R user가 어떻게 attach된 패키지에서, 혹은 `::`를 이용해서 함수를 찾는지. <br /> It's how you, the R user, find a function in an attached package or with `::`. <br /> package env의 parents는 search path에 의해 결정된다. <br />   즉, 패키지가 어떤 순서로 attach되었는지에 따라, package env의 parents가 결정된다.
 
-2.  namespace env는 패키지에 대한 internal interface. <br /> package env가, 우리가 어떻게 함수를 찾는지를 컨트롤한다면, <br /> namespace env는 어떻게 그 함수가 그 안의 변수를 찾는지를 컨트롤.
+2.  namespace env는 패키지에 대한 내부 인터페이스. <br /> package env가, 우리가 어떻게 함수를 찾는지를 컨트롤한다면, <br /> namespace env는 어떻게 그 함수가 그 안의 변수를 찾는지를 컨트롤.
 
 정리해보면, package env는 우리가 함수를 찾을 때 쓰는 것이고, namespace env는 함수가 그 안의 변수를 찾을 때 쓰는 것이고. <br /> 근데 그렇다면, 어떤 함수가 다른 함수들을 찾을 수는 없는 것 아닌가? <br /> 내가 함수를 찾을 수는 있고, 함수가 그 안의 변수들을 찾을 수는 있는데, <br /> 함수가 다른 함수들을 찾을 수는 없잖아?
 
-그래서 <br /> package env에 있는 모든 binding들은 namespace env에도 있다. <br /> 이렇게 모든 함수들이, 패키지 안의 다른 함수들을 사용할 수 있는 것. <br /> 하지만 몇몇 binding들은 namespace env에서만 출현occur한다. <br /> 이것들은 internal 혹은 non-exported 오브젝트들이라고 알려져있는데, 이것들 때문에 <br /> user가 internal implementation을 감출 수 있는 것hide이다.
+그래서, <br /> package env에 있는 모든 binding들은 namespace env에도 있다. <br /> 이렇게 모든 함수들이, 패키지 안의 다른 함수들을 사용할 수 있는 것. <br /> 하지만 몇몇 binding들은 namespace env에서만 출현occur한다. <br /> 이것들은 internal 혹은 non-exported 오브젝트들이라고 알려져있는데, 이것들 때문에 <br /> user가 내부 구현internal implementation을 감출 수 있는 것hide이다.
 
-이걸 그림으로 나타내보면, <img src="https://d33wubrfki0l68.cloudfront.net/d4fc3ef4f21f2cb0cd065933cba3005cc4b0ea3c/4c4b3/diagrams/environments/namespace-bind.png" alt="그림5" style="width:50.0%" />
+이걸 그림으로 나타내보면, <br /> <img src="https://d33wubrfki0l68.cloudfront.net/d4fc3ef4f21f2cb0cd065933cba3005cc4b0ea3c/4c4b3/diagrams/environments/namespace-bind.png" alt="그림5" style="width:50.0%" />
 
-다음으로, 모든 namespace env는 같은 set의 ancestors를 갖는다. <br />
+package env랑 namespace env가 둘 다 `sd`에 binding을 갖고 있는데, `sd()` 함수는 namespace env를 binds. 다음으로, 모든 namespace env는 같은 set의 ancestors를 갖는다. <br />
 
 -   각 namespace는 imports env를 갖는다. <br /> 패키지에 이용된 모든 함수들에 대한 bindings를 갖고 있는 env. <br /> imports env는 패키지 개발자에 의해, NAMESPACE 파일로 컨트롤된다.
 
@@ -636,7 +639,7 @@ h2 <- function(x) {
 
 e <- h2(x = 10)
 env_print(e)
-## <environment: 0000000018ABB688>
+## <environment: 0000000018AD6FF8>
 ## parent: <environment: global>
 ## bindings:
 ##  * a: <dbl>
@@ -660,7 +663,7 @@ plus <- function(x) {
 plus_one <- plus(1)
 plus_one
 ## function(y) x + y
-## <environment: 0x00000000185c1950>
+## <environment: 0x00000000185dd2c0>
 ```
 
 다이어그램을 보면, `plus_one()`의 enclosing env가 `plus()`의 execution env라서 조금 복잡하다. <img src="https://d33wubrfki0l68.cloudfront.net/853b74c3293fae253c978b73c55f3d0531d746c5/6ffd5/diagrams/environments/closure.png" alt="그림9" style="width:50.0%" />
