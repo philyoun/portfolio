@@ -749,7 +749,7 @@ h <- function(x) {
 
 y <- h(1)
 ```
-![그림8](https://d33wubrfki0l68.cloudfront.net/862b3606a4a218cc98739b224521b649eeac6082/5d3e9/diagrams/environments/execution.png){ width=50% }
+![그림8](https://d33wubrfki0l68.cloudfront.net/862b3606a4a218cc98739b224521b649eeac6082/5d3e9/diagrams/environments/execution.png){ height=50% }
 
 
 
@@ -794,14 +794,14 @@ plus_one
 ```
 
 다이어그램을 보면, `plus_one()`의 enclosing env가 `plus()`의 execution env라서 조금 복잡하다. 
-![그림9](https://d33wubrfki0l68.cloudfront.net/853b74c3293fae253c978b73c55f3d0531d746c5/6ffd5/diagrams/environments/closure.png){ width=50% }
+![그림9](https://d33wubrfki0l68.cloudfront.net/853b74c3293fae253c978b73c55f3d0531d746c5/6ffd5/diagrams/environments/closure.png){ height=50% }
 
 우리가 `plus_one()`을 호출하면 무슨 일이 일어나는지?  <br />
 `plus_one()`의 execution env는, 캡쳐된 `plus()`의 execution env를 parent로 가질 것이다. <br />
 What happens when we call plus_one()? <br />
 Its execution environment will have / the captured execution env of plus() as its parent. <br />
 그래서 `plus()`의 execution env가 더 오래 남아있다.
-![그림10](https://d33wubrfki0l68.cloudfront.net/66676485e6a22c807c19b0c54c8fda6bd1292531/3526e/diagrams/environments/closure-call.png){ width=50% }
+![그림10](https://d33wubrfki0l68.cloudfront.net/66676485e6a22c807c19b0c54c8fda6bd1292531/3526e/diagrams/environments/closure-call.png){ height=50% }
 
 function factory에 대해서는 Section 10.2에서 자세하게 배운다.
 
@@ -820,12 +820,7 @@ ___
 <code>parent.frame()</code>이랑 <code>caller_env()</code>와 같은 것이다. 이름은 frame인데, frame이 아니라 env를 return한다.
 </p>
 
-
-<details>
-<summary>base R</summary>
-`parent.frame()`이랑 `caller_env()`와 같은 것이다. 이름은 frame인데, frame이 아니라 env를 return한다.
-</details>
- <br /> <br /> <br /> <br />
+<br /> <br />
 
 
 caller env를 충분히 이해하기 위해서는, 2개의 연관된 개념들concepts을 다루어야 한다. <br />
@@ -842,8 +837,8 @@ Executing a function creates two types of context. <br />
 
 
 ### 7.5.1 Simple call stacks
-간단한 sequence of calls를 illustrate해보자: f()는 g()를, g()는 h()를 call한다. <br />
-f() calls g() calls h().
+간단한 sequence of calls를 illustrate해보자: `f()`는 `g()`를, `g()`는 `h()`를 call한다. <br />
+`f()` calls `g()` calls `h()`.
 
 ```{r}
 f <- function(x) {

@@ -97,14 +97,14 @@ env를 프린팅해보면 그냥 메모리 주소memory address만 표시된다.
 
 ``` r
 e1
-## <environment: 0x0000000014179100>
+## <environment: 0x0000000013ee2ac8>
 ```
 
 대신에 `env_print()`를 사용하면 좀 더 정보를 준다.
 
 ``` r
 env_print(e1)
-## <environment: 0000000014179100>
+## <environment: 0000000013EE2AC8>
 ## parent: <environment: global>
 ## bindings:
 ##  * a: <lgl>
@@ -161,7 +161,7 @@ env의 parent를 `env_parent()`를 통해서 찾을 수 있다.
 
 ``` r
 env_parent(e2b)
-## <environment: 0x0000000018c063e0>
+## <environment: 0x0000000018bfbdb0>
 env_parent(e2a)
 ## <environment: R_GlobalEnv>
 ```
@@ -181,17 +181,17 @@ e2d <- env(e2c, a = 1, b = 2, c = 3)
 
 ``` r
 env_parents(e2b)
-## [[1]]   <env: 0000000018C063E0>
+## [[1]]   <env: 0000000018BFBDB0>
 ## [[2]] $ <env: global>
 env_parent(e2d)
-## <environment: 0x00000000190cabf0>
+## <environment: 0x00000000190c05c0>
 ```
 
 디폴트로, `env_parents()`는 global env에 다다르면 멈춘다. <br /> global env의 ancestors는 모든 attach된 패키지를 포함하고 있기 때문에, 이게 유용하다. <br /> `env_parents()`의 디폴트를, empty env까지 찾게끔 바꿔보면 이걸 확인해볼 수 있다. <br /> Section 7.4.1에서 이 env들을 다시 확인해볼 것이다.
 
 ``` r
 env_parents(e2b, last = empty_env())
-##  [[1]]   <env: 0000000018C063E0>
+##  [[1]]   <env: 0000000018BFBDB0>
 ##  [[2]] $ <env: global>
 ##  [[3]] $ <env: package:rlang>
 ##  [[4]] $ <env: package:stats>
@@ -325,7 +325,7 @@ env_bind_lazy(current_env(), b = {Sys.sleep(1); 1})
 system.time(print(b))
 ## [1] 1
 ##    user  system elapsed 
-##       0       0       1
+##    0.00    0.00    1.01
 system.time(print(b))
 ## [1] 1
 ##    user  system elapsed 
@@ -341,9 +341,9 @@ delayed bindings의 가장 중요한 사용은 `autoload()`에서 이루어진�
 ``` r
 env_bind_active(current_env(), z1 = function(val) runif(1))
 z1
-## [1] 0.79084
+## [1] 0.2718428
 z1
-## [1] 0.0481618
+## [1] 0.233198
 ```
 
 active bindings는 R6의 active fields를 implement할 때 사용된다. Section 14.3.2에서 배우게 됨.
@@ -518,7 +518,7 @@ sd
 ## function (x, na.rm = FALSE) 
 ## sqrt(var(if (is.vector(x) || is.factor(x)) x else as.double(x), 
 ##     na.rm = na.rm))
-## <bytecode: 0x000000001a08ddb8>
+## <bytecode: 0x000000001938d7c8>
 ## <environment: namespace:stats>
 ```
 
@@ -635,7 +635,7 @@ h <- function(x) {
 y <- h(1)
 ```
 
-<img src="https://d33wubrfki0l68.cloudfront.net/862b3606a4a218cc98739b224521b649eeac6082/5d3e9/diagrams/environments/execution.png" alt="그림8" style="width:50.0%" />
+<img src="https://d33wubrfki0l68.cloudfront.net/862b3606a4a218cc98739b224521b649eeac6082/5d3e9/diagrams/environments/execution.png" alt="그림8" style="height:50.0%" />
 
 1.  에서처럼, 우리가 `y <- h(1)`이라고 함수를 호출하면, execution env가 생겨서 `x`에다가 1을 assign. <br />
 2.  에서처럼, 이 execution env안에서 `a`에다가 2를 assign. <br />
@@ -653,7 +653,7 @@ h2 <- function(x) {
 
 e <- h2(x = 10)
 env_print(e)
-## <environment: 0000000018AFA108>
+## <environment: 0000000018AEE958>
 ## parent: <environment: global>
 ## bindings:
 ##  * a: <dbl>
@@ -677,12 +677,12 @@ plus <- function(x) {
 plus_one <- plus(1)
 plus_one
 ## function(y) x + y
-## <environment: 0x00000000185fe4b0>
+## <environment: 0x00000000185f2d00>
 ```
 
-다이어그램을 보면, `plus_one()`의 enclosing env가 `plus()`의 execution env라서 조금 복잡하다. <img src="https://d33wubrfki0l68.cloudfront.net/853b74c3293fae253c978b73c55f3d0531d746c5/6ffd5/diagrams/environments/closure.png" alt="그림9" style="width:50.0%" />
+다이어그램을 보면, `plus_one()`의 enclosing env가 `plus()`의 execution env라서 조금 복잡하다. <img src="https://d33wubrfki0l68.cloudfront.net/853b74c3293fae253c978b73c55f3d0531d746c5/6ffd5/diagrams/environments/closure.png" alt="그림9" style="height:50.0%" />
 
-우리가 `plus_one()`을 호출하면 무슨 일이 일어나는지? <br /> `plus_one()`의 execution env는, 캡쳐된 `plus()`의 execution env를 parent로 가질 것이다. <br /> What happens when we call plus\_one()? <br /> Its execution environment will have / the captured execution env of plus() as its parent. <br /> 그래서 `plus()`의 execution env가 더 오래 남아있다. <img src="https://d33wubrfki0l68.cloudfront.net/66676485e6a22c807c19b0c54c8fda6bd1292531/3526e/diagrams/environments/closure-call.png" alt="그림10" style="width:50.0%" />
+우리가 `plus_one()`을 호출하면 무슨 일이 일어나는지? <br /> `plus_one()`의 execution env는, 캡쳐된 `plus()`의 execution env를 parent로 가질 것이다. <br /> What happens when we call plus\_one()? <br /> Its execution environment will have / the captured execution env of plus() as its parent. <br /> 그래서 `plus()`의 execution env가 더 오래 남아있다. <img src="https://d33wubrfki0l68.cloudfront.net/66676485e6a22c807c19b0c54c8fda6bd1292531/3526e/diagrams/environments/closure-call.png" alt="그림10" style="height:50.0%" />
 
 function factory에 대해서는 Section 10.2에서 자세하게 배운다.
 
@@ -698,7 +698,7 @@ function factory에 대해서는 Section 10.2에서 자세하게 배운다.
 <p class="comment">
 <strong>base R에서는</strong> <br /> <code>parent.frame()</code>이랑 <code>caller\_env()</code>와 같은 것이다. 이름은 frame인데, frame이 아니라 env를 return한다.
 </p>
-<details> <summary>base R</summary> `parent.frame()`이랑 `caller_env()`와 같은 것이다. 이름은 frame인데, frame이 아니라 env를 return한다. </details> <br /> <br /> <br /> <br />
+<br /> <br />
 
 caller env를 충분히 이해하기 위해서는, 2개의 연관된 개념들concepts을 다루어야 한다. <br /> ①**frame**으로 만들어진 ②**call stack**. <br />
 
@@ -708,7 +708,7 @@ caller env를 충분히 이해하기 위해서는, 2개의 연관된 개념들co
 
 ### 7.5.1 Simple call stacks
 
-간단한 sequence of calls를 illustrate해보자: f()는 g()를, g()는 h()를 call한다. <br /> f() calls g() calls h().
+간단한 sequence of calls를 illustrate해보자: `f()`는 `g()`를, `g()`는 `h()`를 call한다. <br /> `f()` calls `g()` calls `h()`.
 
 ``` r
 f <- function(x) {
