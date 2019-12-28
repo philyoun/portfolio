@@ -97,14 +97,14 @@ env를 프린팅해보면 그냥 메모리 주소memory address만 표시된다.
 
 ``` r
 e1
-## <environment: 0x0000000013ee31c8>
+## <environment: 0x0000000014179100>
 ```
 
 대신에 `env_print()`를 사용하면 좀 더 정보를 준다.
 
 ``` r
 env_print(e1)
-## <environment: 0000000013EE31C8>
+## <environment: 0000000014179100>
 ## parent: <environment: global>
 ## bindings:
 ##  * a: <lgl>
@@ -161,7 +161,7 @@ env의 parent를 `env_parent()`를 통해서 찾을 수 있다.
 
 ``` r
 env_parent(e2b)
-## <environment: 0x0000000018bf9790>
+## <environment: 0x0000000018c063e0>
 env_parent(e2a)
 ## <environment: R_GlobalEnv>
 ```
@@ -181,17 +181,17 @@ e2d <- env(e2c, a = 1, b = 2, c = 3)
 
 ``` r
 env_parents(e2b)
-## [[1]]   <env: 0000000018BF9790>
+## [[1]]   <env: 0000000018C063E0>
 ## [[2]] $ <env: global>
 env_parent(e2d)
-## <environment: 0x00000000190bdfa0>
+## <environment: 0x00000000190cabf0>
 ```
 
 디폴트로, `env_parents()`는 global env에 다다르면 멈춘다. <br /> global env의 ancestors는 모든 attach된 패키지를 포함하고 있기 때문에, 이게 유용하다. <br /> `env_parents()`의 디폴트를, empty env까지 찾게끔 바꿔보면 이걸 확인해볼 수 있다. <br /> Section 7.4.1에서 이 env들을 다시 확인해볼 것이다.
 
 ``` r
 env_parents(e2b, last = empty_env())
-##  [[1]]   <env: 0000000018BF9790>
+##  [[1]]   <env: 0000000018C063E0>
 ##  [[2]] $ <env: global>
 ##  [[3]] $ <env: package:rlang>
 ##  [[4]] $ <env: package:stats>
@@ -341,9 +341,9 @@ delayed bindings의 가장 중요한 사용은 `autoload()`에서 이루어진�
 ``` r
 env_bind_active(current_env(), z1 = function(val) runif(1))
 z1
-## [1] 0.7801313
+## [1] 0.79084
 z1
-## [1] 0.2168169
+## [1] 0.0481618
 ```
 
 active bindings는 R6의 active fields를 implement할 때 사용된다. Section 14.3.2에서 배우게 됨.
@@ -518,7 +518,7 @@ sd
 ## function (x, na.rm = FALSE) 
 ## sqrt(var(if (is.vector(x) || is.factor(x)) x else as.double(x), 
 ##     na.rm = na.rm))
-## <bytecode: 0x000000001960c1e8>
+## <bytecode: 0x000000001a08ddb8>
 ## <environment: namespace:stats>
 ```
 
@@ -653,7 +653,7 @@ h2 <- function(x) {
 
 e <- h2(x = 10)
 env_print(e)
-## <environment: 0000000018AEC488>
+## <environment: 0000000018AFA108>
 ## parent: <environment: global>
 ## bindings:
 ##  * a: <dbl>
@@ -677,7 +677,7 @@ plus <- function(x) {
 plus_one <- plus(1)
 plus_one
 ## function(y) x + y
-## <environment: 0x000000001851ce90>
+## <environment: 0x00000000185fe4b0>
 ```
 
 다이어그램을 보면, `plus_one()`의 enclosing env가 `plus()`의 execution env라서 조금 복잡하다. <img src="https://d33wubrfki0l68.cloudfront.net/853b74c3293fae253c978b73c55f3d0531d746c5/6ffd5/diagrams/environments/closure.png" alt="그림9" style="width:50.0%" />
@@ -796,14 +796,16 @@ enclosing env이 아닌, calling stack에서 변수들을 찾아보는 것을 dy
 
 ### 7.5.5 Exercises
 
+------------------------------------------------------------------------
+
 7.6 As data structures
 ----------------------
 
-scoping을 지원하는 것만 아니라, env는 reference semantics를 가지기 때문에, 그 자체로도 유용한 데이터 구조다. 이게 해결하는데 도움을 줄 수 있는, 3가지 일반적인 문제들이 있다.
+scoping을 지원하는 것만 아니라, env는 reference semantics를 가지기 때문에, 그 자체로도 유용한 데이터 구조다. <br /> 이게 해결하는데 도움을 줄 수 있는, 3가지 일반적인 문제들이 있다.
 
--   **large data copies를 만들지 않는다.** Avoiding copies of large data. env는 reference semantics를 가지기 때문에, 절대 실수로 copy를 만들지 않는다. 하지만 bare env를 작업하기는 힘들기 때문에, R6 오브젝트 사용하는 걸 추천한다. env위에 만들어진 것으로, 14장에서 배울 것이다.
+-   **large data copies를 만들지 않는다.** Avoiding copies of large data. <br /> env는 reference semantics를 가지기 때문에, 절대 실수로 copy를 만들지 않는다. <br /> 하지만 bare env를 작업하기는 힘들기 때문에, R6 오브젝트 사용하는 걸 추천한다. <br /> env위에 만들어진 것으로, 14장에서 배울 것이다.
 
--   **패키지내에서 state를 관리한다.** Managing state within a package. explicit env는 패키지 내에서 유용하다. 왜냐하면 함수 호출들에 걸쳐, state를 유지maintain하도록 해주기 때문. 일반적으로, 패키지 내의 오브젝트는 잠겨있어서locked, 직접적으로 수정할 수는 없다. 대신에 이런 식으로 할 수는 있다.
+-   **패키지내에서 state를 관리한다.** Managing state within a package. <br /> explicit env는 패키지 내에서 유용하다. <br /> 왜냐하면 함수 호출들에 걸쳐, state를 유지maintain하도록 해주기 때문. <br /> 일반적으로, 패키지 내의 오브젝트는 잠겨있어서locked, 직접적으로 수정할 수는 없다. <br /> 대신에 이런 식으로 할 수는 있다.
 
 ``` r
 my_env <- new.env(parent = emptyenv())
@@ -820,19 +822,21 @@ set_a <- function(value) {
 }
 ```
 
-setter 함수가 old value를 return하는 것은 좋은 패턴이다. 왜냐하면 이렇게 하면 `on.exit()`을 사용해서 이전 값을 재설정reset하는게 더 쉽기 때문.(Section 6.7.4)
+setter 함수가 old value를 return하는 것은 좋은 패턴이다. <br /> 왜냐하면 이렇게 하면 `on.exit()`을 사용해서 이전 값을 재설정reset하는게 더 쉽기 때문.(Section 6.7.4)
 
--   **hashmap으로 사용.** hashmap은 O(1)이라는 상수constant를 받는 데이터 구조. O(1)은 해당 이름으로 오브젝트를 찾는데 걸리는 시간. environments는 이 behavior을 디폴트로 사용해서, hashmap을 simulate하는데 사용할 수 있다. 이 아이디어에 대한 개발을 보고 싶다면, hash 패키지([Brown 2013](https://cran.r-project.org/web/packages/hash/index.html))를 봐라.
+-   **hashmap으로 사용.** <br /> hashmap은 O(1)이라는 상수constant를 받는 데이터 구조. <br /> O(1)은 해당 이름으로 오브젝트를 찾는데 걸리는 시간. <br /> environments는 이 behavior을 디폴트로 사용해서, hashmap을 simulate하는데 사용할 수 있다. <br /> 이 아이디어에 대한 개발을 보고 싶다면, hash 패키지([Brown 2013](https://cran.r-project.org/web/packages/hash/index.html))를 봐라.
+
+------------------------------------------------------------------------
 
 7.7 Quiz answers
 ----------------
 
-1.  문제: env가 list와 다른 점을 최소한 3가지 이상 나열해보라. <details> <summary>답</summary> 4개가 있다. 이름이 unique해야함. 순서가 없음. reference semantics를 갖고 있고, env는 parents를 가질 수 있음. </details> <br /> <br />
+1.  문제: env가 list와 다른 점을 최소한 3가지 이상 나열해보라. <details> <summary>답</summary> 4개가 있다. <br /> 이름이 unique해야함. 순서가 없음. reference semantics를 갖고 있고, env는 parents를 가질 수 있음. </details> <br /> <br />
 
-2.  문제: global env의 parent는 무엇인가? parent가 없는 유일한 env는 무엇? <details> <summary>답</summary> 가장 최근에 attach한, 로드한 package. parent env가 없는 유일한 env는 empty env. </details> <br /> <br />
+2.  문제: global env의 parent는 무엇인가? parent가 없는 유일한 env는 무엇? <details> <summary>답</summary> 가장 최근에 attach한, 로드한 package. <br /> parent env가 없는 유일한 env는 empty env. </details> <br /> <br />
 
-3.  문제: 함수의 enclosing env란 무엇인가? 왜 중요한가? <details> <summary>답</summary> 그 함수가 생성된 env가 enclosing env. 어디에서 변수를 찾아볼건지를 결정함. being bound. </details> <br /> <br />
+3.  문제: 함수의 enclosing env란 무엇인가? 왜 중요한가? <details> <summary>답</summary> 그 함수가 생성된 env가 enclosing env. 어디에서 변수를 찾아볼건지를 결정함. <br /> being bound. </details> <br /> <br />
 
-4.  문제: 함수가 호출되어진 env를 어떻게 결정할 수 있는지? How do you determine the environment from which a function was called? <details> <summary>답</summary> <code>caller\_env()</code>나 <code>parent.frame()</code>을 사용할 것. 어떻게 함수를 호출했느냐에 따라 달라지는, 함수가 호출된 env를 제공. 이게 caller env. Section 7.5 첫 부분을 보자. </details> <br /> <br />
+4.  문제: 함수가 호출되어진 env를 어떻게 결정할 수 있는지? <br /> How do you determine the environment from which a function was called? <details> <summary>답</summary> <code>caller\_env()</code>나 <code>parent.frame()</code>을 사용할 것. <br /> 어떻게 함수를 호출했느냐에 따라 달라지는, 함수가 호출된 env를 제공. <br /> 이게 caller env. Section 7.5 첫 부분을 보자. </details> <br /> <br />
 
-5.  문제: `<-` 와 `<<-`는 어떻게 다른지? <details> <summary>답</summary> &lt;-는 항상 현재의 env에서 binding을 만듬. &lt;&lt;-는 현재 env의 parent에 있는, 존재하는 이름을 rebind해줌. 없으면 global env에다가 하나 만들었고. </details> <br /> <br />
+5.  문제: `<-` 와 `<<-`는 어떻게 다른지? <details> <summary>답</summary> <code>&lt;-</code>는 항상 현재의 env에서 binding을 만듬. <br /> <code>&lt;&lt;-</code>는 현재 env의 parent에 있는, 존재하는 이름을 rebind해줌. <br /> 없으면 global env에다가 하나 만들었고. </details> <br /> <br />
