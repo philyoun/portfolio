@@ -10,8 +10,8 @@ env는 scoping을 지원powers하는 데이터 구조이다. <br />
 &emsp;&emsp;그 구조에 대해 깊이 있게 설명describe해보며, <br />
 &emsp;&emsp;이걸 이용해서, Section 6.4에서 설명된 4개의 scoping rules에 대한 이해를 증가improve
 
-R을 그날그날 사용하는 사람들에게는, env를 이해하는 것이 중요하지 않다. <br />
-하지만 이해하는 것은 중요하다. <br />
+R을 그날그날 사용하는 사람들에게는, env를 이해하는게 별로 필요하지 않다. <br />
+하지만 우린 전문가니깐. 이해하는 것이 중요하다. <br />
 왜냐하면 env가, <br />
 1. lexical scoping, namespaces, R6 classes과 같은 많은 R의 특징들features을 가능케power하고, <br />
 2. evaluation과 상호 작용하게해서interact with, <br />
@@ -47,7 +47,7 @@ R을 그날그날 사용하는 사람들에게는, env를 이해하는 것이 �
 	&emsp;&emsp;briefly discusses three places where envs are useful data structures for solving other problems.
 
 ### Prerequisites
-부수적인 디테일이 아닌, env의 essence에 대해 focus할 수 있게 도와주는 rlang 함수들이 필요.
+부수적인 디테일이 아닌, env의 에센스essence에 focus할 수 있게 도와주는 rlang 함수들이 필요.
 ```{r warning=FALSE, message=FALSE}
 library(rlang)
 ```
@@ -89,6 +89,16 @@ e1 <- env(
 	d = 1:3,
 )
 ```
+
+<style>
+p.comment {
+background-color: #DBDBDB;
+padding: 10px;
+border: 1px solid black;
+margin-left: 25px;
+border-radius: 5px;
+}
+</style>
 
 <p class="comment">
 <strong>base R에서는</strong> <br />
@@ -289,19 +299,20 @@ env_get(e3, "xyz", default = NA)
 ```
 
 env에다가 bindings를 추가할 수 있는 2가지 방법이 있다. <br />
-1) `env_poke()`는 name(string으로 주어야함)과 value를 받는다.
+- `env_poke()`는 name(string으로 주어야함)과 value를 받는다.
 ```{r collapse=TRUE}
 env_poke(e3, "a", 100)
 e3$a
 ```
 
-2) `env_bind()`는 여러 개의 값들을 bind할 수 있도록 해준다.
+- `env_bind()`는 여러 개의 값들을 bind할 수 있도록 해준다.
 ```{r collapse=TRUE}
 env_bind(e3, a = 10, b = 20)
 env_names(e3)
 ```
 
 
+binding 추가하는것에 대해봤고, <br />
 env가 binding을 갖고 있는지를 `env_has()`를 통해서 확인할 수 있다.
 ```{r collapse=TRUE}
 env_has(e3, "a")

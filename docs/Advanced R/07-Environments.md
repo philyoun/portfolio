@@ -3,7 +3,7 @@
 
 env는 scoping을 지원powers하는 데이터 구조이다. <br /> 이 챕터에서는 env에 대해 깊게 알아볼 것. <br />   그 구조에 대해 깊이 있게 설명describe해보며, <br />   이걸 이용해서, Section 6.4에서 설명된 4개의 scoping rules에 대한 이해를 증가improve
 
-R을 그날그날 사용하는 사람들에게는, env를 이해하는 것이 중요하지 않다. <br /> 하지만 이해하는 것은 중요하다. <br /> 왜냐하면 env가, <br /> 1. lexical scoping, namespaces, R6 classes과 같은 많은 R의 특징들features을 가능케power하고, <br /> 2. evaluation과 상호 작용하게해서interact with, <br />   dplyr나 ggplot2와 같은 domain specific languages을 만드는데 강력한 도구를 주기 때문.
+R을 그날그날 사용하는 사람들에게는, env를 이해하는게 별로 필요하지 않다. <br /> 하지만 우린 전문가니깐. 이해하는 것이 중요하다. <br /> 왜냐하면 env가, <br /> 1. lexical scoping, namespaces, R6 classes과 같은 많은 R의 특징들features을 가능케power하고, <br /> 2. evaluation과 상호 작용하게해서interact with, <br />   dplyr나 ggplot2와 같은 domain specific languages을 만드는데 강력한 도구를 주기 때문.
 
 ### Quiz
 
@@ -29,7 +29,7 @@ R을 그날그날 사용하는 사람들에게는, env를 이해하는 것이 �
 
 ### Prerequisites
 
-부수적인 디테일이 아닌, env의 essence에 대해 focus할 수 있게 도와주는 rlang 함수들이 필요.
+부수적인 디테일이 아닌, env의 에센스essence에 focus할 수 있게 도와주는 rlang 함수들이 필요.
 
 ``` r
 library(rlang)
@@ -67,6 +67,15 @@ e1 <- env(
 )
 ```
 
+<style>
+p.comment {
+background-color: #DBDBDB;
+padding: 10px;
+border: 1px solid black;
+margin-left: 25px;
+border-radius: 5px;
+}
+</style>
 <p class="comment">
 <strong>base R에서는</strong> <br /> 새로운 env를 만들기 위해서는 <code>new.env()</code>를 사용한다. <br /> <code>hash</code>나 <code>size</code>같은 parameter는 무시해라. 필요없다. <br /> 값을 정의하고 생성하는 걸 동시에 할 수는 없다. 밑에 나온대로, <code>$&lt;-</code>를 사용해라.
 </p>
@@ -88,14 +97,14 @@ env를 프린팅해보면 그냥 메모리 주소memory address만 표시된다.
 
 ``` r
 e1
-## <environment: 0x0000000013b29008>
+## <environment: 0x0000000014da9f28>
 ```
 
 대신에 `env_print()`를 사용하면 좀 더 정보를 준다.
 
 ``` r
 env_print(e1)
-## <environment: 0000000013B29008>
+## <environment: 0000000014DA9F28>
 ## parent: <environment: global>
 ## bindings:
 ##  * a: <lgl>
@@ -152,7 +161,7 @@ env의 parent를 `env_parent()`를 통해서 찾을 수 있다.
 
 ``` r
 env_parent(e2b)
-## <environment: 0x0000000018b929a8>
+## <environment: 0x0000000018b8ea28>
 env_parent(e2a)
 ## <environment: R_GlobalEnv>
 ```
@@ -172,17 +181,17 @@ e2d <- env(e2c, a = 1, b = 2, c = 3)
 
 ``` r
 env_parents(e2b)
-## [[1]]   <env: 0000000018B929A8>
+## [[1]]   <env: 0000000018B8EA28>
 ## [[2]] $ <env: global>
 env_parent(e2d)
-## <environment: 0x00000000190571b8>
+## <environment: 0x0000000019053238>
 ```
 
 디폴트로, `env_parents()`는 global env에 다다르면 멈춘다. <br /> global env의 ancestors는 모든 attach된 패키지를 포함하고 있기 때문에, 이게 유용하다. <br /> `env_parents()`의 디폴트를, empty env까지 찾게끔 바꿔보면 이걸 확인해볼 수 있다. <br /> Section 7.4.1에서 이 env들을 다시 확인해볼 것이다.
 
 ``` r
 env_parents(e2b, last = empty_env())
-##  [[1]]   <env: 0000000018B929A8>
+##  [[1]]   <env: 0000000018B8EA28>
 ##  [[2]] $ <env: global>
 ##  [[3]] $ <env: package:rlang>
 ##  [[4]] $ <env: package:stats>
@@ -259,7 +268,7 @@ env_get(e3, "xyz", default = NA)
 ## [1] NA
 ```
 
-env에다가 bindings를 추가할 수 있는 2가지 방법이 있다. <br /> 1) `env_poke()`는 name(string으로 주어야함)과 value를 받는다.
+env에다가 bindings를 추가할 수 있는 2가지 방법이 있다. <br /> - `env_poke()`는 name(string으로 주어야함)과 value를 받는다.
 
 ``` r
 env_poke(e3, "a", 100)
@@ -267,7 +276,7 @@ e3$a
 ## [1] 100
 ```
 
-1.  `env_bind()`는 여러 개의 값들을 bind할 수 있도록 해준다.
+-   `env_bind()`는 여러 개의 값들을 bind할 수 있도록 해준다.
 
 ``` r
 env_bind(e3, a = 10, b = 20)
@@ -275,7 +284,7 @@ env_names(e3)
 ## [1] "x" "y" "z" "a" "b"
 ```
 
-env가 binding을 갖고 있는지를 `env_has()`를 통해서 확인할 수 있다.
+binding 추가하는것에 대해봤고, <br /> env가 binding을 갖고 있는지를 `env_has()`를 통해서 확인할 수 있다.
 
 ``` r
 env_has(e3, "a")
@@ -316,7 +325,7 @@ env_bind_lazy(current_env(), b = {Sys.sleep(1); 1})
 system.time(print(b))
 ## [1] 1
 ##    user  system elapsed 
-##    0.00    0.00    1.02
+##       0       0       1
 system.time(print(b))
 ## [1] 1
 ##    user  system elapsed 
@@ -332,9 +341,9 @@ delayed bindings의 가장 중요한 사용은 `autoload()`에서 이루어진�
 ``` r
 env_bind_active(current_env(), z1 = function(val) runif(1))
 z1
-## [1] 0.1963889
+## [1] 0.5417594
 z1
-## [1] 0.4950598
+## [1] 0.4149112
 ```
 
 active bindings는 R6의 active fields를 implement할 때 사용된다. Section 14.3.2에서 배우게 됨.
@@ -432,7 +441,7 @@ sd
 ## function (x, na.rm = FALSE) 
 ## sqrt(var(if (is.vector(x) || is.factor(x)) x else as.double(x), 
 ##     na.rm = na.rm))
-## <bytecode: 0x00000000145801b0>
+## <bytecode: 0x0000000013b5f260>
 ## <environment: namespace:stats>
 ```
 
@@ -553,7 +562,7 @@ h2 <- function(x) {
 
 e <- h2(x = 10)
 env_print(e)
-## <environment: 0000000019E70D68>
+## <environment: 0000000019713008>
 ## parent: <environment: global>
 ## bindings:
 ##  * a: <dbl>
@@ -577,7 +586,7 @@ plus <- function(x) {
 plus_one <- plus(1)
 plus_one
 ## function(y) x + y
-## <environment: 0x000000001a036868>
+## <environment: 0x000000001a4d2bd0>
 ```
 
 다이어그램을 보면, `plus_one()`의 enclosing env가 `plus()`의 execution env라서 조금 복잡하다. <img src="https://d33wubrfki0l68.cloudfront.net/853b74c3293fae253c978b73c55f3d0531d746c5/6ffd5/diagrams/environments/closure.png" alt="그림9" style="width:50.0%" />
