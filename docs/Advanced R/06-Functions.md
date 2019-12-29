@@ -170,7 +170,7 @@ deviation <- function(x) x - mean(x)
 ``` r
 x <- runif(100)
 sqrt(mean(square(deviation(x))))
-## [1] 0.2788802
+## [1] 0.2955688
 ```
 
 ② 아니면 중간중간 결과물들을 변수로 저장할 수도 있다.
@@ -181,7 +181,7 @@ out <- square(out)
 out <- mean(out)
 out <- sqrt(out)
 out
-## [1] 0.2788802
+## [1] 0.2955688
 ```
 
 위 2개는 base R이고, <br /> ③ magrittr 패키지([Bache and Wickham 2014](https://magrittr.tidyverse.org/))는 3번째 옵션을 제공한다. <br /> 이항 연산자binary operator인 `%>%`는, 파이프pipe라고 부르고, "and then"이라고 발음한다.
@@ -194,7 +194,7 @@ x %>%
     square() %>%
     mean() %>%
     sqrt()
-## [1] 0.2788802
+## [1] 0.2955688
 ```
 
 `x %>% f()`는, `f(x)`와 같은 것이다. <br /> `x %>% f(y)`는, `f(x, y)`와 같은 것이다. <br /> 파이프를 사용하면 낮은 수준의 데이터 흐름이 아니라, 높은 수준의 함수 구성에 집중할 수 있다. <br /> 초점은 수정 된 것(명사)이 아니라, 수행중인 것(동사)에 있다. <br /> The pipe allows you to focus on the high-level composition of functions rather than the low-level flow of data; <br /> the focus is on what's being done(the verbs), rather than on what's being modified(the nouns). <br /> 이러한 스타일은 하스켈이나 F\#에서는 흔하다. <br /> 이게 magrittr을 만드는데 있어 영감이 되었고, Forth나 Factor라는 프로그래밍 언어의 디폴트 스타일이다. <br /> (둘 다 이번에 처음 알게 된 프로그래밍 언어다.)
@@ -391,7 +391,54 @@ g12()
 
 문제와 해결법을 보고나면, 왜 이런 원치않아보이는 행동이 존재하는지를 알게 된다. <br /> R은 하나부터 끝까지, 뭘 찾든간에, lexical scoping에 의존하고 있다. <br /> `mean()`과 같이 명백해보이는 것들에서부터 시작해서, 좀 덜 명백해보이는 `+`나 `{` 같은 것들까지. <br /> 이것은 R의 scoping rule에 좀 아름다운 단순함을 부여한다.
 
+### 6.4.5 Exercises
+
 ------------------------------------------------------------------------
 
 6.5 Lazy evaluation
 -------------------
+
+------------------------------------------------------------------------
+
+6.6 `...` (dot-dot-dot)
+-----------------------
+
+------------------------------------------------------------------------
+
+6.7 Exiting a function
+----------------------
+
+### 6.7.1 Implicit versus explicit returns
+
+### 6.7.2 Invisible values
+
+### 6.7.3 Errors
+
+### 6.7.4 Exit handlers
+
+### 6.7.5 Exercises
+
+<style>
+p.comment {
+background-color: #DBDBDB;
+padding: 5px;
+border: 1px navy;
+margin-left: 30px;
+border-radius: 10px;
+}
+</style>
+<p class="comment">
+<strong>base R에서는</strong> <br /> <code>map()</code>과 동등한 base 함수는 <code>lapply()</code>다. <br /> 유일한 차이는 <code>lapply()</code>는 밑에서 배우게 될 helpers를 지원하지 않는다는 것이다. <br /> 그래서 만약에 purrr에서 <code>map()</code>만 쓸 것이라면, 추가적인 의존성additional dependency를 스킵하고 <code>lapply()</code>를 쓰면 된다.
+</p>
+<style>
+p.comment {
+background-color: #DBDBDB;
+padding: 15px;
+border: 1px skyblue;
+margin-left: 30px;
+border-radius: 10px;
+}
+</style>
+<p class="comment">
+<strong>base R에서는</strong> <br /> <code>map()</code>과 동등한 base 함수는 <code>lapply()</code>다. <br /> 유일한 차이는 <code>lapply()</code>는 밑에서 배우게 될 helpers를 지원하지 않는다는 것이다. <br /> 그래서 만약에 purrr에서 <code>map()</code>만 쓸 것이라면, 추가적인 의존성additional dependency를 스킵하고 <code>lapply()</code>를 쓰면 된다.
+</p>

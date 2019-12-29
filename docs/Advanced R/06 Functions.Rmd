@@ -466,12 +466,54 @@ R은 하나부터 끝까지, 뭘 찾든간에, lexical scoping에 의존하고 �
 `mean()`과 같이 명백해보이는 것들에서부터 시작해서, 좀 덜 명백해보이는 `+`나 `{` 같은 것들까지. <br />
 이것은 R의 scoping rule에 좀 아름다운 단순함을 부여한다.
 
+### 6.4.5 Exercises
 ___
 
 ## 6.5 Lazy evaluation
+___
+## 6.6 `...` (dot-dot-dot)
 
+___
+## 6.7 Exiting a function
 
+### 6.7.1 Implicit versus explicit returns
+### 6.7.2 Invisible values
+### 6.7.3 Errors
+### 6.7.4 Exit handlers
+### 6.7.5 Exercises
+<style>
+p.comment {
+background-color: #DBDBDB;
+padding: 5px;
+border: 1px navy;
+margin-left: 30px;
+border-radius: 10px;
+}
+</style>
 
+<p class="comment">
+<strong>base R에서는</strong> <br />
+<code>map()</code>과 동등한 base 함수는 <code>lapply()</code>다. <br />
+유일한 차이는 <code>lapply()</code>는 밑에서 배우게 될 helpers를 지원하지 않는다는 것이다. <br />
+그래서 만약에 purrr에서 <code>map()</code>만 쓸 것이라면, 추가적인 의존성additional dependency를 스킵하고 <code>lapply()</code>를 쓰면 된다.
+</p>
+
+<style>
+p.comment {
+background-color: #DBDBDB;
+padding: 15px;
+border: 1px skyblue;
+margin-left: 30px;
+border-radius: 10px;
+}
+</style>
+
+<p class="comment">
+<strong>base R에서는</strong> <br />
+<code>map()</code>과 동등한 base 함수는 <code>lapply()</code>다. <br />
+유일한 차이는 <code>lapply()</code>는 밑에서 배우게 될 helpers를 지원하지 않는다는 것이다. <br />
+그래서 만약에 purrr에서 <code>map()</code>만 쓸 것이라면, 추가적인 의존성additional dependency를 스킵하고 <code>lapply()</code>를 쓰면 된다.
+</p>
 
 
 
