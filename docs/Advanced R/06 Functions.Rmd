@@ -232,7 +232,242 @@ the focus is on what's being done(the verbs), rather than on what's being modifi
 
 ___
 ## 6.4 Lexical scoping
+Chapter 2에서, 할당assignment에 대해 배웠다. <br />
+이름name에다가 값value을 binding하는 행동. <br />
+여기서는 **scoping**에 대해 다룰 것인데, 이름과 연관associate된 값을 찾는 행동임.
+
+scoping의 기본적인 룰은 꽤나 직관적이다. <br />
+대놓고 배우지는 않았더라도, 모르는 사이에 이미 어느 정도 알고 있을수도 있다. <br />
+예를 들어, 다음의 코드는 10과 20 중 어떤 값을 return할까?
+```{r eval=FALSE}
+x <- 10
+g01 <- function() {
+  x <- 20
+  x
+}
+
+g01()
+```
+
+이 섹션에서는, scoping의 형식적인 룰들과 사소한 디테일들에 대해 배울 것이다. <br />
+scoping에 대해 깊이 이해하고 나면, 좀 더 advanced function programming 툴들을 사용할 수 있을 것이고, <br />
+R 코드를 다른 언어들로 번역할 수 있는 툴들을 작성할 수 있게 해준다.
+
+R은 **lexical scoping**을 사용한다. <br />
+함수가 어떻게 정의되었는지를 바탕으로 이름name의 값value을 찾아본다. <br />
+	&emsp;&emsp;어떻게 호출되었는지가 아니라. <br />
+R looks up the values of names based on how a function is defined, not how it is called.
+
+여기서 "Lexical"은 word나 vocabulary라는 뜻이 아니다. <br />
+이건 기술적인 CS 단어다. <br />
+	&emsp;&emsp;scoping rule이, run-time 구조가 아닌 parse-time을 사용한다는. <br />
+It’s a technical CS term that tells us that the scoping rules use a parse-time, rather than a run-time structure.
+
+<details>
+<summary>parse-time run-time</summary>
+여기서 parse-time이랑 run-time이 무슨 뜻인지 한참 찾아봤는데, <br />
+	&emsp;&emsp;parse-time이라는건 위에 how a function is defined, 함수가 어떻게 정의되었는지와 관련이, <br />
+	&emsp;&emsp;run-time이라는건 위에 how a function is called, 함수가 어떻게 호출되었는지와 관련이 있음. <br />
+그래서 lazy evaluation같이, 받아만 놓고 evaluate는 호출되었을 때만 하면 그게 run-time이랑 연관이, <br />
+	&emsp;&emsp;입력한 즉시 evaluate가 되는 그런건 parse-time이랑 연관이 있는듯.
+</details>
+<br />
+<br />
+
+R의 lexical scoping은, 4개의 주요한 규칙들이 있다. <br />
+1. Name masking <br />
+2. Functions versus variables <br />
+3. A fresh start <br />
+4. Dynamic lookup
+
+
+### 6.4.1 Name masking
+lexical scoping의 기본 원리, <br />
+	&emsp;&emsp;함수 안에서 정의된 이름name들은, 밖에서 정의된 이름들을 가린다.mask <br />
+그러니깐 밖에서 정의된 이름들이 함수 안에서 정의된 걸로 덮어씌워진다는 것. <br />
+하지만, 덮어씌운다고 한다면 override라고 했을텐데 mask라고 했으니 '가린다'라고 번역했다. <br />
+다음의 예를 보자.
+```{r collapse=TRUE}
+x <- 10
+y <- 20
+g02 <- function() {
+  x <- 1
+  y <- 2
+  c(x, y)
+}
+
+g02()
+```
+
+만약 이름이 함수 안에 정의되어 있지 않으면, R은 한 레벨 위를 찾아본다.
+```{r collapse=TRUE}
+x <- 2
+g03 <- function() {
+  y <- 1
+  c(x, y)
+}
+
+g03()
+```
+
+그리고 이건 이전의 y값을 바꾸지는 않음
+```{r collapse=TRUE}
+y
+```
+
+어떤 함수가 다른 함수 안에서 정의되어 있다해도, 같은 규칙이 적용된다. <br />
+먼저, R은 현재 함수의 안에서 찾아보고, <br />
+다음으로 함수가 정의된 곳을 찾아보고(없으면 한 레벨 위씩 올라가서 global env까지), <br />
+마지막으로 다른 로드된 패키지들에서 찾아본다.
+
+다음의 코드는 어떤 결과물이 나올지를 예상해보자.
+```{r eval=FALSE}
+x <- 1
+g04 <- function() {
+    y <- 2
+    i <- function() {
+      z <- 3
+      c(x, y, z)
+    }
+    i()
+}
+
+g04()
+```
+
+같은 규칙이, 다른 함수들로 만들어진 함수들에도 적용된다. <br />
+난 이걸 찍어낸 함수manufactured function라고 부른다. <br />
+이건 10장의 주제다.
+
+### 6.4.2 Function versus variables
+R에서는, 함수도 일반적인 오브젝트이다. <br />
+이 말인즉슨, 위에서 설명했던 scoping rule이 함수에도 똑같이 적용된다는 말이다.
+```{r collapse=TRUE}
+g07 <- function(x) x + 1
+g08 <- function() {
+  g07 <- function(x) x + 100
+  g07(10)
+}
+
+g08()
+```
+
+하지만, 만약에 함수와, 함수가 아닌 것이, 똑같은 이름을 갖는다면,(물론 둘은 서로 다른 env에 있어야겠지만) <br />
+	&emsp;&emsp;이 규칙을 적용하는 것이 조금은 더 복잡해진다. <br />
+However, when a function and a non-function share the same name (they must, of course, reside in different environments), <br />
+applying these rules gets a little more complicated.
+
+함수 호출에서 이름을 사용할 때, R은 그 값을 찾는데 있어 함수가 아닌 오브젝트들은 애초에 무시한다. <br />
+예를 들어 아래의 코드에서, `g09`는 2개의 다른 값들을 갖는다.
+```{r collapse=TRUE}
+g09 <- function(x) x + 100
+g10 <- function() {
+  g09 <- 10
+  g09(g09)
+}
+
+g10()
+```
+
+그러니깐 `g09()`를 찾는데 있어 함수가 아니면 애초에 고려를 하지도 않아서 함수 안의 10의 값을 갖는 `g09`를 제끼고, <br />
+함수 밖의 `g09()`라는 함수를 잘 찾는 것.
+
+물론 분명히 말하건대, 다른 것들에 대해 같은 이름을 사용하는 것은 헷갈리고, 피하는 것이 가장 좋다!
+
+### 6.4.3 A fresh start
+함수 호출invocation을 여러 번 하는데 있어, 값들values에는 무슨 일이 일어날까? <br />
+What happens to values between invocations of a function? <br />
+아래의 예를 보자. 아래의 함수를 처음으로 실행하면 무슨 값을 얻을까? 두 번째로 실행할 때는? <br />
+(`exists()`를 본 적이 없다면, 그 이름으로 된 변수가 존재한다면 `TRUE`를 return하고 아니면 `FALSE`를 return)
+
+```{r eval=FALSE}
+g11 <- function() {
+  if (!exists("a")) {
+    a <- 1
+  } else {
+    a <- a + 1
+  }
+  a
+}
+
+g11()
+g11()
+```
+
+`g11()`이 항상 같은 값을 return한다는 것에 놀랄 수도 있다. <br />
+함수가 호출될 때마다, 실행을 호스팅하기 위해 새로운 env가 만들어지기 때문. <br />
+This happens because every time a function is called a new environment is created to host its execution. <br />
+저번 실행 때 무슨 일이 일어났는지를, 함수가 말해줄 방법은 없다는 것. <br />
+각 호출은 완전히 독립적이다. each invocation is completely independent. <br />
+이걸 [Section 10.2.4](https://blog-for-phil.readthedocs.io/en/latest/Advanced%20R/10-Function-Factories/#102-factory-fundamentals)에서 다룰 것이다.
+
+
+<details>
+<summary>call과 invocation?</summary>
+call도 호출이고 invocation도 호출이라고 번역을 하긴했는데, 분명 차이가 있을거 같아서 찾아봤다. <br />
+javaScript에서는 구별이 확실히 되는거같은데, <br />
+	&emsp;&emsp;call a function이라고 하면 직접적으로 실행을 하는 것이고, <br />
+	&emsp;&emsp;invoke a function이라고 하면 간접적으로 실행을 하는 것인가보다. <br />
+Section 6.2.4 Invoking a function에서, <code>do.call()</code>처럼 <code>mean()</code>을 호출하는 것도 일종의 간접적인 방법으로 실행하는 거라고 생각해봐도 되겠다.
+</details>
+<br />
+<br />
+
+
+### 6.4.4 Dynamic lookup
+Lexical scoping은 언제가 아니라, 어디서 값을 찾아볼지를 정하는 것이다. <br />
+Lexical scoping determines where, but not when to look for values.
+
+R은 함수가 만들어졌을 때가 아니라, 실행될 때 값을 찾아본다. <br />
+R looks for values when the function is run, not when the function is created.
+
+실행될 때, 그리고 어디서. <br />
+이 2개를 종합해보면, 함수의 output은 함수 env 외부 오브젝트들에 따라 달라질 수 있다는 것. <br />
+Together, these two properties tell us that the output of a function can differ depending on the objects outside the function's environment.
+
+```{r collapse=TRUE}
+g12 <- function() x + 1
+x <- 15
+g12()
+
+x <- 20
+g12()
+```
+
+이러한 행동은 꽤 짜증날 수 있다. <br />
+코드에 스펠링 실수를 했다면, 함수를 생성할 때 아무런 에러 메세지를 얻지 못한다. <br />
+그리고 실수를 하지 않았어도, global env에 정의된 변수들에 따라, 함수를 실행할 때 아무런 에러 메세지를 얻지 못할수도 있다.
+
+이러한 문제를 감지하기 위해, `codetools::findGlobals()`를 사용하자. <br />
+이 함수는 함수 내의 모든 외부 종속성들dependencies(unbound symbol)을 나열한다. <br />
+This function lists all the external dependencies (unbound symbols) within a function:
+
+
+<details>
+<summary>unbound symbols?</summary>
+그러니깐 name에는 value가 associate되어있는게 일반적인데, value가 없는 name, 예를 들어 <code>+</code>를 unbound symbol이라고 하는듯
+</details>
+<br />
+<br />
+
+```{r collapse=TRUE}
+codetools::findGlobals(g12)
+```
+
+이 문제를 해결하기 위해서, 함수의 env를 `emptyenv()`로 manual하게 바꿀 수 있다. <br />
+아무것도 없는 env임.
+```{r collapse=TRUE, error=TRUE}
+environment(g12) <- emptyenv()
+g12()
+```
+
+문제와 해결법을 보고나면, 왜 이런 원치않아보이는 행동이 존재하는지를 알게 된다. <br />
+R은 하나부터 끝까지, 뭘 찾든간에, lexical scoping에 의존하고 있다. <br />
+`mean()`과 같이 명백해보이는 것들에서부터 시작해서, 좀 덜 명백해보이는 `+`나 `{` 같은 것들까지. <br />
+이것은 R의 scoping rule에 좀 아름다운 단순함을 부여한다.
+
 ___
+
 ## 6.5 Lazy evaluation
 
 
