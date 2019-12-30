@@ -475,45 +475,145 @@ ___
 
 ___
 ## 6.7 Exiting a function
+대부분의 함수는 두 가지 방법 중 하나로 exit한다.
+①성공을 나타내는, 값value을 return하거나, 혹은 ②실패를 나타내는, 에러를 나타낸다.
+이 section에서는,
+	1. 값을 반환하는 것에 대해 다루고(implicit versus explicit, visible versus invisible), 
+	2. 에러에 대해 간략하게 다루어보며, 
+	3. exit handlers를 소개한다. 함수를 exit할 때 코드를 실행하게 해준다.
 
 ### 6.7.1 Implicit versus explicit returns
+함수가 값value을 return할 수 있는 2가지 방법이 있다.
+- Implicit하게, 즉, 마지막으로 evaluate된 expression이 return되는 값이 되는 것임.
+```{r collapse=TRUE}
+j01 <- function(x) {
+	if (x < 10) {
+		0
+	} else {
+		10
+	}
+}
+
+j01(5)
+j01(15)
+```
+
+- Explicit하게, 즉, `return()`을 호출해서 쓰는 것임.
+```{r collapse=TRUE}
+j02 <- function(x) {
+	if (x < 10) {
+		return(0)
+	} else {
+		return(10)
+	}
+}
+
+j02(5)
+j02(15)
+```
+
+
 ### 6.7.2 Invisible values
+대부분의 함수들은 눈에 보이게 return한다. 
+그냥 interactive context에다가 함수를 호출하면, 결과물을 출력한다.
+(콘솔에다가 함수를 호출하면 결과물이 나온단 소리임)
+
+```{r collapse=TRUE}
+j03 <- function() 1
+j03()
+```
+
+그러나, 마지막 값last value에다가 invisible()을 씌워서, 자동적으로 프린트되는 것을 막을 수 있다.
+```{r collapse=TRUE}
+j04 <- function() invisible(1)
+j04()
+```
+
+이 값이 진짜로 존재한다는 걸 증명하려면, explicit하게 print하던가, 괄호로 감싸주면 된다.
+```{r collapse=TRUE}
+print(j04())
+
+
+(j04())
+```
+
+혹은, `withVisible()`을 사용해, value랑 보이는지 안보이는지 visibility flag도 return하게끔 할 수 있다.
+```{r collapse=TRUE}
+str(withVisible(j04()))
+```
+
+invisible하게 return하는 가장 흔한 함수는, <-다.
+```{r collapse=TRUE}
+a <- 2
+(a <- 2)
+```
+
+이게 체인 할당chain assignments이 가능한 이유다.
+```{r collapse=TRUE}
+a <- b <- c <- d <- 2
+```
+
+일반적으로, side effect 때문에 호출되는 모든 함수들은, invisible value를 return해야 한다.
+그런 함수들의 예를 들자면 `<-`, `print()`, `plot()` 같은 것들, 
+그리고 return하는 invisible value는 보통 첫 번째 인자의 값.
+
+
 ### 6.7.3 Errors
+함수가 할당된 작업assigned task을 완수할 수 없다면, `stop()`과 함께 에러가 나온다.
+`stop()`은 즉시 함수의 실행을 종료한다.
+```{r collapse=TRUE, error=TRUE}
+j05 <- function() {
+	stop("I'm an error")
+	return(10)
+}
+
+j05()
+```
+
+에러는 뭔가가 잘못되었다는 걸 알려주며, 유저가 문제를 해결하게끔 강제한다.
+C, Go, Rust 같은 몇몇 언어들은 문제들을 알려주는 특별한 return 값들이 있다.
+그러나 R에서는 항상 에러가 나와야 한다.
+8장에서 에러들과 이것들을 어떻게 다루어야 하는지 배울 것이다.
+
+
 ### 6.7.4 Exit handlers
+가끔 함수는 global state에 임시적인 변화들changes을 필요로 할 수 있다.
+하지만 이러한 변화들changes을 나중에 치우는게clean-up 힘들 수 있다.(만약 에러가 생긴다면?과 같은)
+어떻게 함수가 exit되던간에, 
+	이러한 변화들이 취소undone되고 global state가 복구되었다는걸 보장하기 위해서는,
+	exit handler를 셋업하기 위해 `on.exit()`을 사용하자.
+
+다음의 간단한 예는, 함수가 정상적으로 exit되든 에러로 exit되든, 
+	exit handler가 실행된다는 것을 보여준다.
+
+```{r collapse=TRUE, error=TRUE}
+j06 <- function(x) {
+	cat("Hello\n")
+	on.exit(cat("Goodbye!\n"), add = TRUE)
+
+	if(x) {
+		return(10)
+	} else {
+		stop("Error")
+	}
+}
+
+j06(TRUE)
+
+j06(FALSE)
+```
+
+
+
+
+
+
+
+
+
+
+
 ### 6.7.5 Exercises
-<style>
-p.comment {
-background-color: #DBDBDB;
-padding: 5px;
-border: 1px navy;
-margin-left: 30px;
-border-radius: 10px;
-}
-</style>
-
-<p class="comment">
-<strong>base R에서는</strong> <br />
-<code>map()</code>과 동등한 base 함수는 <code>lapply()</code>다. <br />
-유일한 차이는 <code>lapply()</code>는 밑에서 배우게 될 helpers를 지원하지 않는다는 것이다. <br />
-그래서 만약에 purrr에서 <code>map()</code>만 쓸 것이라면, 추가적인 의존성additional dependency를 스킵하고 <code>lapply()</code>를 쓰면 된다.
-</p>
-
-<style>
-p.comment {
-background-color: #DBDBDB;
-padding: 15px;
-border: 1px skyblue;
-margin-left: 30px;
-border-radius: 10px;
-}
-</style>
-
-<p class="comment">
-<strong>base R에서는</strong> <br />
-<code>map()</code>과 동등한 base 함수는 <code>lapply()</code>다. <br />
-유일한 차이는 <code>lapply()</code>는 밑에서 배우게 될 helpers를 지원하지 않는다는 것이다. <br />
-그래서 만약에 purrr에서 <code>map()</code>만 쓸 것이라면, 추가적인 의존성additional dependency를 스킵하고 <code>lapply()</code>를 쓰면 된다.
-</p>
 
 
 

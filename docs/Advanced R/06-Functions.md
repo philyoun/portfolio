@@ -170,7 +170,7 @@ deviation <- function(x) x - mean(x)
 ``` r
 x <- runif(100)
 sqrt(mean(square(deviation(x))))
-## [1] 0.2955688
+## [1] 0.3010561
 ```
 
 ② 아니면 중간중간 결과물들을 변수로 저장할 수도 있다.
@@ -181,7 +181,7 @@ out <- square(out)
 out <- mean(out)
 out <- sqrt(out)
 out
-## [1] 0.2955688
+## [1] 0.3010561
 ```
 
 위 2개는 base R이고, <br /> ③ magrittr 패키지([Bache and Wickham 2014](https://magrittr.tidyverse.org/))는 3번째 옵션을 제공한다. <br /> 이항 연산자binary operator인 `%>%`는, 파이프pipe라고 부르고, "and then"이라고 발음한다.
@@ -194,7 +194,7 @@ x %>%
     square() %>%
     mean() %>%
     sqrt()
-## [1] 0.2955688
+## [1] 0.3010561
 ```
 
 `x %>% f()`는, `f(x)`와 같은 것이다. <br /> `x %>% f(y)`는, `f(x, y)`와 같은 것이다. <br /> 파이프를 사용하면 낮은 수준의 데이터 흐름이 아니라, 높은 수준의 함수 구성에 집중할 수 있다. <br /> 초점은 수정 된 것(명사)이 아니라, 수행중인 것(동사)에 있다. <br /> The pipe allows you to focus on the high-level composition of functions rather than the low-level flow of data; <br /> the focus is on what's being done(the verbs), rather than on what's being modified(the nouns). <br /> 이러한 스타일은 하스켈이나 F\#에서는 흔하다. <br /> 이게 magrittr을 만드는데 있어 영감이 되었고, Forth나 Factor라는 프로그래밍 언어의 디폴트 스타일이다. <br /> (둘 다 이번에 처음 알게 된 프로그래밍 언어다.)
@@ -408,37 +408,140 @@ g12()
 6.7 Exiting a function
 ----------------------
 
+대부분의 함수는 두 가지 방법 중 하나로 exit한다. ①성공을 나타내는, 값value을 return하거나, 혹은 ②실패를 나타내는, 에러를 나타낸다. 이 section에서는, 1. 값을 반환하는 것에 대해 다루고(implicit versus explicit, visible versus invisible), 2. 에러에 대해 간략하게 다루어보며, 3. exit handlers를 소개한다. 함수를 exit할 때 코드를 실행하게 해준다.
+
 ### 6.7.1 Implicit versus explicit returns
+
+함수가 값value을 return할 수 있는 2가지 방법이 있다. - Implicit하게, 즉, 마지막으로 evaluate된 expression이 return되는 값이 되는 것임.
+
+``` r
+j01 <- function(x) {
+    if (x < 10) {
+        0
+    } else {
+        10
+    }
+}
+
+j01(5)
+## [1] 0
+j01(15)
+## [1] 10
+```
+
+-   Explicit하게, 즉, `return()`을 호출해서 쓰는 것임.
+
+``` r
+j02 <- function(x) {
+    if (x < 10) {
+        return(0)
+    } else {
+        return(10)
+    }
+}
+
+j02(5)
+## [1] 0
+j02(15)
+## [1] 10
+```
 
 ### 6.7.2 Invisible values
 
+대부분의 함수들은 눈에 보이게 return한다. 그냥 interactive context에다가 함수를 호출하면, 결과물을 출력한다. (콘솔에다가 함수를 호출하면 결과물이 나온단 소리임)
+
+``` r
+j03 <- function() 1
+j03()
+## [1] 1
+```
+
+그러나, 마지막 값last value에다가 invisible()을 씌워서, 자동적으로 프린트되는 것을 막을 수 있다.
+
+``` r
+j04 <- function() invisible(1)
+j04()
+```
+
+이 값이 진짜로 존재한다는 걸 증명하려면, explicit하게 print하던가, 괄호로 감싸주면 된다.
+
+``` r
+print(j04())
+## [1] 1
+
+
+(j04())
+## [1] 1
+```
+
+혹은, `withVisible()`을 사용해, value랑 보이는지 안보이는지 visibility flag도 return하게끔 할 수 있다.
+
+``` r
+str(withVisible(j04()))
+## List of 2
+##  $ value  : num 1
+##  $ visible: logi FALSE
+```
+
+invisible하게 return하는 가장 흔한 함수는, &lt;-다.
+
+``` r
+a <- 2
+(a <- 2)
+## [1] 2
+```
+
+이게 체인 할당chain assignments이 가능한 이유다.
+
+``` r
+a <- b <- c <- d <- 2
+```
+
+일반적으로, side effect 때문에 호출되는 모든 함수들은, invisible value를 return해야 한다. 그런 함수들의 예를 들자면 `<-`, `print()`, `plot()` 같은 것들, 그리고 return하는 invisible value는 보통 첫 번째 인자의 값.
+
 ### 6.7.3 Errors
+
+함수가 할당된 작업assigned task을 완수할 수 없다면, `stop()`과 함께 에러가 나온다. `stop()`은 즉시 함수의 실행을 종료한다.
+
+``` r
+j05 <- function() {
+    stop("I'm an error")
+    return(10)
+}
+
+j05()
+## Error in j05(): I'm an error
+```
+
+에러는 뭔가가 잘못되었다는 걸 알려주며, 유저가 문제를 해결하게끔 강제한다. C, Go, Rust 같은 몇몇 언어들은 문제들을 알려주는 특별한 return 값들이 있다. 그러나 R에서는 항상 에러가 나와야 한다. 8장에서 에러들과 이것들을 어떻게 다루어야 하는지 배울 것이다.
 
 ### 6.7.4 Exit handlers
 
-### 6.7.5 Exercises
+가끔 함수는 global state에 임시적인 변화들changes을 필요로 할 수 있다. 하지만 이러한 변화들changes을 나중에 치우는게clean-up 힘들 수 있다.(만약 에러가 생긴다면?과 같은) 어떻게 함수가 exit되던간에, 이러한 변화들이 취소undone되고 global state가 복구되었다는걸 보장하기 위해서는, exit handler를 셋업하기 위해 `on.exit()`을 사용하자.
 
-<style>
-p.comment {
-background-color: #DBDBDB;
-padding: 5px;
-border: 1px navy;
-margin-left: 30px;
-border-radius: 10px;
+다음의 간단한 예는, 함수가 정상적으로 exit되든 에러로 exit되든, exit handler가 실행된다는 것을 보여준다.
+
+``` r
+j06 <- function(x) {
+    cat("Hello\n")
+    on.exit(cat("Goodbye!\n"), add = TRUE)
+
+    if(x) {
+        return(10)
+    } else {
+        stop("Error")
+    }
 }
-</style>
-<p class="comment">
-<strong>base R에서는</strong> <br /> <code>map()</code>과 동등한 base 함수는 <code>lapply()</code>다. <br /> 유일한 차이는 <code>lapply()</code>는 밑에서 배우게 될 helpers를 지원하지 않는다는 것이다. <br /> 그래서 만약에 purrr에서 <code>map()</code>만 쓸 것이라면, 추가적인 의존성additional dependency를 스킵하고 <code>lapply()</code>를 쓰면 된다.
-</p>
-<style>
-p.comment {
-background-color: #DBDBDB;
-padding: 15px;
-border: 1px skyblue;
-margin-left: 30px;
-border-radius: 10px;
-}
-</style>
-<p class="comment">
-<strong>base R에서는</strong> <br /> <code>map()</code>과 동등한 base 함수는 <code>lapply()</code>다. <br /> 유일한 차이는 <code>lapply()</code>는 밑에서 배우게 될 helpers를 지원하지 않는다는 것이다. <br /> 그래서 만약에 purrr에서 <code>map()</code>만 쓸 것이라면, 추가적인 의존성additional dependency를 스킵하고 <code>lapply()</code>를 쓰면 된다.
-</p>
+
+j06(TRUE)
+## Hello
+## Goodbye!
+## [1] 10
+
+j06(FALSE)
+## Hello
+## Error in j06(FALSE): Error
+## Goodbye!
+```
+
+### 6.7.5 Exercises
