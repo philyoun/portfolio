@@ -170,7 +170,7 @@ deviation <- function(x) x - mean(x)
 ``` r
 x <- runif(100)
 sqrt(mean(square(deviation(x))))
-## [1] 0.3010561
+## [1] 0.2879764
 ```
 
 ② 아니면 중간중간 결과물들을 변수로 저장할 수도 있다.
@@ -181,7 +181,7 @@ out <- square(out)
 out <- mean(out)
 out <- sqrt(out)
 out
-## [1] 0.3010561
+## [1] 0.2879764
 ```
 
 위 2개는 base R이고, <br /> ③ magrittr 패키지([Bache and Wickham 2014](https://magrittr.tidyverse.org/))는 3번째 옵션을 제공한다. <br /> 이항 연산자binary operator인 `%>%`는, 파이프pipe라고 부르고, "and then"이라고 발음한다.
@@ -194,7 +194,7 @@ x %>%
     square() %>%
     mean() %>%
     sqrt()
-## [1] 0.3010561
+## [1] 0.2879764
 ```
 
 `x %>% f()`는, `f(x)`와 같은 것이다. <br /> `x %>% f(y)`는, `f(x, y)`와 같은 것이다. <br /> 파이프를 사용하면 낮은 수준의 데이터 흐름이 아니라, 높은 수준의 함수 구성에 집중할 수 있다. <br /> 초점은 수정 된 것(명사)이 아니라, 수행중인 것(동사)에 있다. <br /> The pipe allows you to focus on the high-level composition of functions rather than the low-level flow of data; <br /> the focus is on what's being done(the verbs), rather than on what's being modified(the nouns). <br /> 이러한 스타일은 하스켈이나 F\#에서는 흔하다. <br /> 이게 magrittr을 만드는데 있어 영감이 되었고, Forth나 Factor라는 프로그래밍 언어의 디폴트 스타일이다. <br /> (둘 다 이번에 처음 알게 된 프로그래밍 언어다.)
@@ -398,21 +398,317 @@ g12()
 6.5 Lazy evaluation
 -------------------
 
+R에서, 함수 인자들function arguments은 **lazily evaluated**된다. <br /> 접근되었을 때만 evaluate된다는 것. <br /> 예를 들어, 이 코드는 에러가 나오지 않는다. 왜냐하면 `x`는 전혀 사용되지 않았기 때문.
+
+``` r
+h01 <- function(x) {
+  10
+}
+
+h01(stop("This is an error!"))
+## [1] 10
+```
+
+그러니깐, 원래 `stop()` 함수는 에러를 내는 함수임. <br /> 그래서 `h01(stop("This is an error!"))` 하면 에러가 나와야 할 것 같지만, <br /> `h01()`이라는 함수는 `x`를 받는데 body에는 `x`가 없으니 evaluate할 필요가 없어서, <br /> 에러가 안 나온다. 이런 얘기.
+
+이건, <br />   함수 인자들에, 필요할 때만 evaluate되는, 잠재적으로 값비싼 계산을 포함시키는 것과 같은 일을 할 수 있기 때문에, <br /> 중요한 기능feature이다.
+
+### 6.5.1 Promises
+
+lazy evaluation은, **promise**라고 부르는 데이터 구조data structure로 작동power된다. <br /> promise는, 덜 흔하게는 thunk라고 부른다. <br /> 이건 R을 흥미로운 프로그래밍 언어로 만드는 기능 중 하나다. <br /> (Section 20.3에서 promises에 대해 다시 다룰 것이다.)
+
+promise는 3개의 요소components들을 가지고 있다. <br /> ① expression, `x + y`와 같은, delayed computation을 발생시킨다. <br /> ② environment는 expression이 evaluate되는 장소다. 즉, environment는 함수가 호출되는 곳이다. <br /> 그래서 다음의 함수는 101이 아닌, 11을 return한다.
+
+``` r
+y <- 10
+h02 <- function(x) {
+  y <- 100
+  x + 1
+}
+
+h02(y)
+## [1] 11
+```
+
+그리고, 함수 호출 안에서 할당assignment을 하면, 변수는 함수 안이 아닌, 밖에서 bound된다. <br /> `h02(y <- 1000)`는 무슨 값이 나올까? 변수가 함수 안이 아닌 밖에서 bound된다고 했으니,
+
+``` r
+y <- 1000
+h02 <- function(x) {
+    y <- 100
+    x + 1
+}
+
+h02(y)
+```
+
+와 같은 것이다. <br /> 즉, `h02(y <- 1000)`은 1001이 나온다.
+
+``` r
+h02(y <- 1000)
+## [1] 1001
+y
+## [1] 1000
+```
+
+③ value는 promise가 처음으로 접근되었을 때 계산되고 캐시cache되는 것. <br /> expression이 특정한 env에서 evaluate되었을 때, <br />   value는, promise가 처음 access되었을 때 계산되고 캐시cache된다. <br /> A value, which is computed and cached the first time a promise is accessed when <br /> the expression is evaluated in the specified environment.
+
+이래서 promise는 최대 한 번 evaluate되고, 다음의 예에서 "Calculating..."은 한 번만 보게 된다.
+
+``` r
+double <- function(x) {
+  message("Calculating...")
+  x * 2
+}
+
+h03 <- function(x) {
+  c(x, x)
+}
+
+h03(double(20))
+## Calculating...
+## [1] 40 40
+```
+
+R 코드로는 promises를 조작manipulate할 수 없다. <br /> promises는 마치 퀀텀 상태quantum state와 비슷하다. <br /> R 코드로 이걸 검사inspect해보려고 하면, 즉시 evaluation이 실행되어서, promise가 사라지게 될 것이다. <br /> 나중에 Section 20.3에서 quosure에 대해 배울 것이다. <br /> 얘는 promise를 R 오브젝트로 바꿔서, expression과 environment를 쉽게 검사해볼 수 있다.
+
+### 6.5.2 Default arguments
+
+lazy evaluation 덕분에, 디폴트 값들이 다른 인자들arguments로 정의될 수 있다. <br /> 심지어는, 나중에 함수 안에서 정의될 변수들variables로도 디폴트 값을 정의할 수 있다. <br /> 다음의 예를 보면 이해된다.
+
+``` r
+h04 <- function(x = 1, y = x * 2, z = a + b) {
+    a <- 10
+    b <- 100
+
+    c(x, y, z)
+}
+
+h04()
+## [1]   1   2 110
+```
+
+여기서 보면, `y`는 `x`라는 다른 인자로 정의되었고, `z`는 함수 안에서 정의될 변수들 `a`, `b`로 정의되었다.
+
+많은 base R 함수들이 이러한 테크닉을 사용하지만, 나는 이걸 추천하지 않는다. <br /> 이러면 코드가 더 이해하기 힘들기 때문. <br /> 무엇이 return될지 예상하기 위해, <br />   정확히 어떤 순서로 디폴트 인자들arguments이 evaluate되는지를 알아야한다.
+
+그런데, <br /> 디폴트 인자들arguments이 evaluate되는 env와, 사용자가 공급한 인자들이 evaluate되는 env가 살짝 다르다. <br /> The evaluation env is slightly different for default and user supplied arguments. <br /> 디폴트 인자들은 함수 안에서 evaluate된다.
+
+그래서 보기엔 똑같아 보이는 호출들도 다른 값들을 return할 수 있다. <br /> 다음의 극단적인 예를 보자.
+
+``` r
+h05 <- function(x = ls()) {
+  a <- 1
+  x
+}
+```
+
+``` r
+h05()
+## [1] "a" "x"
+```
+
+이렇게 디폴트 인자들의 경우에는, `ls()`가 함수 안에서 evaluate된다.
+
+``` r
+h05(ls())
+##  [1] "args"      "deviation" "double"    "f01"       "f02"      
+##  [6] "funs"      "g02"       "g03"       "g07"       "g08"      
+## [11] "g09"       "g10"       "g12"       "h01"       "h02"      
+## [16] "h03"       "h04"       "h05"       "out"       "square"   
+## [21] "x"         "y"
+```
+
+이렇게 사용자 공급 인자들의 경우에는, `ls()`가 global env에서 evaluate된다.
+
+### 6.5.3 Missing arguments
+
+인자들 값이 user에서 오는지 디폴트에서 오는지는, `missing()`을 이용해서 알 수 있다.
+
+``` r
+h06 <- function(x = 10) {
+    list(missing(x), x)
+}
+
+str(h06())
+## List of 2
+##  $ : logi TRUE
+##  $ : num 10
+str(h06(10))
+## List of 2
+##  $ : logi FALSE
+##  $ : num 10
+```
+
+`TRUE`라면 디폴트, `FALSE`라면 사용자 공급.
+
+하지만, `missing()`은 덜 사용하는 것이 제일 좋다. missing() is best used sparingly, however. <br /> `sample()` 함수를 예로 들어보자. <br /> 몇 개의 인자들arguments이 요구되는가?
+
+``` r
+args(sample)
+## function (x, size, replace = FALSE, prob = NULL) 
+## NULL
+```
+
+`x`와 `size`는 꼭 필요한 것처럼 보인다. <br /> 하지만 만약 `size`를 주지 않으면, `sample()`은 디폴트를 제공하기 위해 `missing()`을 이용한다. <br /> (`sample`을 콘솔 창에 그냥 입력해보면, `missing(size)`가 등장하는 것을 볼 수 있음.) <br /> 이 함수를 내가 다시 써본다면, `size`가 꼭 필요한 것은 아니지만 값을 넣을 수는 있다고, explicit하게 `NULL`을 써 줄 것이다.
+
+``` r
+sample <- function(x, size = NULL, replace = FALSE, prob = NULL) {
+  if (is.null(size)) {
+    size <- length(x)
+  }
+  
+  x[sample.int(length(x), size, replace = replace, prob = prob)]
+}
+```
+
+만약 여기서 `%||%`라는 삽입 연산자infix operator를 사용해서, 위에 새롭게 쓴 `sample()`을 더 간단하게 만들 수 있다. <br /> (삽입 연산자라는건 기호의 왼쪽 오른쪽에 뭐가 있다는 거임. 그러니깐 `3 + 4`처럼. `+`도 infix operator임. Section 6.8에서 배우게 됨.) <br /> 이 기호는, 간단하게 말해, `NULL`이라면 오른쪽을 사용하고, `NULL`이 아니라면 왼쪽을 사용한다는 뜻이다.
+
+``` r
+`%||%` <- function(lhs, rhs) {
+  if (!is.null(lhs)) {
+    lhs
+  } else {
+    rhs
+  }
+}
+
+sample <- function(x, size = NULL, replace = replace, prob = NULL) {
+  size <- size %||% length(x)
+  x[sample.int(length(x), size, replace = replace, prob = prob)]
+}
+```
+
+lazy evaluation 덕분에, 불필요한 계산에 대해 걱정할 필요가 없다. <br /> `%||%`은 `size`가 `NULL`이 아닐때만 evaluate될 것이다.
+
+### 6.5.4 Exercises
+
 ------------------------------------------------------------------------
 
 6.6 `...` (dot-dot-dot)
 -----------------------
+
+함수들은 특별한 인자argument인 `...`(dot-dot-dot이라고 읽음)을 가질 수 있다. <br /> 이것과 함께라면, 함수는 몇 개든 추가적인 인자들arguments을 가질 수 있다. <br /> 다른 프로그래밍 언어들에서는, 이러한 타입의 인자를 종종 varargs(variable arguments의 줄임말)라고 부른다. <br /> 그리고 이 인자를 사용하는 함수를 variadic이라고 부른다.
+
+다른 함수에게 추가적인 인자들을 전달하는데 `...`을 사용할 수도 있다.
+
+``` r
+i01 <- function(y, z) {
+  list(y = y, z = z)
+}
+
+i02 <- function(x, ...) {
+  i01(...)
+}
+
+str(i02(x = 1, y = 2, z = 3))
+## List of 2
+##  $ y: num 2
+##  $ z: num 3
+```
+
+`..N`으로 시작하는, 특별한 형식form을 사용하면, `...`에서 해당하는 elements를, 포지션position으로 refer해줌.
+
+``` r
+i03 <- function(...) {
+  list(first = ..1, third = ..3)
+}
+
+str(i03(1, 2, 3))
+## List of 2
+##  $ first: num 1
+##  $ third: num 3
+
+i03 <- function(...) {
+  list(first = ..1, second = ..3)
+}
+
+str(i03(1, 2, 3))
+## List of 2
+##  $ first : num 1
+##  $ second: num 3
+```
+
+이것보다 더 유용한건 `list(...)`인데, 얘는 arguments를 evaluate하고 list에 저장하는 것.
+
+``` r
+i04 <- function(...) {
+    list(...)
+}
+str(i04(a = 1, b = 2))
+## List of 2
+##  $ a: num 1
+##  $ b: num 2
+```
+
+`rlang::list2()`도 확인해봐라. 얘는 쪼개는 것splicing과, 뒤에 쓸데없이 콤마가 붙는 것을 무시하는 것도 지원한다. <br /> 예를 들어, `list(a = 1, b = 2, )` 이렇게 뒤에 ,가 붙어도 무시하고 해준다는 것.
+
+그리고 `rlang::enquos()`는 unevaluated 인자들arguments도 캡쳐해준다. <br /> 얘는 [quasiquotation]()의 주제다.
+
+음... `...`의 2가지 주요한 사용법이 있다.
+
+-   만약에 지금 함수가 다른 함수를 argument로 받는데, <br />   후자의 함수에 추가적인 인자들additional arguments을 전해주고 싶다. 할 때. <br /> 아래의 예에서는, `lapply()`가 `...`를 사용한다. `mean()`이라는 함수에 `na.rm`을 전달하기 위해서.
+
+``` r
+x <- list(c(1, 3, NA), c(4, NA, 6))
+str(lapply(x, mean, na.rm = TRUE))
+## List of 2
+##  $ : num 2
+##  $ : num 5
+```
+
+그러니까, `lapply()`라는 함수가 `mean()`이라는 함수를 argument로 받는데, <br />   `mean()`이라는 함수에 `na.rm`이라는 추가 인자를 전달하기 위해서 `...`을 사용한다. 이 뜻. <br /> `lapply`를 보면 `...`이라는 걸 argument로 받고 있는걸 볼 수 있음.
+
+``` r
+lapply
+## function (X, FUN, ...) 
+## {
+##     FUN <- match.fun(FUN)
+##     if (!is.vector(X) || is.object(X)) 
+##         X <- as.list(X)
+##     .Internal(lapply(X, FUN))
+## }
+## <bytecode: 0x000000001358c038>
+## <environment: namespace:base>
+```
+
+이 테크닉에 대해 [Section 9.2.3](https://blog-for-phil.readthedocs.io/en/latest/Advanced%20R/09-Functionals/#92-my-first-functional-map)에서 다시 다룰 것이다.
+
+-   만약 너의 함수가 S3 제네릭generic이라면, <br />   메소드들methods이 임의의 추가 인자들arbitrary extra arguments을 받을 수 있게끔 해주고 싶을 수 있다.
+
+예를 들어서, `print()`라는 함수를 예로 들어보자. <br /> 어떠한 타입의 오브젝트를 print하냐에 따라, 다양한 옵션들이 있기 때문에, <br />   어떤 인자들을 받을건지 미리 다 정해놓을 수는 없다. <br /> 그리고 `...`가 각각의 메소드들이 그때그때마다 다른 인자들arguments를 받을 수 있게끔 허락해준다. <br /> 아래의 예를 보면 그때그때 주는 인자들arguments이 다른 걸 볼 있다. <br /> `...`이 이걸 가능하게 해주는 것임. <br /> `print`를 콘솔 창에 쳐보면, 위의 `lapply`와 마찬가지로 `...`가 있는 걸 볼 수 있을 것이다.
+
+``` r
+print(factor(letters), max.levels = 4)
+
+print(y ~ x, showEnv = TRUE)
+```
+
+이 `...`의 사용법에 대해서는 Section 13.4.3에서 다시 다룰 것이다.
+
+`...`을 사용하는 것에는 2가지 단점이 있다.
+
+-   다른 함수에 인자들arguments을 전달하기 위해 사용할 때에는, <br />   이 인자들이 어디로 가는지 사용자에게 잘 설명해줘야 한다. <br /> 그래서 `lapply()`나 `plot()`같은 함수들로 무엇을 할 수 있는지 이해하기가 힘들어진다.
+
+-   오타난 인자misspelled argument임에도 에러가 발생하지 않는다. 오타를 알아차리기 힘들게 된다.
+
+``` r
+sum(1, 2, NA, na_rm = TRUE)
+## [1] NA
+```
+
+### 6.6.1 Exercises
 
 ------------------------------------------------------------------------
 
 6.7 Exiting a function
 ----------------------
 
-대부분의 함수는 두 가지 방법 중 하나로 exit한다. ①성공을 나타내는, 값value을 return하거나, 혹은 ②실패를 나타내는, 에러를 나타낸다. 이 section에서는, 1. 값을 반환하는 것에 대해 다루고(implicit versus explicit, visible versus invisible), 2. 에러에 대해 간략하게 다루어보며, 3. exit handlers를 소개한다. 함수를 exit할 때 코드를 실행하게 해준다.
+대부분의 함수는 두 가지 방법 중 하나로 exit한다. <br /> ①성공을 나타내는, 값value을 return하거나, 혹은 ②실패를 나타내는, 에러를 나타낸다. <br /> 이 section에서는, <br />   1. 값을 반환하는 것에 대해 다루고(implicit versus explicit, visible versus invisible), <br />   2. 에러에 대해 간략하게 다루어보며, <br />   3. exit handlers를 소개한다. 함수를 exit할 때 코드를 실행하게 해준다.
 
 ### 6.7.1 Implicit versus explicit returns
 
-함수가 값value을 return할 수 있는 2가지 방법이 있다. - Implicit하게, 즉, 마지막으로 evaluate된 expression이 return되는 값이 되는 것임.
+함수가 값value을 return할 수 있는 2가지 방법이 있다. <br /> - Implicit하게, 즉, 마지막으로 evaluate된 expression이 return되는 값이 되는 것임.
 
 ``` r
 j01 <- function(x) {
@@ -448,7 +744,7 @@ j02(15)
 
 ### 6.7.2 Invisible values
 
-대부분의 함수들은 눈에 보이게 return한다. 그냥 interactive context에다가 함수를 호출하면, 결과물을 출력한다. (콘솔에다가 함수를 호출하면 결과물이 나온단 소리임)
+대부분의 함수들은 눈에 보이게 return한다. <br /> 그냥 interactive context에다가 함수를 호출하면, 결과물을 출력한다. <br /> (콘솔에다가 함수를 호출하면 결과물이 나온단 소리임)
 
 ``` r
 j03 <- function() 1
@@ -456,7 +752,7 @@ j03()
 ## [1] 1
 ```
 
-그러나, 마지막 값last value에다가 invisible()을 씌워서, 자동적으로 프린트되는 것을 막을 수 있다.
+그러나, 마지막 값last value에다가 `invisible()`을 씌워서, 자동적으로 프린트되는 것을 막을 수 있다.
 
 ``` r
 j04 <- function() invisible(1)
@@ -497,11 +793,11 @@ a <- 2
 a <- b <- c <- d <- 2
 ```
 
-일반적으로, side effect 때문에 호출되는 모든 함수들은, invisible value를 return해야 한다. 그런 함수들의 예를 들자면 `<-`, `print()`, `plot()` 같은 것들, 그리고 return하는 invisible value는 보통 첫 번째 인자의 값.
+일반적으로, side effect 때문에 호출되는 모든 함수들은, invisible value를 return해야 한다. <br /> 그런 함수들의 예를 들자면 `<-`, `print()`, `plot()` 같은 것들, <br /> 그리고 return하는 invisible value는 보통 첫 번째 인자의 값.
 
 ### 6.7.3 Errors
 
-함수가 할당된 작업assigned task을 완수할 수 없다면, `stop()`과 함께 에러가 나온다. `stop()`은 즉시 함수의 실행을 종료한다.
+함수가 할당된 작업assigned task을 완수할 수 없다면, `stop()`과 함께 에러가 나온다. <br /> `stop()`은 즉시 함수의 실행을 종료한다.
 
 ``` r
 j05 <- function() {
@@ -513,13 +809,13 @@ j05()
 ## Error in j05(): I'm an error
 ```
 
-에러는 뭔가가 잘못되었다는 걸 알려주며, 유저가 문제를 해결하게끔 강제한다. C, Go, Rust 같은 몇몇 언어들은 문제들을 알려주는 특별한 return 값들이 있다. 그러나 R에서는 항상 에러가 나와야 한다. 8장에서 에러들과 이것들을 어떻게 다루어야 하는지 배울 것이다.
+에러는 뭔가가 잘못되었다는 걸 알려주며, 유저가 문제를 해결하게끔 강제한다. <br /> C, Go, Rust 같은 몇몇 언어들은 문제들을 알려주는 특별한 return 값들이 있다. <br /> 그러나 R에서는 항상 에러가 나와야 한다. <br /> 8장에서 에러들과 이것들을 어떻게 다루어야 하는지 배울 것이다.
 
 ### 6.7.4 Exit handlers
 
-가끔 함수는 global state에 임시적인 변화들changes을 필요로 할 수 있다. 하지만 이러한 변화들changes을 나중에 치우는게clean-up 힘들 수 있다.(만약 에러가 생긴다면?과 같은) 어떻게 함수가 exit되던간에, 이러한 변화들이 취소undone되고 global state가 복구되었다는걸 보장하기 위해서는, exit handler를 셋업하기 위해 `on.exit()`을 사용하자.
+가끔 함수는 global state에 임시적인 변화들changes을 필요로 할 수 있다. <br /> 하지만 이러한 변화들changes을 나중에 치우는게clean-up 힘들 수 있다.(만약 에러가 생긴다면? 어떻게 복구할건지?) <br /> 어떻게 함수가 exit되던간에, <br />   이러한 변화들이 취소undone되고 global state가 복구되었다는걸 보장하기 위해서는, <br />   exit handler를 셋업하기 위해 `on.exit()`을 사용하자.
 
-다음의 간단한 예는, 함수가 정상적으로 exit되든 에러로 exit되든, exit handler가 실행된다는 것을 보여준다.
+다음의 간단한 예는, 함수가 정상적으로 exit되든 에러로 exit되든, <br />   exit handler가 실행된다는 것을 보여준다.
 
 ``` r
 j06 <- function(x) {
@@ -544,4 +840,85 @@ j06(FALSE)
 ## Goodbye!
 ```
 
+<style>
+p.comment {
+background-color: #DBDBDB;
+padding: 10px;
+border: 1px solid black;
+margin-left: 25px;
+border-radius: 5px;
+}
+</style>
+<p class="comment">
+<code>on.exit()</code>을 사용할 때는 <code>add = TRUE</code>로 설정해놓자. <br /> 만약 그렇지 않으면, 각 <code>on.exit()</code>가 이전의 exit handler를 덮어쓸 것이다. <br /> 디폴트가 <code>add = FALSE</code>라서 그럼. <br /> 그래서 한 개의 handler만 쓰더라도, <code>add = TRUE</code>로 설정하는 것은 좋은 습관이다. <br /> 그래야 나중에 exit handlers를 추가하더라도 문제가 생기지 않을 것이다.
+</p>
+`on.exit()`는 유용하다. <br /> 왜냐하면 다음과 같이, 클린업clean-up을 필요로 하는 코드 바로 다음에, 클린업 코드를 놓으면 되기 때문.
+
+``` r
+cleanup <- function(dir, code) {
+  old_dir <- setwd(dir)
+  on.exit(setwd(old_dir), add = TRUE)
+  
+  old_opt <- options(stringsAsFactors = FALSE)
+  on.exit(options(old_opt), add = TRUE)
+}
+```
+
+위 코드가 의미하는 것은, 함수 안에서는 새롭게 경로를 설정했다가(`old_dir <- setwd(dir)`), <br /> `on.exit(setwd(old_dir), add = TRUE)`로 함수가 끝나고 난 뒤에는 원래의 경로로 복구undone하고(clean-up),
+
+함수 안에서는 데이터 프레임이나 행렬을 읽는 기본 옵션을 바꿨다가(`old_opt <- options(stringsAsFactors = FALSE)`), <br /> `on.exit(options(old_opt), add = TRUE)`로 함수가 끝나고 난 뒤에는 원래의 옵션으로 복구undone하는 것(clean-up).
+
+함수 안에서 `setwd()` 같은 것으로 새롭게 경로를 설정하면, global state에서도 경로가 바뀐다. <br /> 직접해서 확인해봐도 됨. ㅇㅇ
+
+lazy evaluation과 함께 써서, 변경된 env에서 코드 블락을 실행시키는, 매우 유용한 패턴을 만들 수 있다.
+
+``` r
+with_dir <- function(dir, code) {
+  old <- setwd(dir)
+  on.exit(setwd(old), add = TRUE)
+  
+  force(code)
+}
+
+getwd()
+## [1] "C:/Users/Phil2/Documents/portfolio/docs/Advanced R"
+with_dir("~", getwd())
+## [1] "C:/Users/Phil2/Documents"
+```
+
+`code`라고만 써도 evluation이 강제 되기 때문에 `force()`를 쓰는 것이 꼭 필요하지는 않다. <br /> 하지만, `force()`를 사용하면, 우리가 의도적으로 실행을 강제한다는게 매우 명백해진다. <br /> `force()`의 다른 사용법들에 대해서는 10장에서 배울 것이다.
+
+withr 패키지는([Hester et al. 2018](http://withr.r-lib.org/)), 임시적인 state를 셋업해주는 여러가지 다른 함수들을 제공한다.
+
+3.4나 그 이전의 버전 R은, `on.exit()` expression들은 항상 만들어진 순서대로 실행된다.
+
+``` r
+j08 <- function() {
+  on.exit(message("a"), add = TRUE)
+  on.exit(message("b"), add = TRUE)
+}
+
+j08()
+## a
+## b
+```
+
+위처럼 actions가 특정한 순서대로 일어나야 한다면, 클린업을 하는 것이 까다로워진다. <br /> 전형적으로 최근에 추가된 expression이 먼저 실행되기를 원하는 경우엔. <br /> This can make cleanup a little tricky if some actions need to happen in a specific order; <br /> typically you want the most recent added expression to be first. <br /> 이걸 3.5 혹은 이후 버전의 R에서는, `after = FALSE` 옵션을 이용해서 컨트롤할 수 있다.
+
+``` r
+j09 <- function() {
+  on.exit(message("a"), add = TRUE, after = FALSE)
+  on.exit(message("b"), add = TRUE, after = FALSE)
+}
+
+j09()
+## b
+## a
+```
+
 ### 6.7.5 Exercises
+
+------------------------------------------------------------------------
+
+6.8 Function forms
+------------------
