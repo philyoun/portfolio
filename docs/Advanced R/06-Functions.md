@@ -1,6 +1,51 @@
 6.1 Introduction
 ----------------
 
+만약 이 책을 읽고 있다면, 아마 당신은 이미 많은 R 함수들을 만들어 봤을거다. <br /> 그리고 코드에서 단순 반복을 제거하려면 어떻게 해야할 줄도 알고 있고. <br /> 이 챕터에서는, 그 비형식적이고 실습으로 배운 지식을, <br />   좀 더 단단하고 이론적인 이해로 바꿀 것. <br /> 흥미로운 트릭들이랑 테크닉들을 보게 될 건데, <br /> 여기서 배우는 것들은 나중에 나오는 advanced 토픽들을 이해하는데 있어 중요하다는 걸 인지하자.
+
+### Quiz
+
+다음의 문제들을 보고, 이 챕터를 스킵할 수 있을지 확인해보셈. <br /> 답은 Section 6.9에 있다. <br /> 1. 함수의 3 요소components는?
+
+1.  다음의 코드는 무엇을 return하는가?
+
+``` r
+x <- 10
+f1 <- function(x) {
+    function() {
+        x + 10
+    }
+}
+f1(1)()
+```
+
+1.  다음의 코드를 통상적인 표현으로는 어떻게 쓸 수 있을까?
+
+``` r
+`+`(1, `*`(2, 3))
+```
+
+1.  어떻게 하면 다음의 코드를 좀 더 읽기 쉽게 만들 수 있을까?
+
+``` r
+mean(, TRUE, x = c(1:10, NA))
+```
+
+1.  다음의 코드는 실행되었을 때 에러가 나올까 안 나올까? Why or why not?
+
+``` r
+f2 <- function(a, b) {
+    a * 10
+}
+f2(10, stop("This is an error!"))
+```
+
+1.  infix 함수란 무엇인가? 어떻게 만들 수 있는가? <br /> 대체 함수는 무엇인가? 어떻게 만들수 있는가?
+
+2.  함수를 어떻게 exit하던간에, cleanup action이 실행된다고 어떻게 보장할 수 있는가?
+
+### Outline
+
 ------------------------------------------------------------------------
 
 6.2 Function fundamentals
@@ -170,7 +215,7 @@ deviation <- function(x) x - mean(x)
 ``` r
 x <- runif(100)
 sqrt(mean(square(deviation(x))))
-## [1] 0.2879764
+## [1] 0.2887039
 ```
 
 ② 아니면 중간중간 결과물들을 변수로 저장할 수도 있다.
@@ -181,7 +226,7 @@ out <- square(out)
 out <- mean(out)
 out <- sqrt(out)
 out
-## [1] 0.2879764
+## [1] 0.2887039
 ```
 
 위 2개는 base R이고, <br /> ③ magrittr 패키지([Bache and Wickham 2014](https://magrittr.tidyverse.org/))는 3번째 옵션을 제공한다. <br /> 이항 연산자binary operator인 `%>%`는, 파이프pipe라고 부르고, "and then"이라고 발음한다.
@@ -194,7 +239,7 @@ x %>%
     square() %>%
     mean() %>%
     sqrt()
-## [1] 0.2879764
+## [1] 0.2887039
 ```
 
 `x %>% f()`는, `f(x)`와 같은 것이다. <br /> `x %>% f(y)`는, `f(x, y)`와 같은 것이다. <br /> 파이프를 사용하면 낮은 수준의 데이터 흐름이 아니라, 높은 수준의 함수 구성에 집중할 수 있다. <br /> 초점은 수정 된 것(명사)이 아니라, 수행중인 것(동사)에 있다. <br /> The pipe allows you to focus on the high-level composition of functions rather than the low-level flow of data; <br /> the focus is on what's being done(the verbs), rather than on what's being modified(the nouns). <br /> 이러한 스타일은 하스켈이나 F\#에서는 흔하다. <br /> 이게 magrittr을 만드는데 있어 영감이 되었고, Forth나 Factor라는 프로그래밍 언어의 디폴트 스타일이다. <br /> (둘 다 이번에 처음 알게 된 프로그래밍 언어다.)
@@ -668,7 +713,7 @@ lapply
 ##         X <- as.list(X)
 ##     .Internal(lapply(X, FUN))
 ## }
-## <bytecode: 0x000000001358c038>
+## <bytecode: 0x000000001358bf88>
 ## <environment: namespace:base>
 ```
 
@@ -922,3 +967,320 @@ j09()
 
 6.8 Function forms
 ------------------
+
+> R의 계산computations을 이해할 때, 2가지 슬로건을 기억하자. <br /> - 존재하는 모든 것들은 오브젝트다. Everything that exists is an object. <br /> - 일어나는 모든 일들은 함수 호출이다. Everything that happens is a function call. <br /> - John Chambers
+
+R에서 일어나는 모든 일들은 함수 호출의 결과물이지만, 모든 호출들calls이 같은 모습은 아니다. <br /> 함수 호출은 4가지 모습으로 나타날 수 있다.
+
+-   **prefix**: 함수 이름이, 인자들arguments보다 먼저 나옴. 예를 들어 `footy(a, b, c)` <br /> 이게 R의 함수 호출 중 대다수임.
+
+-   **infix**: 함수 이름이 인자들 사이에 나온다. 예를 들어, `x + y`. <br /> infix 형식은 많은 수학 연산자들에서 사용되고, `%`로 시작하고 끝나는 사용자 정의user-defined 함수에서 나온다. <br /> 이전에 본 `%||%` 같이.
+
+-   **replacement**: 이건 값들values을, 할당assign 받은대로 대체해준다. 예를 들어, `names(df) <- c("a", "b", "c")` <br /> 사실 prefix 함수들처럼 생기긴했다. <br /> 이거 많이 써봤던 것이라서, 쉽게 생각할 수 있는데 조금 다르다. 긴장해야함.
+
+-   **special**: `[[`, `if`, `for`과 같은 함수들. 일관적인 구조를 갖지는 않지만, R의 문법에서 중요한 역할을 한다.
+
+이렇게 4가지 형식forms이 있긴한데, 사실 하나만 알아도 된다. prefix form. <br /> 왜냐하면 모든 호출들을 이걸로 쓸 수 있기 때문. <br /> prefix form으로 다 쓸 수 있는 이 특성을 먼저 보여준 다음, 각 형식들을 하나씩 배울 것이다.
+
+### 6.8.1 Rewriting to prefix form
+
+R의 흥미로운 특성 중 하나는, <br />   모든 infix, replacement, special form을 prefix form으로 쓸 수 있다는 점이다. <br /> 이렇게 하는 것은, 언어의 구조에 대한 이해를 깊게 해주기 때문에 유용하다. <br /> prefix form으로 하다보면, 모든 함수의 '진짜 이름real name'을 알게 되고, <br />   이 함수들을 재미로 혹은 이득을 보기 위해 수정할 수도 있다. <br /> 예를 들어서, `x + y`도 함수 호출function call인데, 여기서 우리가 사용하는 함수가 `+`이며, <br /> 이걸 수정할 수도 있다는걸 알게됨ㅇㅇ
+
+<details> <summary>답답하신 분들을 위해</summary> 내가 이걸 처음 공부할 땐 참 답답했다. 내가 이해한게 맞는건가싶기도 하고, 빨리 뭔소린지 예를 보고싶기도하고. <br /> 그러니깐 빨리 몇 가지 예만 후딱 보여주고 넘어가겠다. <br /> 먼저, <code>x + y</code>에서 우리가 사용하는 함수가 <code>+</code>인게 어쩌라고? <br /> 그럼, 이 함수에 대한 documentation을 찾고 싶다면? <code>?+</code>를 쓰면 될까?
+
+``` r
+> ?+
++
+```
+
+안 된다. <code>?`+`</code>라고 해야한다.
+
+뭐 대단한거 아닌거 같지만, 밑에서는 더 쓸모있는 것도 나온다. <br /> 다음 예는 더 충격적이다. <br /> 이 함수를 수정할수도 있다고 했다. <br />
+
+``` r
+`+` <- function(a, b) a - b
+
+5 + 2
+## [1] 3
+```
+
+그렇다. 함수라서 수정하면 이렇게도 되는 것이다. 7이 아닌 3이 나온다. <br /> 밑에서 이런 예를 다 설명해준다. 그냥 내가 공부할 때의 답답함이 생각나서 써봤다.
+
+``` r
+rm("+")
+
+5 + 2
+## [1] 7
+```
+
+</details> <br /> <br />
+
+모든 함수 호출을 다 prefix form으로 쓸 수 있다.
+
+`x + y`를 \``` +`(x, y) `` 이렇게 쓸 수 있고,
+
+`names(df) <- c("x", "y", "z")`를 \``` names(df)<-`(df, c('x", "y", "z")) `` 이렇게 쓸 수 있고,
+
+`for(i in 1:10) print(i)`를 \``` for`(i, 1:10, print(i)) ``로 쓸 수 있음.
+
+놀랍게도 R에서는, for을 그냥 일반적인 함수처럼 호출할 수 있다. <br /> 이게 R의 모든 조작operation에서 마찬가지다. <br /> 이 말인즉슨, prefix function이 아닌 함수의 이름을 알고 있다면, 이걸 바꿀 수 있다는 것. <br /> 아래의 예를 보면 뭔 말인지 쉽게 이해가 된다.
+
+``` r
+`(` <- function(e1) {
+    if (is.numeric(e1) && runif(1) < 0.1) {
+        e1 + 1
+    } else {
+        e1
+    }
+}
+```
+
+이건 괄호가 하는 일을 바꾼 것이다. <br /> 이러면 10%의 확률로, 괄호 안의 숫자 계산에다가 1을 더해버림.
+
+``` r
+replicate(50, (1 + 2))
+##  [1] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 4 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 4 3 3 3 3
+## [36] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+rm("(")
+```
+
+물론, 이렇게 이미 만들어져 있는built-in 함수들을 override하는 것은 나쁜 아이디어다. <br /> 하지만, Section 21.2.5에서 배우게 될건데, 정해진 코드 블락에서만 적용하도록 할 수도 있다. <br /> 이러면 도메인 특화 언어domain specific languages을 작성하고, <br />   다른 언어로 번역translate하는 것에 대한 깔끔하고 우아한 접근을 할 수 있게 해준다.
+
+더 유용한 응용은, 함수형 프로그래밍 툴들functional programming tools을 쓸 때이다. <br /> 예를 들어, `add()`라는 함수를 먼저 정의해서, 리스트의 모든 elements에 3을 더하는 작업을 하는데 있어, <br />   `lapply()`를 쓸 수도 있다.
+
+``` r
+add <- function(x, y) x + y
+lapply(list(1:3, 4:5), add, 3)
+## [[1]]
+## [1] 4 5 6
+## 
+## [[2]]
+## [1] 7 8
+```
+
+하지만 그냥 이미 존재하는 `+`라는 함수를 이용해서도 같은 결과를 얻을 수 있다.
+
+``` r
+lapply(list(1:3, 4:5), `+`, 3)
+## [[1]]
+## [1] 4 5 6
+## 
+## [[2]]
+## [1] 7 8
+```
+
+이 아이디어를 Section 9에서 다룰 것이다.
+
+### 6.8.2 Prefix form
+
+접두 형식prefix form은 R 코드에서 가장 흔한 형식이다. <br /> 그리고 대부분의 프로그래밍 언어에서 마찬가지임. <br /> R에서 접두 호출prefix calls는, 인자들arguments을 3가지 방식으로 정할 수 있다는 점에서 조금 특별하다.
+
+1.  position으로. 예를 들어, `help(mean)` <br />
+2.  부분 매칭partial matching으로. 예를 들어, `help(top = mean)` <br />
+3.  이름name으로. 예를 들어, `help(topic = mean)`
+
+topic이라는 이름 대신 그 부분인 top으로도 매칭이 argument specify가 가능하다는 것. <br /> 아래의 예에서 3가지를 다 써보았다.
+
+``` r
+k01 <- function(abcdef, bcde1, bcde2) {
+    list(a = abcdef, b1 = bcde1, b2 = bcde2)
+}
+
+str(k01(1, 2, 3))
+## List of 3
+##  $ a : num 1
+##  $ b1: num 2
+##  $ b2: num 3
+```
+
+이러면 position으로 매칭을 한 것이고,
+
+``` r
+str(k01(2, 3, abcdef = 1))
+## List of 3
+##  $ a : num 1
+##  $ b1: num 2
+##  $ b2: num 3
+```
+
+이러면 이름name으로 매칭을 한 것이고,
+
+``` r
+str(k01(2, 3, a = 1))
+## List of 3
+##  $ a : num 1
+##  $ b1: num 2
+##  $ b2: num 3
+```
+
+이러면 unique한 앞글자로 매칭을 한 것.
+
+``` r
+str(k01(1, 3, b = 2))
+## Error in k01(1, 3, b = 2): argument 3 matches multiple formal arguments
+```
+
+이러면 unique한 앞글자가 아니었기 때문에, 애매함ambiguity으로 인한 에러가 발생한다.
+
+일반적으로, 인자 한 두개만 받는 것에 대해서는, positional 매칭을 사용하자. <br /> 가장 흔하게 사용되는 것임. 그리고 대부분의 독자들이 그게 무엇인지를 안다. <br /> 예를 들어, `sample(1:10, 3)` 같은 것.
+
+하지만 흔하지 않게 이용되는 인자들arguments에 대해서는, 이러한 positional 매칭을 쓰지말자. <br /> 그리고 부분partial 매칭은 절대 쓰지말자. <br /> 불행히도 이러한 부분 매칭을 하는 것을 금지시킬 방법은 없는데, <br />   warnPartialMatchArgs 옵션을 사용해서 warning이 뜨게끔 할 수는 있다. <br />
+
+``` r
+options(warnPartialMatchArgs = TRUE)
+x <- k01(a = 1, 2, 3)
+## Warning in k01(a = 1, 2, 3): partial argument match of 'a' to 'abcdef'
+```
+
+### 6.8.3 Infix functions
+
+삽입 함수infix functions는, 함수가 인자들arguments 사이에 위치하기 때문에 이러한 이름이 붙었다. <br /> R에는 이미 만들어져 있는 삽입 함수들이 있다. <br /> `:`, `::`, `:::`, `$`, `@`, `^`, `*`, `/`, `+`, `-`, `>`, `>=`, `<`, `<=`, `==`, `!=`, `!`, `&`, `&&`, `|`, `||`, `~`, `<-`, `<<-` <br /> 그리고 `%`로 시작하고 끝나는, 너만의 infix 함수들을 만들수도 있다. <br /> (이전에 `%||%` 처럼) <br /> 그리고 base R은, 이러한 패턴을 `%%`. `%*%`, `%/%`, `%in%`, `%o%`, `%x%`을 정의하는데 사용하고 있다.
+
+자신만의 infix 함수를 정의하는 것은 단순하다. <br /> 그냥 2개의 arguments를 갖게 하는 함수를 만들면 된다.
+
+``` r
+`%+%` <- function(a, b) paste0(a, b)
+"new" %+% "string"
+## [1] "newstring"
+```
+
+infix 함수의 이름은 보통 R 함수이름보다 좀 더 자유롭게 지을 수 있다. <br /> `%`을 제외한 어떠한 character의 sequence도 가능하다. <br /> 물론, 가끔 특별한 캐릭터들은 escape해주긴 해야한다.
+
+``` r
+`% %` <- function(a, b) paste(a, b)
+`%/\\%` <- function(a, b) paste(a, b)
+
+"new" % % "string"
+## [1] "new string"
+"new" %/\% "string"
+## [1] "new string"
+```
+
+R의 디폴트 우선순위 규칙precedence rule은, <br />   infix 연산자는 왼쪽에서 오른쪽으로 구성되어야 한다는 것이다. <br /> R’s default precedence rules mean that infix operators are composed left to right:
+
+``` r
+`%-%` <- function(a, b) paste0("(", a, " %-% ", b, ")")
+"a" %-% "b" %-% "c"
+## [1] "((a %-% b) %-% c)"
+```
+
+그런데, 하나의 인자single argument만 가지고 호출할 수 있는, 2개의 특별한 infix 함수들이 있다. <br /> `+`와 `-`.
+
+``` r
+-1
+## [1] -1
++10
+## [1] 10
+```
+
+### 6.8.4 Replacement functions
+
+대체 함수replacement functions는 인자를 수정하는 것처럼 행동한다. <br /> 그리고 `xxx <-`라는 특별한 이름을 가지고 있다. <br /> 항상 `x`와 `value`라는 인자들arguments을 가져야 하며, 꼭 수정된 오브젝트를 return해야한다. <br /> 예를 들어, 다음의 함수는 어떤 벡터의 두 번째 element를 수정한다.
+
+``` r
+`second<-` <- function(x, value) {
+    x[2] <- value
+    x
+}
+```
+
+대체 함수는, `<-`의 왼쪽 편에 함수 호출을 둠으로써 사용된다.
+
+``` r
+x <- 1:10
+second(x) <- 5L
+x
+##  [1]  1  5  3  4  5  6  7  8  9 10
+```
+
+왜 대체 함수가 인자를 수정하는 것처럼 행동한다고 했냐면, <br /> Section 2.5에서 다뤘듯, 사실은 수정된 카피modified copy를 만드는 것이기 때문. <br /> 이걸 `tracemem()`을 통해 볼 수 있다.
+
+``` r
+x <- 1:10
+tracemem(x)
+## [1] "<0000000015F48B00>"
+
+second(x) <- 6L
+## tracemem[0x0000000015f48b00 -> 0x0000000016ad6c00]: eval eval withVisible withCallingHandlers handle timing_fn evaluate_call <Anonymous> evaluate in_dir block_exec call_block process_group.block process_group withCallingHandlers process_file <Anonymous> <Anonymous> 
+## tracemem[0x0000000016ad6c00 -> 0x0000000016ad8170]: second<- eval eval withVisible withCallingHandlers handle timing_fn evaluate_call <Anonymous> evaluate in_dir block_exec call_block process_group.block process_group withCallingHandlers process_file <Anonymous> <Anonymous>
+```
+
+만약 대체 함수가 추가적인 인자들additional arguments을 필요로 한다면, <br />   `x`와 `value` 사이에 놓고, 대체 함수의 왼쪽에 이것들을 둔채로 호출해라. <br /> 말로 설명하려면 더 힘들다. 그냥 밑의 예를 보자.
+
+``` r
+`modify<-` <- function(x, position, value) {
+    x[position] <- value
+    x
+}
+
+modify(x, 1) <- 10
+## tracemem[0x0000000016ad8170 -> 0x0000000016abeea0]: eval eval withVisible withCallingHandlers handle timing_fn evaluate_call <Anonymous> evaluate in_dir block_exec call_block process_group.block process_group withCallingHandlers process_file <Anonymous> <Anonymous> 
+## tracemem[0x0000000016abeea0 -> 0x0000000016abef10]: modify<- eval eval withVisible withCallingHandlers handle timing_fn evaluate_call <Anonymous> evaluate in_dir block_exec call_block process_group.block process_group withCallingHandlers process_file <Anonymous> <Anonymous> 
+## tracemem[0x0000000016abef10 -> 0x0000000016adaa08]: modify<- eval eval withVisible withCallingHandlers handle timing_fn evaluate_call <Anonymous> evaluate in_dir block_exec call_block process_group.block process_group withCallingHandlers process_file <Anonymous> <Anonymous>
+```
+
+사실 modify(x, 1) &lt;- 10이라고 칠 때, R은 뒤에서 이걸 이렇게 바꾸고 있다.
+
+``` r
+x <- `modify<-`(x, 1, 10)
+```
+
+다른 함수들과 replacement를 결합하는 것은, 조금 더 복잡한 translation을 필요로 한다. <br /> Combining replacement with other functions requires more complex translation. <br /> 예를 들어,
+
+``` r
+x <- c(a = 1, b = 2, c = 3)
+names(x)
+## [1] "a" "b" "c"
+
+names(x)[2] <- "two"
+names(x)
+## [1] "a"   "two" "c"
+```
+
+이러면 사실 어떤 작업이 일어나고 있는거냐면, <br /> 어떻게 translate될 수 있냐면,
+
+``` r
+`*tmp*` <- x
+x <- `names<-`(`*tmp*`, `[<-`(names(`*tmp*`), 2, "two"))
+rm(`*tmp*`)
+```
+
+임시 변수 `*tmp*`를 진짜로 만들어서 쓴 다음, 제거하는 것이다.
+
+### 6.8.5 Special forms
+
+마지막으로, 특별한 형식으로 작성된 언어 특성들이 있는데, 물론 이것들도 prefix form으로 쓸 수 있다. <br /> 괄호들(소괄호, 중괄호)도 여기에 포함된다. <br /> `(x)`를 `` `(`)(x) `` 이렇게 쓸 수 있고, <br /> `{x}`를 \``` {`(x) `` 이렇게 쓸 수 있다.
+
+대괄호는? 얘는 subsetting으로 이용한다는 걸 잊지말자... <br /> subsetting 연산자operator들도, <br /> `x[i]`를 `` `[`(x, i) `` 이렇게 쓸 수 있고, <br /> `x[[i]]`를 `` `[[`(x, i) `` 이렇게 쓸 수 있다.
+
+그리고 컨트롤 플로우control flow의 도구들tools도. <br /> `if (cond) true` 를 ``` if`(cond, true)`` <br /> `if (cond) true else false` 를 ```if``` (cond, true, false)`` <br /> ```for(var in seq) action```` 를 ```for ````(var, seq, action)```` <br /> `while(cond) action` 을 ```while`(cond, action) ```` <br /> `repeat expr` 을 ``` repeat`(expr)`` <br /> `next` 를 ```next``` ()`` <br /> ```break\` 를 `break`
+
+마지막으로, 가장 복잡한 건 function이라는 함수다. <br /> `function(arg1, arg2) {body}` 를 \``` function`(alist(arg1, arg2), body, env) ``로 쓸 수 있음.
+
+특별한 형식special form 밑의 함수의 이름을 정확히 알면, documentation을 얻는데 도움이 된다. <br /> `?(`라고 하면 syntax error가 발생한다. <br /> \``?`(\`\`\`라고 해야 괄호에 대한 documentation을 볼 수 있다.
+
+모든 특별한 형식들은 원시 함수로 고안implement되어 있다(C언어 같은). <br /> 그래서 이 함수들은 print해봐야 별 도움이 안 된다.
+
+``` r
+`for`
+## .Primitive("for")
+```
+
+### 6.8.6 Exercises
+
+6.9 Quiz answers
+----------------
+
+1.  formal, body, environment
+
+2.  11이 return됨. 20이 아니고.
+
+3.  `(2 * 3) + 1`
+
+4.  `mean(x = c(1:10, NA), na.rm = TRUE)`
+
+5.  에러 안 나옴. 왜냐하면 뒤의 `stop("This is an error!")`는 evaluate되지도 않아서. <br />   두 번째 인자argument는 사용되지 않아서, evaluate되지도 않음. lazy evaluation.
+
+6.  infix 함수들은 무엇이고 어떻게 만드는지? Section 6.8.3, Section 6.8.4
+
+7.  `on.exit()`을 사용. Section 6.7.4
