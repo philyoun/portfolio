@@ -8,7 +8,7 @@ output: github_document
 > “The simple graph has brought more information to the data analyst’s mind than any other device.” — John Tukey
 
 이 chapter에서는 ggplot2를 이용해, 데이터를 어떻게 visualise할지 알려준다. <br />
-R에는 그래프를 만들어주는 몇 가지 시스템들이 있지만, ggplot2는 가장 우아하고 다재다능한 것이다.
+R에는 그래프를 만들어주는 몇 가지 시스템들이 있지만, ggplot2는 가장 우아하고 다재다능하다.
 
 ggplot2는 **그래픽의 문법**을 구현implement했다. <br />
 그래프를 만들고 묘사하는데 있어, 일관적인 시스템을 정립했음. <br />
@@ -46,7 +46,7 @@ library(tidyverse)
 
 ___
 
-## 3.2 
+## 3.2 First steps
 다음의 질문을 대답하는데 있어, 첫 번째 그래프를 사용해 볼 것이다.
 큰 엔진을 사용하는 차들이, 작은 엔진을 사용하는 차들보다 기름을 많이 먹을까?>
 Do cars with big engines use more fuel than cars with small engines?

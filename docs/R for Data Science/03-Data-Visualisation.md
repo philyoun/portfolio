@@ -6,7 +6,7 @@
 
 > "간단한 그래프가 다른 어떤 도구보다 데이터 애널리스트에게 많은 정보를 전달해준다." - 존 튜키 <br /> “The simple graph has brought more information to the data analyst’s mind than any other device.” — John Tukey
 
-이 chapter에서는 ggplot2를 이용해, 데이터를 어떻게 visualise할지 알려준다. <br /> R에는 그래프를 만들어주는 몇 가지 시스템들이 있지만, ggplot2는 가장 우아하고 다재다능한 것이다.
+이 chapter에서는 ggplot2를 이용해, 데이터를 어떻게 visualise할지 알려준다. <br /> R에는 그래프를 만들어주는 몇 가지 시스템들이 있지만, ggplot2는 가장 우아하고 다재다능하다.
 
 ggplot2는 **그래픽의 문법**을 구현implement했다. <br /> 그래프를 만들고 묘사하는데 있어, 일관적인 시스템을 정립했음. <br /> ggplot2와 함께라면, 하나의 시스템만을 배워서 더 빠르게, 그리고 많은 곳에 응용할 수 있다.
 
@@ -35,8 +35,8 @@ library(tidyverse)
 
 ------------------------------------------------------------------------
 
-3.2
----
+3.2 First steps
+---------------
 
 다음의 질문을 대답하는데 있어, 첫 번째 그래프를 사용해 볼 것이다. 큰 엔진을 사용하는 차들이, 작은 엔진을 사용하는 차들보다 기름을 많이 먹을까?&gt; Do cars with big engines use more fuel than cars with small engines? 이미 답을 알고 있을수도 있지만, 더 정확하게 답을 해보자. 엔진 사이즈와 연비(fuel efficiency)는 어떤 관계가 있을까? 양의 관계? 음의 관계? 선형? 비선형?
 
