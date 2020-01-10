@@ -309,7 +309,7 @@ ggplot2의 용어로 말하면, 각각은 다른 **geoms**를 사용하고 있�
 
 **geom**은 데이터를 표현하기 위해 그래프가 사용하는 기하학적geometrical인 오브젝트다.
 사람들은 가끔 그래프를, 어떤 geom을 이용했는지를 바탕으로 표현하기도 한다.
-예를 들어서, 막대기 차트bar chart는 bar geom을 이용하고,
+예를 들어서, 막대 그래프bar chart는 bar geom을 이용하고,
 	선형 차트line chart는 line geom을 이용하고,
 	박스 플랏box plot은 boxplot geom을 이용하고, 이런 식으로.
 산점도scatterplot는 예외다. 얘네는 point geom을 이용한다.
@@ -439,6 +439,162 @@ ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) +
 ___
 
 ## 3.7 Statistical transformations
+이제, 막대 그래프bar chart를 봐보자.
+막대 그래프는 단순해보이지만, 흥미롭다.
+왜냐하면 그래프에 대한 사소한 것들을 알려주기 때문.
+`geom_bar()`로 그린, 기초적인 막대 그래프를 생각해보자.
+다음의 그래프는, `cut`을 기준으로 그룹해서, `diamonds` 데이터셋에 있는 다이아몬드의 총 수를 나타낸다.
+`diamonds` 데이터셋은 ggplot2에 있는 것으로, 약 54000개 다이아몬드의 정보를 가지고 있다.
+각 다이아몬드의 `price`, `carat`, `color`, `clarity`, `cut`이라는 정보들.
+
+막대 그래프를 보면 알 수 있듯, 높은 퀄리티의 다이아몬드들이, 낮은 퀄리티의 다이아몬드들보다 많다.
+```{r}
+ggplot(data = diamonds) +
+	geom_bar(mapping = aes(x = cut))
+```
+
+x축에는, `cut`이라는 변수가 있다.
+그런데 y축에는, 카운트count를 나타나는데, 얘는 `diamonds`에 있는 변수가 아니다!
+그럼 이 count라는 값은 어디서 나온건지?
+
+아까 그려봤던 산점도 같은 많은 그래프들이, 데이터셋에 있는 그대로의 값들을 그린다.
+그런데 막대 그래프bar chart는, 그래프에 추가할 새로운 값들을 계산한다.
+이런 것들이 있는데, 얘네들은 그래프에 추가할 새로운 값을 계산한다.
+
+- 막대 그래프, 히스토그램, 그리고 빈도 다각형frequency polygons은 데이터를 구간화bin하고, 
+	구간에 해당하는 포인트 수를 각 구간에 표시.
+
+- 선을 부드럽게 그어주는 애들smoothers은 데이터에 맞는 모형을 적합fit해준다음, 모형의 predictions를 그린다.
+
+- 박스플랏은 분포의 요약summary 통계량을 계산하고, 이걸 특별하게 포맷된 박스에다가 표시한다.
+
+이렇게 그래프에 필요한 새로운 값들을 계산해주는 알고리즘을 **stat**이라고 부른다.
+statistical transformation의 줄임말로써. 
+아래의 그림은 `geom_bar()`의 경우엔 이 프로세스가 어떻게 작동하는지를 보여준다.
+
+![Figure 3.10](https://d33wubrfki0l68.cloudfront.net/70a3b18a1128c785d8676a48c005ee9b6a23cc00/7283c/images/visualization-stat-bar.png)
+
+`stat` 인자argument의 기본 값을 조사해봄으로써, geom이 어떠한 stat을 사용하는지를 알 수 있다.
+예를 들어, `?geom_bar`하면 stat의 기본 값이 "count"라는걸 알 수 있다.
+	`geom_bar()`이 `stat_count()`를 사용하고 있다는 것.
+`stat_count()`는 `geom_bar()`과 같은 페이지에 다큐먼트가 있다.
+그리고 이걸 밑으로 내리면, "Computed variables"라는 섹션이 있는걸 볼 수 있다.
+`count`와 `prop`라는 2개의 새로운 변수들을 어떻게 계산하는지를 보여준다.
+
+geoms와 stats를 섞어서 쓸 수 있다.
+예를 들어, 이전에 그래프를 `geom_bar()` 대신 `stat_count()`를 이용해서 만들수도 있다.
+```{r}
+ggplot(data = diamonds) +
+	stat_count(mapping = aes(x = cut))
+```
+
+이게 가능한 이유는, 모든 geom은 디폴트 stat이 있고, 모든 stat은 디폴트 geom이 있기 때문.
+이 말인즉슨, underlying statistical transformation에 대해 걱정하지 않고, geom을 이용하면 된다는 것.
+그런데 이게 가끔 explicit하게 필요한 3가지 이유가 있다.
+
+1. 디폴트 stat을 덮어씌우고 싶을 때.
+아래의 코드에서, `geom_bar()`의 stat을, 디폴트인 count에서 identity로 바꿨다.
+이러고 나면 데이터 y 변수의 값들을, 그래프의 높이로 그려준다.
+불행하게도, 사람들이 보통 막대 그래프라고 하면, 이걸 생각하고 있는 것이다.
+그래프의 높이가 될 값이, 데이터에 이미 존재한다고 생각하는 것.
+
+```{r}
+demo <- tribble(
+	~cut,	~freq,
+	"Fair",	1610,
+	"Good",	4906,
+	"Very Good",	12082,
+	"Premium",	13791,
+	"Ideal",	21551
+)
+
+ggplot(data = demo) +
+	geom_bar(mapping = aes(x = cut, y = freq), stat = "identity")
+```
+
+`<-` 나 `tribble()`이 뭔지 모른다고 걱정하지말자. 뭐 이미 문맥상 이해했을 수도 있는데,
+곧 배우게 될 거다!
+
+2. 디폴트 매핑을, 변형된 변수가 아닌 다른 aesthetics로 바꾸길 원할 수 있다.
+예를 들어, 막대 그래프가 count가 아닌 proportion을 나타내도록.
+```{r}
+ggplot(data = diamonds) +
+	geom_bar(mapping = aes(x = cut, y = ..prop.., group = 1))
+```
+
+여기서 `group = 1`이 뭔지를 찾아봤는데,
+이걸 추가 안하면 다음과 같이 나온다.
+
+```{r}
+ggplot(data = diamonds) +
+	geom_bar(mapping = aes(x = cut, y = ..prop..))
+```
+
+왜 이러냐면 Fair인 것들의 Fair 비율은 100%, Ideal인 것들의 Ideal 비율은 100% 이런 식이기 때문.
+뭘 기준으로 prop(비율)을 계산할건지를 지정하는게, `group = 1`의 역할.
+즉, x 변수인 cut을 기준으로 Fair가 몇 퍼센트인지, Ideal은 몇 퍼센트인지를 계산해라.하는 것.
+그래서 다음과 같이 해도 된다.
+```{r}
+ggplot(data = diamonds) +
+	geom_bar(mapping = aes(x = cut, y = ..prop.., group = "x"))
+```
+
+3. 코드에 있는 statistical transformations가 좀 더 관심받도록 할 수도 있다.
+예를 들어서, `stat_summary()`를 이용하면, 각 unique한 x 값에 대해, y 값들을 요약summarise해준다.
+```{r}
+ggplot(data = diamonds) +
+	stat_summary(
+		mapping = aes(x = cut, y = depth),
+		fun.ymin = min,
+		fun.ymax = max,
+		fun.y = median
+	)
+```
+ggplot2는 20개가 넘는 stats들을 제공한다.
+각 stat은 함수이기 때문에, `?stat_bin`과 같은 방법으로 help를 얻을 수 있다.
+모든 stats들 리스트를 보고 싶다면, ggplot2 cheatsheet를 확인해보자.
+
+### 3.7.1 Execises
+
+___
+## 3.8 Position adjustments
+### 3.8.1 Exercises
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
