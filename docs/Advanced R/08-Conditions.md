@@ -2,3 +2,314 @@
 ----------------
 
 **condition** 시스템은, 함수 작성자function author가 뭔가 잘못되고 있다는 걸 알려주고, 함수 사용자가 해결할게 있다는 걸 알려주는, the author of a function to indicate that something unusual is happening, and the user of that function to deal with it 한 쌍의 도구들tools을 제공한다.
+
+여기서 conditions는 조건문의 컨디션이 아니라, 상태라는 뜻의 컨디션으로 쓰였다.
+
+함수 작성자는 컨디션들conditions을, `stop()`(에러에 대해), `warning()`(경고에 대해), `message()`(메세지에 대해)와 같은 함수들을 이용해 시그널signal해주고,
+
+함수 사용자는 `tryCatch()`나 `withCallingHandlers()`와 같은 함수들을 이용해 컨디션들을 다룬다handle.
+
+컨디션 시스템을 이해하는 것은 중요하다. 왜냐하면 작성자나 사용자 둘 다의 입장에서 종종 다룰 것이기 때문. 너가 함수를 만들 때는 컨디션 시그널링을, 함수를 호출할 때는 함수가 보내는 시그널된 컨디션을 다뤄야함.
+
+R은 Common Lisp의 아이디어를 기반으로 한 매우 강력한pwerful 컨디션 시스템을 제공한다. R의 Object-oriented 프로그래밍과 마찬가지로, 인기있는 프로그래밍 언어들과는 조금 달라서, 잘못 이해하기가 쉽다. 그리고 효율적으로 사용할 수 있게끔 설명해놓은게 별로 없기도 하다. 역사적으로, 이건 몇 안 되는 사람들만 이것의 power을 완전히 사용했다는 뜻이다. 이 챕터의 목표는 이 상황을 개선하는 것. R의 컨디션 시스템에 대한 핵심 아이디어를 이해하고, 너의 코드를 더 강하게 만드는 여러가지 실용적인 도구들tools에 대해 배울 것.
+
+이 챕터를 작성하는데 있어, 2가지 자료가 매우 유용했다. 컨디션 시스템에 대한 영감과 동기를 더 배우고 싶어, 직접 읽어보고 싶을 수도 있겠다. - [A propotype of a conditions system for R](http://homepage.stat.uiowa.edu/~luke/R/exceptions/simpcond.html) - [Beyond exception handling: conditions and restarts](http://www.gigamonkeys.com/book/beyond-exception-handling-conditions-and-restarts.html)
+
+이 아이디어들을 고안implement해 놓은 C 코드에 대해서 알아보는 것도 도움이 된다. 어떻게 작동하는지를 이해해보는데 관심이 있다면, [my notes](https://gist.github.com/hadley/4278d0a6d3a10e42533d59905fbed0ac)를 읽어보는 것도 유용할거다.
+
+### Quiz
+
+이 챕터를 스킵하고 싶은가? 아래의 문제들을 대답할 수 있다면, 그래도 된다. [Section 8.7]()에서 답을 찾을 수 있음.
+
+1.  컨디션condition의 3가지 가장 중요한 타입들은?
+
+2.  코드 블락에서 에러들을 무시하고 싶다면 어떤 함수를 이용해야할까? What function do you use to ignore errors in block of code?
+
+3.  `tryCatch()`와 `withCallingHandlers()`간의 가장 중요한 차이는 무엇인가?
+
+4.  커스텀custom 에러 오브젝트를 만들어하고 싶을 이유는 무엇일까?
+
+### Outline
+
+-   Section 8.2에서는 컨디션들을 시그널링하는데 쓸 기본적인 툴들을 소개해줌 그리고 각 타입을 언제 사용하는 것이 적절한지에 대해 다룸.
+
+-   Section 8.3에서는 컨디션들을 다루는데 있어 가장 간단한 툴들에 대해 가르쳐줌. `try()`나 `supressMessages()`와 같은 함수들은 컨디션들을 삼키고swallow, 컨디션들이 탑 레벨에 뜨는 것을 방지?
+
+그러니깐 8.2는 함수 작성자의 입장, 8.3은 함수 사용자의 입장
+
+-   Section 8.4에서는 컨디션 오브젝트에 대해 소개하고, 컨디션 핸들링의 2가지 기본적인 툴들. 에러 컨디션들에 대해선 `tryCatch()`, 나머지에 대해선 `withCallingHandlers()`
+
+-   Section 8.5에서는 이미 만들어져있는 컨디션 오브젝트를 유용한 데이터 저장을 위해 어떻게 확장시킬건지. 더 좋은 결정을 내리기 위해 컨디션 핸들러가 이용할 수 있는.
+
+-   Section 8.6에서는 이전 sections에서 배웠던, low-level 툴들을 사용한 실용적인 응용으로 챕터를 마무리.
+
+### 8.1.1 Prerequisites
+
+컨디션 시그널링과 핸들링을 하는데 있어, base R 함수들뿐 아니라 rlang의 함수들을 좀 이용해야 한다.
+
+``` r
+library(rlang)
+```
+
+------------------------------------------------------------------------
+
+8.2 Signalling conditions
+-------------------------
+
+코드에서 시그널할 수 있는 3개의 컨디션들이 있다. : 에러, 경고, 메세지
+
+-   에러errors가 가장 심각한거다. 함수가 계속될 방법이 없다는 걸 알려주고, 실행이 멈춘다.
+
+-   경고warnings는 에러와 메세지 사이에 있다. 보통 뭔가가 잘못되었지만, 함수가 적어도 부분적으로 복구 가능했다는 걸 알려준다. indicate that something has gone wrong but the function has been able to at least partially recover.
+
+-   메세지messages가 가장 순한 것이다. 이건, 유저들 대신에, 어떠한 행동action이 실행되었다는 걸 알려주는 방법이다.
+
+interactive하게만 생성될 수 있는 마지막 컨디션이 있다. interrupt interrupt는 Esc 키, Ctrl+Break 혹은 Ctrl+C(윈도우냐 맥이냐에 따라)를 눌러서 실행을 방해interrupt했다는 것을 알려준다.
+
+컨디션들을 보통 크게 표시된다. R의 인터페이스에 따라, 진한 글씨체로 혹은 빨간 색으로. 에러들은 항상, ①에러는 "Error"로, ②경고는 "Warning" 혹은 "Warning message"로, ③메세지는 아무것도 없이 시작하기 때문에, 구별할 수 있다.
+
+``` r
+stop("This is what an error looks like")
+## Error in eval(expr, envir, enclos): This is what an error looks like
+warning("This is what warning looks like")
+## Warning: This is what warning looks like
+message("This is what a message looks like")
+## This is what a message looks like
+```
+
+다음의 3개 sections에서 에러, 경고, 메세지를 자세하게 설명한다.
+
+### 8.2.1 Errors
+
+base R에서, 에러들은 `stop()`을 통해 시그널되거나 던져thrown진다.
+
+``` r
+f <- function() g()
+g <- function() h()
+h <- function() stop("This is an error!")
+
+f()
+## Error in h(): This is an error!
+```
+
+디폴트로, 에러 메세지는 call을 포함한다. 하지만 보통 별로 쓸모가 없다. 그리고 `traceback()`을 통해 쉽게 얻을 수 있는 정보를 요약한다. 그래서, `call. = FALSE`를 사용하는 것이 좋은 습관이라고 생각한다.
+
+``` r
+h <- function() stop("This is an error!", call. = FALSE)
+f()
+## Error: This is an error!
+```
+
+rlang 패키지에서, `stop()`과 같은 역할을 하는 것은 `rlang::abort()`다. 얘는 이걸 자동으로 한다. `call. = FALSE`를 자동으로 한다고. `abort()`를 챕터 내내 쓸 것인데, 가장 강력한 기능인, 추가적인 메타데이터를 추가add additional metadata하는 기능은 마지막에 배울 것이다.
+
+``` r
+h <- function() abort("This is an error!")
+f()
+## Error: This is an error!
+```
+
+주의사항: `stop()`은 여러 개의 인풋들을 붙일 수 있다. `abort()`는 못 함. abort를 사용해 복잡한 에러 메세지를 만들고 싶다면, `glue::glue()` 사용할 것을 추천한다. 이럼, [Section 8.5]()에서 배울, `abort()`의 유용한 기능들에, 다른 인자들arguments 사용하는걸 가능케 해준다.
+
+가장 좋은 에러 메세지는, 무엇이 잘못되었는지를 말해주고, 해결하기 위해서는 어떻게 해야할지 방향을 알려주는 것. 좋은 에러 메세지를 작성하는 것은 힘들다. 왜냐하면 보통 에러는, 사용자가 흠이 있는flawed 모델을 넣었을 때 발생하는데, 개발자가, 사용자가 함수에 대해 어떻게 잘못 생각했을지를 상상하는 것이 어렵기에, 알맞은 방향으로 조종하기 힘들기 때문. 말나온김에, tidyverse 스타일 가이드는 유용한 몇 개의 일반적인 원리들을 설명해준다. <http://style.tidyverse.org/error-messages.html>
+
+### 8.2.2 Warnings
+
+`warning()`으로 시그널되는 경고들은, 에러들보단 약한 것이다. 얘들은, 뭔가 잘못되었지만, 코드는 복구된 다음 계속 되었다는 것을 시그널해준다. 에러들과는 다르게, 하나의 함수 호출에 여러 개의 경고들을 가질 수 있다.
+
+``` r
+fw <- function() {
+    cat("1\n")
+    warning("W1")
+    cat("2\n")
+    warning("W2")
+    cat("3\n")
+    warning("W3")
+}
+```
+
+디폴트로, 컨트롤control이 최상위 레벨로 돌아올 때만 경고들은 캐시되고 프린트된다.
+warnings() are cached and printed only when control returns to the top level.
+
+``` r
+fw()
+## 1
+## Warning in fw(): W1
+## 2
+## Warning in fw(): W2
+## 3
+## Warning in fw(): W3
+```
+
+이 행동을 warn 옵션을 이용해서 컨트롤할 수 있다.
+
+-   경고들이 즉시 나오게 하려면, `options(warn = 1)`으로 설정
+
+-   경고들을 에러들로 바꾸려면, `options(warn = 2)`으로 설정 이게 경고를 디버그하기 가장 쉬운 방법이다. 왜냐하면 에러라면 `traceback()`과 같은 도구를 이용해 출처source를 찾을 수 있기 때문.
+
+-   디폴트 행동을 복원하려면, `options(warn = 0)`으로 설정
+
+하나씩 해보면 무슨 소리인지 금방 이해할 수 있다.
+
+`stop()`과 마찬가지로, `warning()`도 call 인자argument를 받는다. 이건 좀 더 유용하긴한데(경고들은 보통 출처source에서 좀 더 멀기 때문), 그래도 난 여전히 `call. = FALSE`를 이용해 억제suppress해놓는다. `rlang::abort()`와 마찬가지로, rlang은 `warning()`의 동일한 역할로 `rlang::warn()`이 있다. 이것도 `call.`을 디폴트로 억제해놓는다.
+
+경고는 메세지(이거에 대해 알아야한다)와 에러(이걸 고쳐야한다) 사이에 위치하기에, 언제 경고를 사용해야하는지 정확한 충고를 주는게 힘들다. 일반적으로, 절제해서 사용해라. 왜냐하면 경고는, output이 많다면 놓치기가 쉽고, 명백하게 잘못된 input이 있는데 함수가 너무 쉽게 복구되지 않도록 원하기 때문. 개인적인 의견으로, base R은 경고를 너무 많이 쓰는 것 같다. 그리고 이 중 많은 것들이 에러인게 더 나을 것 같다. 예를 들어, 다음의 경고들은 에러인게 더 낫다.
+
+``` r
+formals(1)
+## Warning in formals(fun): argument is not a function
+## NULL
+file.remove("this-file-doesn't exist")
+## Warning in file.remove("this-file-doesn't exist"): 파일 'this-file-doesn't
+## exist'을 지울 수 없습니다, 그 이유는 'No such file or directory'입니다
+## [1] FALSE
+lag(1:3, k = 1.5)
+## Warning in lag.default(1:3, k = 1.5): 'k' is not an integer
+## [1] 1 2 3
+## attr(,"tsp")
+## [1] -1  1  1
+```
+
+경고가 확실하게 더 적절한 경우는 2개의 경우밖에 없다. 1. 오래된 코드가 작업을 계속 할 수는 있는 함수를 **비난deprecate**하고 싶을 때.(경고를 무시하는 것은 괜찮) 하지만 새로운 함수를 사용하도록 권장하고 싶다.할 때. When you deprecate a function you want to allow older to continue to work(so ignoring the warning is OK) but you want to encourage the user to switch to a new function.
+
+1.  문제를 복구recover할 수 있다고 상당히 확신reasonably certain할 때. 만약에 문제 해결이 가능하다고 100% 확신한다면, 아무런 메세지가 필요없을 것이다. 만약 문제 해결할 수 있을지 확신할 수 없다면, 에러를 내도록 하는게 낫다.
+
+다른 경우에는 경고를 절제해서 쓰고, 에러가 적절하지 않을지 신중하게 고려해봐라.
+
+### 8.2.3 Messages
+
+`message()`로 시그널되는 메세지는, 정보를 준다informational. 메세지는, 사용자 대신에 R이 뭔가를 했다는걸 알려준다. 좋은 메세지들은 중도를 지킨다.: 사용자에게 어떻게 되어가고 있는지 딱 적당한 정보를 주지만, 압도되지는 않을 정도만 준다.
+
+`message()`는 즉시 디스플레이되며, `call.` 인자argument는 받지 않는다.
+
+``` r
+fm <- function() {
+    cat("1\n")
+    message("M1")
+    cat("2\n")
+    message("M2")
+    cat("3\n")
+    message("M3")
+}
+
+fm()
+## 1
+## M1
+## 2
+## M2
+## 3
+## M3
+```
+
+메세지를 사용하기 좋은 때는, - 디폴트 인자argument가 사소하지 않은 양의 계산을 필요로 하고, 사용자에게 어떤 값이 이용되었는지 알려주고 싶을 때. 예를 들어, ggplot2는 `bindwidth`를 공급해주지 않았을 때, 몇 개의 bins를 사용했는지를 보고한다.
+
+-   일차적으로 다른 작업side-effects을 위해 호출되는 함수들. 예를 들어, 디스크에 파일을 저장write하거나, 웹 API를 호출하거나, 데이터베이스에 저장할 때, 일정한 상태 메세지를 통해 무엇이 일어나고 있는지 사용자에게 말해주는 것은 유용하다.
+
+-   중간 결과물intermediate output 없이 긴 running 프로세스를 시작하려 할 때. progress bar([progress](https://github.com/r-lib/progress))가 더 낫긴하지만, 메세지로 시작해보기 좋다.
+
+-   패키지를 작성할 때, 너의 패키지가 로드되었다는걸 표시할 메세지를 원할 수 있다.(예를 들어, `.onAttach()` 안에서처럼) 여기서는 `packageStartupMessage()`를 사용해야만 한다.
+
+일반적으로, 메세지를 만드는 모든 함수들은, 어떻게든 억제suppress할 방법이 필요하다. 예를 들어 `quiet = TRUE`와도 같은 인자argument. `suppressMessages()`를 이용해 모든 메세지들을 억제하는 것이 가능하다. 하지만 곧 배우게 될 텐데, 좀 더 정제된 컨트롤을 주는 것이 낫다.
+
+`message()`와 긴밀하게 연결되어 있는 `cat()`을 비교하는 것은 중요하다. 사용법과 결과물을 보면, 상당히 비슷해보인다.
+
+``` r
+cat("Hi!\n")
+## Hi!
+message("Hi!")
+## Hi!
+```
+
+하지만, `cat()`과 `message()`의 목적이 다르다. 함수의 첫 번째 목적이, 콘솔에 프린트할 때는 `cat()`을 사용한다. `print()`나 `str()` 메소드와 같이. 주요 목적은 다른 것인데, 콘솔에 프린트하게끔 사이드 채널side-channel을 원할 때는 `message()`를 사용. 즉, `cat()`은 사용자가 뭔가 프린트되도록 요청ask할 때. `message()`는 개발자가 뭔가 프린트되도록 선택elect할 때.
+
+### 8.2.4 Exercises
+
+------------------------------------------------------------------------
+
+8.3 Ignoring conditions
+-----------------------
+
+R에서 컨디션을 다루는 가장 간단한 방법은, 무시ignore하는 것이다.
+
+-   에러는 `try()`로 무시
+-   경고는 `suppressWarnings()`로 무시
+-   메세지는 `suppressMessages()`로 무시
+
+알고있는 어떤 한 타입의 컨디션은 억제하면서 다른 컨디션들은 통과되도록 할 수가 없기 때문에, 이 함수들은 사용하기가 어렵다. ??? 이 문제에 대해선 나중에 다루어볼 것이다. These functions are heavy handed as you can't use them to suppress a single type of condition that you know about, while allowing everything else to pass through.
+
+`try()`는 실행이, 에러가 일어난 뒤에도 계속될 수 있게끔 허용해준다. 보통 실행한 함수가 에러를 내면, 함수는 즉시 종료되며, 값을 return하지 않는다.
+
+``` r
+f1 <- function(x) {
+    log(x)
+    10
+}
+
+f1("x")
+## Error in log(x): 수학함수에 숫자가 아닌 인자가 전달되었습니다
+```
+
+하지만, 에러를 만드는 statement을 `try()`로 감싸놓으면, 에러 메세지는 표시되지만 실행은 계속된다.
+
+``` r
+f2 <- function(x) {
+    try(log(x))
+    10
+}
+
+f2("a")
+## Error in log(x) : 수학함수에 숫자가 아닌 인자가 전달되었습니다
+## [1] 10
+```
+
+`try()`의 결과물을 저장하고, 성공했는지 실패했는지에 따라 다른 행동action을 하도록 하는 것도 가능은 하다. 하지만 추천하지는 않는다. 대신에, `tryCatch()`를 사용하거나 높은 차원의higher-level helper를 사용하는게 낫다. 곧 배울 것이다.
+
+간단하지만 유용한 패턴은, 호출 안에다가 할당을 하는 것이다. 이럼 코드가 성공하지 못할 경우, 사용될 디폴트값이 정의하도록 해준다. argument는 calling env에서 evaluate되지, 함수 안에서 evaluate되는게 아니기 때문에 그렇다. ([Section 6.5.1](https://blog-for-phil.readthedocs.io/en/latest/Advanced%20R/06-Functions/#651-promises)을 다시 보자.)
+
+``` r
+default <- NULL
+try(default <- read.csv("possibly-bad-input.csv"), silent = TRUE)
+```
+
+`suppressWarnings()`랑 `suppressMessages()`는 모든 경고랑 메세지를 억제suppress한다. 에러와는 다르게, 메세지랑 경고는 실행을 종료하지 않으며, 하나의 블락 안에 여러 개의 경고들이랑 메세지들을 가질 수 있다.
+
+``` r
+suppressWarnings({
+    warning("Uhoh!")
+    warning("Another warning")
+    1
+})
+## [1] 1
+
+suppressMessages({
+    message("Hello there")
+    2
+})
+## [1] 2
+
+suppressWarnings({
+    message("You can still see me")
+    3
+})
+## You can still see me
+## [1] 3
+```
+
+------------------------------------------------------------------------
+
+8.4 Handling conditions
+-----------------------
+
+### 8.4.1 Condition objects
+
+### 8.4.2 Exiting handlers
+
+### 8.4.3 Calling handlers
+
+### 8.4.4 Call stacks
+
+### 8.4.5 Exercises
+
+------------------------------------------------------------------------
+
+8.5 Custom conditions
+---------------------
