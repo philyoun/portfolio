@@ -304,9 +304,11 @@ suppressWarnings({
 8.4 Handling conditions
 -----------------------
 
-모든 컨디션들은 각각의 디폴트 행동behaviour이 있다: 에러는 실행을 멈추고 최상위 레벨top level로 return하며, 경고는 캡쳐되고 다 합쳐서 표시된다.displayed in aggregate 메세지는 즉시 표시된다. 컨디션 **핸들러handler**는, 디폴트 행동을 일시적으로 덮어씌우거나 보충할 수 있도록 해준다. override or supplement
+모든 컨디션들은 각각의 디폴트 행동behaviour이 있다: <br />   에러는 실행을 멈추고 최상위 레벨top level로 return하며, <br />   경고는 캡쳐되고 다 합쳐서 표시된다.displayed in aggregate <br />   메세지는 즉시 표시된다.
 
-두 개의 함수들, tryCatch()나 withCallingHandlers()는 핸들러들을 등록register할 수 있도록 해준다. 핸들러라는건, 시그널된 컨디션을 단 하나의 인자argument로 받는 함수들. 등록 함수registration function들은 같은 기본 형식을 갖는다.
+컨디션 **핸들러handler**는, 디폴트 행동을 일시적으로 덮어씌우거나 보충할 수 있도록 해준다. <br /> override or supplement
+
+두 개의 함수들, `tryCatch()`나 `withCallingHandlers()`는 핸들러들을 등록register할 수 있도록 해준다. <br /> 핸들러라는건, 시그널된 컨디션을 단 하나의 인자argument로 받는 함수들. <br /> 등록 함수registration function들은 같은 기본 형식을 갖는다.
 
 ``` r
 tryCatch(
@@ -331,15 +333,15 @@ withCallingHandlers(
 
 각각이 만드는 핸들러들의 타입은 다르다.
 
--   `tryCatch()`는 exiting 핸들러를 정의한다. 컨디션이 핸들되고나면, 컨트롤control은 `tryCatch()`가 호출된 context로 돌아간다. 이래서 `tryCatch()`가 에러나 방해interrupt를 다룰 때 더 적합하다. 왜냐하면, 이것들은 어쨋거나 항상 exit해야되기 때문.
+-   `tryCatch()`는 exiting 핸들러를 정의한다. <br /> 컨디션이 핸들되고나면, 컨트롤control은 `tryCatch()`가 호출된 context로 돌아간다. <br /> 이래서 `tryCatch()`가 에러나 방해interrupt를 다룰 때 더 적합하다. <br /> 왜냐하면, 이것들은 어쨋거나 항상 exit해야되기 때문.
 
--   `withCallingHandlers()`는 calling 핸들러를 정의한다. 컨디션이 캡쳐되고나면, 컨트롤control은 컨디션이 시그널 되었던 context로 돌아간다. after the condition is captured control returns to the context where the condition was signalled. 이래서 `withCallingHandlers()`는 에러가 아닌 컨디션들을 다룰 때 더 적합하다.
+-   `withCallingHandlers()`는 calling 핸들러를 정의한다. <br /> 컨디션이 캡쳐되고나면, 컨트롤control은 컨디션이 시그널 되었던 context로 돌아간다. <br /> after the condition is captured control returns to the context where the condition was signalled. <br /> 이래서 `withCallingHandlers()`는 에러가 아닌 컨디션들을 다룰 때 더 적합하다.
 
-하지만 이 핸들러들을 배우고 사용하기 전에, 컨디션 오브젝트들objects에 대해 다뤄봐야한다. 이것들은 컨디션을 시그널할 때 암묵적implicit으로 만들어지지만, 핸들러 안에서는 명백하다.
+하지만 이 핸들러들을 배우고 사용하기 전에, 컨디션 오브젝트들objects에 대해 다뤄봐야한다. <br /> 이것들은 컨디션을 시그널할 때 암묵적implicit으로 만들어지지만, 핸들러 안에서는 명백하다.
 
 ### 8.4.1 Condition objects
 
-이 때까지는 컨디션들을 시그널하기만 했고, 안보는데서 만들어지는 오브젝트들에 대해선 알아보지 않았다. 컨디션 오브젝트를 보는 가장 쉬운 방법은, 시그널된 컨디션에서 하나 캐치catch해보는 것. 그게 `rlang::catch_cnd()`이 하는 것이다.
+이 때까지는 컨디션들을 시그널하기만 했고, 안보는데서 만들어지는 오브젝트들에 대해선 알아보지 않았다. <br /> 컨디션 오브젝트를 보는 가장 쉬운 방법은, 시그널된 컨디션에서 하나 캐치catch해보는 것. <br /> 그게 `rlang::catch_cnd()`이 하는 것이다.
 
 ``` r
 cnd <- catch_cnd(stop("An error"))
@@ -352,17 +354,17 @@ str(cnd)
 
 만들어져 있는built-in 컨디션은, 2개의 원소들elements을 갖고 있는 리스트다.
 
--   `message`는, 사용자에게 보여줄 텍스트를 가지고 있는, 길이 하나짜리 캐릭터 벡터. 메세지를 추출하기 위해서는, `conditionMessage(cnd)`를 사용해라.
+-   `message`는, 사용자에게 보여줄 텍스트를 가지고 있는, 길이 하나짜리 캐릭터 벡터. <br /> 메세지를 추출하기 위해서는, `conditionMessage(cnd)`를 사용해라.
 
--   `call`은, 컨디션을 불러 일으키는 호출. the call which triggers the condition. 위의 예에서처럼, 우린 call을 사용하지 않기 때문에, 이건 보통 `NULL`일 것이다. 이걸 추출하기 위해서는, `conditionCall(cnd)`을 사용해라
+-   `call`은, 컨디션을 불러 일으키는 호출. the call which triggers the condition. <br /> 위의 예에서처럼, 우린 call을 사용하지 않기 때문에, 이건 보통 `NULL`일 것이다. <br /> 이걸 추출하기 위해서는, `conditionCall(cnd)`을 사용해라
 
-커스텀 컨디션들은 다른 요소들components을 가지고 있을수도 있다. [Section 8.5]()에서 다뤄볼 것.
+커스텀 컨디션들은 다른 요소들components을 가지고 있을수도 있다. <br /> [Section 8.5]()에서 다뤄볼 것.
 
-또한 컨디션들은 class 특성을 가지고 있다. 이게 컨디션들을 S3 오브젝트들로 만들어준다. Chapter 13에서 S3을 다뤄볼 때까지 언급하지 않을 것이지만, 다행히, 컨디션 오브젝트들은 꽤나 단순하다. 가장 중요한 점은 class 특성은 캐릭터 벡터이며, 이게 어떤 핸들러들이 컨디션을 매치할 것인지를 결정한다는 것. it determines which handlers will match the condition.
+또한 컨디션들은 `class` 특성을 가지고 있다. 이게 컨디션들을 S3 오브젝트들로 만들어준다. <br /> Chapter 13에서 S3을 다뤄볼 때까지 언급하지 않을 것이지만, 다행히, 컨디션 오브젝트들은 꽤나 단순하다. <br /> 가장 중요한 점은 `class` 특성은 캐릭터 벡터이며, 이게 어떤 핸들러들이 컨디션을 매치할 것인지를 결정한다는 것. <br />   it determines which handlers will match the condition.
 
 ### 8.4.2 Exiting handlers
 
-tryCatch()는 exititing 핸들러를 등록register한다. tryCatch() registers exiting handlers. 보통 에러 컨디션을 다룰 때 사용하는데, 에러났을 때 디폴트 행동behaviour을 바꿀 수 있도록 해준다. 예를 들어, 다음의 코드는 에러를 내는 대신, NA를 return할 것이다.
+`tryCatch()`는 exititing 핸들러를 등록register한다. <br /> tryCatch() registers exiting handlers. <br /> 보통 에러 컨디션을 다룰 때 사용하는데, <br />   에러났을 때 디폴트 행동behaviour을 바꿀 수 있도록 해준다. <br /> 예를 들어, 다음의 코드는 에러를 내는 대신, `NA`를 return할 것이다.
 
 ``` r
 f3 <- function(x) {
@@ -376,7 +378,7 @@ f3("x")
 ## [1] NA
 ```
 
-만약 아무런 컨디션들이 시그널되지 않거나, 시그널된 컨디션의 클래스가 핸들러 이름을 매치하지 않는다면, 코드는 정상적으로 실행된다.
+만약 아무런 컨디션들이 시그널되지 않거나, 시그널된 컨디션의 클래스가 핸들러 이름을 매치하지 않는다면, <br /> 코드는 정상적으로 실행된다.
 
 ``` r
 tryCatch(
@@ -396,7 +398,7 @@ tryCatch(
 ## [1] 2
 ```
 
-`tryCatch()`로 셋업한 핸들러들은 **exiting** 핸들러라고 불린다. 왜냐하면 컨디션이 시그널되고나면, 컨트롤은 핸들러에게 패스되며, 오리지널 코드로 절대 돌아오지 않는다. 한 마디로 하면, 코드를 exit한다는 뜻임.
+`tryCatch()`로 셋업한 핸들러들은 **exiting** 핸들러라고 불린다. <br /> 왜냐하면 컨디션이 시그널되고나면, 컨트롤은 핸들러에게 패스되며, 오리지널 코드로 절대 돌아오지 않는다. <br /> 한 마디로 하면, 코드를 exit한다는 뜻임.
 
 ``` r
 tryCatch(
@@ -409,11 +411,11 @@ tryCatch(
 ## [1] "There"
 ```
 
-이 경우에는 "Here"라는 메세지가 감지되었으니깐, 위로 올라가서 "There"이 나오고, 오리지널 코드로는 절대 돌아오지 않아서, `stop()`의 것들은 evaluate되지 않는다는 것.
+이 경우에는 "Here"라는 메세지가 감지되었으니깐, 위로 올라가서 "There"이 나오고, <br /> 오리지널 코드로는 절대 돌아오지 않아서, `stop()`의 것들은 evaluate되지 않는다는 것. <br />
 
-보호된 코드protected code는 `tryCatch()`의 env에서 evaluate된다. 하지만 핸들러 코드는 그렇지 않다. 왜냐하면 핸들러들도 함수이기 때문. 이건 기억하는게 중요하다. 특히나 parent env에 있는 오브젝트들을 수정하려 할 때.
+보호된 코드protected code는 `tryCatch()`의 env에서 evaluate된다. <br /> 하지만 핸들러 코드는 그렇지 않다. 왜냐하면 핸들러들도 함수이기 때문. <br /> 이건 기억하는게 중요하다. 특히나 parent env에 있는 오브젝트들을 수정하려 할 때.
 
-핸들러 함수들은, 컨디션 오브젝트라는 하나의 인자로 호출된다. 나는 이 인자를 관습에 따라 `cnd`라고 부른다. 이 값은, base 컨디션들에 대해선 조금만 유용하다. 왜냐하면 정보가 적기 때문. 곧 보게될텐데, 이건 커스텀 컨디션들을 만들 때 특히나 더 유용하다.
+핸들러 함수들은, 컨디션 오브젝트라는 하나의 인자로 호출된다. <br /> 나는 이 인자를 관습에 따라 `cnd`라고 부른다. <br /> 이 값은, base 컨디션들에 대해선 조금만 유용하다. 왜냐하면 정보가 적기 때문. <br /> 곧 보게될텐데, 이건 커스텀 컨디션들을 만들 때 특히나 더 유용하다.
 
 ``` r
 path <- tempfile()
@@ -431,14 +433,14 @@ tryCatch(
 
 ### 8.4.3 Calling handlers
 
-tryCatch()로 셋업된 핸들러들은 exiting handlers라고 부른다. 왜냐하면 한 번 컨디션이 잡히고나면 코드를 exit하기 때문. 반대로, withCallingHandlers()는 **calling** handlers를 셋업한다. 핸들러가 return하고 난 뒤에도 코드 실행은 정상적으로 계속된다. 이래서 withCallingHandelrs()는 에러가 아닌 컨디션들과 자연스럽게 짝을 짓는다. exiting handler와 calling handler는 handler라는 단어를 좀 다른 의미로 사용한다.
+`tryCatch()`로 셋업된 핸들러들은 exiting handlers라고 부른다. <br /> 왜냐하면 한 번 컨디션이 잡히고나면 코드를 exit하기 때문. <br /> 반대로, `withCallingHandlers()`는 **calling** handlers를 셋업한다. <br />   핸들러가 return하고 난 뒤에도 코드 실행은 정상적으로 계속된다. <br /> 이래서 `withCallingHandelrs()`는 에러가 아닌 컨디션들과 자연스럽게 짝을 짓는다. <br /> exiting handler와 calling handler는 handler라는 단어를 좀 다른 의미로 사용한다.
 
--   exiting handler는, 문제를 다루는handle 것처럼, 시그널을 handle한다. 문제가 사라지도록 함.
+-   exiting handler는, 문제를 다루는handle 것처럼, 시그널을 handle한다. 문제가 사라지도록 함. <br />
 -   calling handler는, 차를 핸들handle하는 것처럼, 시그널을 handle한다. 차는 여전히 남아있음.
 
-아래의 tryCatch()와 withCallingHandlers()의 결과물을 비교해보자. 첫 번째 예에서는 메세지가 프린트되지 않는다. 왜냐하면 exiting handler가 완료되고나면 코드가 종료되기 때문.
+아래의 `tryCatch()`와 `withCallingHandlers()`의 결과물을 비교해보자. <br /> 첫 번째 예에서는 메세지가 프린트되지 않는다. <br /> 왜냐하면 exiting handler가 완료되고나면 코드가 종료되기 때문.
 
-두 번째 예에서는 메세지가 프린트된다. 왜냐하면 calling handler는 exit하지 않기 때문.
+두 번째 예에서는 메세지가 프린트된다. <br /> 왜냐하면 calling handler는 exit하지 않기 때문.
 
 ``` r
 tryCatch(
@@ -465,7 +467,7 @@ withCallingHandlers(
 ## Why, yes!
 ```
 
-핸들러들은 차례대로 적용되기 때문에applied in order, 무한 루프에 갇힐 걱정을 하지 않아도 된다. 다음의 예에서, 핸들러에 의해 시그널된 message()는 잡히지 않는다.
+핸들러들은 차례대로 적용되기 때문에applied in order, 무한 루프에 갇힐 걱정을 하지 않아도 된다. <br /> 다음의 예에서, 핸들러에 의해 시그널된 `message()`는 잡히지 않는다.
 
 ``` r
 withCallingHandlers(
@@ -476,13 +478,13 @@ withCallingHandlers(
 ## First message
 ```
 
-그러니깐 메세지가 감지되어서 메세지가 나오는데 이게 또 감지되지 않을까 걱정할 수 있는데, 그렇지 않다는 것. (하지만 여러개의 핸들러가 있을 때에는 조심해라. 핸들러에 의해 캡쳐된 시그널을, 다른 핸들러가 또 시그널할 수 있음. 순서를 철저하게 잘 생각해야 한다.)
+그러니깐 메세지가 감지되어서 메세지가 나오는데 이게 또 감지되지 않을까 걱정할 수 있는데, 그렇지 않다는 것. <br /> (하지만 여러개의 핸들러가 있을 때에는 조심해라. 핸들러에 의해 캡쳐된 시그널을, 다른 핸들러가 또 시그널할 수 있음. <br /> 순서를 철저하게 잘 생각해야 한다.)
 
-calling handler의 return 값은 무시된다. 왜냐하면 핸들러가 완료되더라도 코드는 계속해서 실행되기 때문.
+calling handler의 return 값은 무시된다. <br /> 왜냐하면 핸들러가 완료되더라도 코드는 계속해서 실행되기 때문.
 
-그럼 return값은 어디로 가는지? 그래서 calling handlers는 side-effect를 위해서 쓸 때가 가장 효과적이라는 것.
+그럼 return값은 어디로 가는지? <br /> 그래서 calling handlers는 side-effect를 위해서 쓸 때가 가장 효과적이라는 것.
 
-calling handler의 고유한, 중요 side-effect는 시그널을 **muffle**할 수 있는 것. 디폴트로, 컨디션은 parent handler까지 계속해서 전달propagate된다. 디폴트 핸들러까지 전달됨.(혹은 exiting 핸들러가 있다면, 거기까지) 다음의 예를 보자.
+calling handler의 고유한, 중요 side-effect는 시그널을 **muffle**할 수 있는 것. <br /> 디폴트로, 컨디션은 parent handler까지 계속해서 전달propagate된다. <br /> 디폴트 핸들러까지 전달됨.(혹은 exiting 핸들러가 있다면, 거기까지) <br /> 다음의 예를 보자.
 
 ``` r
 # 메세지를 만드는 디폴트 핸들러까지 올라감bubble up
@@ -511,7 +513,7 @@ tryCatch(
 ## Level 2
 ```
 
-올라가는 걸bubble up 방지하고 싶지만 코드 블락의 나머지들은 여전히 실행하고 싶다면, rlang::cnd\_muffle()을 이용해서 명백하게 muffle할 수는 있다.
+올라가는 걸bubble up 방지하고 싶지만 코드 블락의 나머지들은 여전히 실행하고 싶다면, <br /> `rlang::cnd_muffle()`을 이용해서 명백하게 muffle할 수는 있다.
 
 ``` r
 withCallingHandlers(
@@ -528,9 +530,9 @@ withCallingHandlers(
 ## Level 2
 ```
 
-원래는 Level 1 Level 2 Hello 이렇게 나와야하는데
+원래는, <br /> Level 1 <br /> Level 2 <br /> Hello <br /> 이렇게 나와야하는데
 
-cnd\_muffle(cnd) 이 Level 2 다음에 있으니깐, Hello는 안 나옴
+`cnd_muffle(cnd)` 이 Level 2 다음에 있으니깐, Hello는 안 나옴 <br />
 
 ``` r
 withCallingHandlers(
@@ -548,13 +550,13 @@ withCallingHandlers(
 ## Level 1
 ```
 
-그러니깐 디폴트로 컨디션은 parent handler까지 계속해서 전달되는데, 이걸 cnd\_muffle()을 통해서 방해muffle할 수 있다는거군.
+그러니깐 디폴트로 컨디션은 parent handler까지 계속해서 전달되는데, <br /> 이걸 `cnd_muffle()`을 통해서 방해muffle할 수 있다는거군.
 
 ### 8.4.4 Call stacks
 
-section을 끝내기전에, exiting 핸들러의 콜 스택과 calling 핸들러간의 콜 스택간의 차이점을 알아보자. 이 차이점들이 그리 중요하지는 않은데, 가끔 유용할 수 있기 때문에 여기 넣어놨다.
+section을 끝내기전에, exiting 핸들러의 콜 스택과 calling 핸들러간의 콜 스택간의 차이점을 알아보자. <br /> 이 차이점들이 그리 중요하지는 않은데, 가끔 유용할 수 있기 때문에 여기 넣어놨다.
 
-lobstr::cst()을 사용하는 작은 예를 이용해서 차이점을 살펴보는게 가장 쉽다.
+`lobstr::cst()`을 사용하는 작은 예를 이용해서 차이점을 살펴보는게 가장 쉽다.
 
 ``` r
 f <- function() g()
@@ -562,7 +564,7 @@ g <- function() h()
 h <- function() message("!")
 ```
 
-calling 핸들러는 호출된다. 컨디션을 시그널하는 호출call의 문맥에 따라. Calling handlers are called in the context of the call that signalled the condition.
+calling 핸들러는 호출된다. 컨디션을 시그널하는 호출call의 문맥에 따라. <br /> Calling handlers are called in the context of the call that signalled the condition.
 
 ``` r
 withCallingHandlers(f(), message = function(cnd) {
@@ -583,7 +585,7 @@ withCallingHandlers(f(), message = function(cnd) {
 ##  11.   \-lobstr::cst()
 ```
 
-exiting 핸들러는 호출된다. tryCatch()을 호출하는 문맥에 따라. Exiting handlers are called in the context of the call to tryCatch().
+exiting 핸들러는 호출된다. `tryCatch()`를 호출하는 문맥에 따라. <br /> Exiting handlers are called in the context of the call to tryCatch().
 
 ``` r
 tryCatch(f(), message = function(cnd) lobstr::cst())
@@ -602,11 +604,11 @@ tryCatch(f(), message = function(cnd) lobstr::cst())
 8.5 Custom conditions
 ---------------------
 
-R에서 에러를 핸들링하는 것의 문제 중 하나는, 대부분의 함수들이 이미 만들어져 있는built-in 컨디션들을 생성한다는 것. 이것들은 message랑 call만을 가지고 있음. 이말인즉슨, 특정한 타입의 에러를 감지하고 싶다면, 에러 메세지의 텍스트 가지고서만 작업을 할 수 있다는 것. 이건 에러가 나기 쉽다. 메세지가 시간이 지남에 따라 달라질뿐 아니라, 메세지가 다른 언어들로 번역이 될 수도 있기 때문.
+R에서 에러를 핸들링하는 것의 문제 중 하나는, <br />   대부분의 함수들이 이미 만들어져 있는built-in 컨디션들을 생성한다는 것. <br /> 이것들은 `message`랑 `call`만을 가지고 있음. <br /> 이말인즉슨, 특정한 타입의 에러를 감지하고 싶다면, 에러 메세지의 텍스트 가지고서만 작업을 할 수 있다는 것. <br /> 이건 에러가 나기 쉽다. 메세지가 시간이 지남에 따라 달라질뿐 아니라, 메세지가 다른 언어들로 번역이 될 수도 있기 때문.
 
-다행히도 R은 강력한 기능이 있다. 물론 별로 사용이 덜 되긴하지만. 추가적인 메타데이터를 가질 수 있는 커스텀 컨디션을 만들 수 있다. 커스텀 컨디션을 만드는 것은 base R에서는 성가시다. 하지만 rlang::abort()는 커스텀 .subClass랑 추가적인 메타데이터를 줄 수 있어서 매우 쉽다.
+다행히도 R은 강력한 기능이 있다. 물론 별로 사용이 덜 되긴하지만. <br /> 추가적인 메타데이터를 가질 수 있는 커스텀 컨디션을 만들 수 있다. <br /> 커스텀 컨디션을 만드는 것은 base R에서는 성가시다. <br /> 하지만 `rlang::abort()`는 커스텀 `.subClass`랑 추가적인 메타데이터를 줄 수 있어서 매우 쉽다.
 
-다음의 예는, 기본적인 패턴을 보여준다. 커스텀 컨디션에 대해서는, 다음의 콜 구조 사용할 것을 추천한다. R의 유연한 인자 매칭flexible argument matching을 이용해서, 에러 타입의 이름이 첫 번째로 나오고, 사용자가 보게 되는 텍스트가 그 다음으로 나오고,user facing text 커스텀 메타데이터custom metadata가 그 다음으로 나온다.
+다음의 예는, 기본적인 패턴을 보여준다. <br /> 커스텀 컨디션에 대해서는, 다음의 콜 구조 사용할 것을 추천한다. <br /> R의 유연한 인자 매칭flexible argument matching을 이용해서, <br />   에러 타입의 이름이 첫 번째로 나오고, <br />   사용자가 보게 되는 텍스트가 그 다음으로 나오고,user facing text <br />   커스텀 메타데이터custom metadata가 그 다음으로 나온다.
 
 ``` r
 abort(
@@ -617,11 +619,11 @@ abort(
 ## Error: Path `blah.csv` not found
 ```
 
-커스텀 컨디션들은 인터랙티브하게 사용할 때는 평범한 컨디션들같이 작동한다. 하지만 핸들러들이 좀 더 많은걸 할 수 있게해줌.
+커스텀 컨디션들은 인터랙티브하게 사용할 때는 평범한 컨디션들같이 작동한다. <br /> 하지만 핸들러들이 좀 더 많은걸 할 수 있게해줌.
 
 ### 8.5.1 Motivation
 
-base::log()를 이용해 좀 더 자세하게 알아보자. 유효하지 않은 인자들arguments로 인해 에러가 나올 때, 너무 불친절하다.
+`base::log()`를 이용해 좀 더 자세하게 알아보자. <br /> 유효하지 않은 인자들arguments로 인해 에러가 나올 때, 너무 불친절하다.
 
 ``` r
 log(letters)
@@ -630,7 +632,7 @@ log(1:10, base = letters)
 ## Error in log(1:10, base = letters): 수학함수에 숫자가 아닌 인자가 전달되었습니다
 ```
 
-어떤 인자argument가 문제였는지를 알려주고,(x가 문제인지 base가 문제인지) 어떤 input이 문제였는지를 알려줌으로써 좀 더 명백해질 수 있다고 생각한다.
+어떤 인자argument가 문제였는지를 알려주고,(`x`가 문제인지 `base`가 문제인지) <br />   어떤 input이 문제였는지를 알려줌으로써 좀 더 명백해질 수 있다고 생각한다.
 
 ``` r
 my_log <- function(x, base = exp(1)) {
@@ -659,13 +661,13 @@ my_log(1:10, base = letters)
 ## Error: `base` must be a numeric vector; not character.
 ```
 
-이제 최소한, 어떤 인자가 잘못되었는지는 알게 됐다. 인터랙티브한 사용 측면에서, 이건 발전이다. 왜냐하면 에러 메세지가, 사용자로 하게끔 정확한 수정으로 유도했기 때문. 하지만, 프로그램적으로 에러를 핸들하기 원했다면, 나아진 건 없는거다. they're no better if you want to programmatically handle the errors 에러에 대한 모든 유용한 메타데이터는, 하나의 스트링으로 축약됐다.
+이제 최소한, 어떤 인자가 잘못되었는지는 알게 됐다. <br /> 인터랙티브한 사용 측면에서, 이건 발전이다. <br /> 왜냐하면 에러 메세지가, 사용자로 하게끔 정확한 수정으로 유도했기 때문. <br /> 하지만, 프로그램적으로 에러를 핸들하기 원했다면, 나아진 건 없는거다. <br /> they're no better if you want to programmatically handle the errors <br /> 에러에 대한 모든 유용한 메타데이터는, 하나의 스트링으로 축약됐다.
 
 ### 8.5.2 Signalling
 
-이 상황을 발전시키기 위한 기초적 구조infrastructure를 만들어보자. 잘못된 인자argument에 대한 커스텀 abort()를 공급하는 것에서 시작해볼거다. 이건 너무 일반화시킨 예제이긴한데, 다른 함수들에서도 나타나는 일반적인 패턴을 반영한다. 이 패턴은 꽤나 단순하다.
+이 상황을 발전시키기 위한 기초적 구조infrastructure를 만들어보자. <br /> 잘못된 인자argument에 대한 커스텀 `abort()`를 공급하는 것에서 시작해볼거다. <br /> 이건 너무 일반화시킨 예제이긴한데, 다른 함수들에서도 나타나는 일반적인 패턴을 반영한다. <br /> 이 패턴은 꽤나 단순하다.
 
-사용자user를 위해선, glue::glue()를 이용해 나이스한 에러 메세지를 만들어준다. 개발자developer를 위해선, 컨디션 콜condition call에 있는 메타데이터를 저장한다.
+사용자user를 위해선, `glue::glue()`를 이용해 나이스한 에러 메세지를 만들어준다. <br /> 개발자developer를 위해선, 컨디션 콜condition call에 있는 메타데이터를 저장한다.
 
 ``` r
 abort_bad_argument <- function(arg, must, not = NULL) {
@@ -694,7 +696,7 @@ border-radius: 5px;
 }
 </style>
 <p class="comment">
-<strong>base R에서는</strong> <br /> rlang을 쓰지않고 커스텀 에러를 만들고 싶다면, 컨디션 오브젝트를 직접 만들고by hand, stop()에게 전달해주면 된다.
+<strong>base R에서는</strong> <br /> rlang을 쓰지않고 커스텀 에러를 만들고 싶다면, 컨디션 오브젝트를 직접 만들고by hand, <br /> <code>stop()</code>에게 전달해주면 된다.
 
 ``` r
 stop_custom <- function(.subClass, message, call = NULL, ...) {
@@ -719,7 +721,7 @@ err$x
 ```
 
 </p>
-이제, 이 새로운 헬퍼를 이용해서 my\_log()를 다시 써볼 수 있다.
+이제, 이 새로운 헬퍼를 이용해서 `my_log()`를 다시 써볼 수 있다.
 
 ``` r
 my_log <- function(x, base = exp(1)) {
@@ -734,7 +736,7 @@ my_log <- function(x, base = exp(1)) {
 }
 ```
 
-my\_log() 자체는 이제 좀 길어졌는데, 하지만 훨씬 의미를 많이 전달한다. 그리고 에러 메세지가, 함수들에 걸쳐, 잘못된 인자들에 대해 일관성 있게 되었다. 이전과 같이, 인터랙티브 에러 메세지를 내준다.
+`my_log()` 자체는 이제 좀 길어졌는데, 하지만 훨씬 의미를 많이 전달한다. <br /> 그리고 에러 메세지가, 함수들에 걸쳐, 잘못된 인자들에 대해 일관성 있게 되었다. <br /> 이전과 같이, 인터랙티브 에러 메세지를 내준다.
 
 ``` r
 my_log(letters)
@@ -745,7 +747,7 @@ my_log(1:10, base = letters)
 
 ### 8.5.3 Hanlding
 
-이렇게 구조화된 컨디션 오브젝트는, 프로그램하기가 훨씬 쉬워진다. 이 기능을, 니가 만든 함수를 테스트할 때 써볼 수 있다. 유닛 테스팅unit testing은 이 책의 주제가 아니지만, 기본은 이해하기 쉽다.(자세하게 알고 싶다면, R packages 참고) (간단히 찾아보니, 프로그래밍에서 소스 코드의 특정 모듈이, 의도된 대로 정확히 작동하는지 검증하는 절차) 다음의 코드는 에러를 캡쳐하고, 우리가 기대한 구조를 가지고 있다는 걸 보여준다.
+이렇게 구조화된 컨디션 오브젝트는, 프로그램하기가 훨씬 쉬워진다. <br /> 이 기능을, 니가 만든 함수를 테스트할 때 써볼 수 있다. <br /> 유닛 테스팅unit testing은 이 책의 주제가 아니지만, 기본은 이해하기 쉽다.(자세하게 알고 싶다면, R packages 참고) <br /> (간단히 찾아보니, 프로그래밍에서 소스 코드의 특정 모듈이, 의도된 대로 정확히 작동하는지 검증하는 절차) <br /> 다음의 코드는 에러를 캡쳐하고, 우리가 기대한 구조를 가지고 있다는 걸 보여준다.
 
 ``` r
 library(testthat)
@@ -767,9 +769,9 @@ expect_equal(err$arg, "x")
 expect_equal(err$not, "character")
 ```
 
-(위에 있는 라이브러리랑 함수들은 저자Hadley가 직접 만든 것들이다. my\_log("a")가 내놓은 컨디션을 캐치한 것을 바탕으로, 이것저것 원하는대로 되었는지 유닛 테스팅을 한 것.)
+(위에 있는 라이브러리랑 함수들은 저자Hadley가 직접 만든 것들이다. <br /> `my_log("a")`가 내놓은 컨디션을 캐치한 것을 바탕으로, 이것저것 원하는대로 되었는지 유닛 테스팅을 한 것.)
 
-또는, tryCatch()의 error\_bad\_argument 클래스를 사용해서, 특정한 에러를 handle하도록할 수도 있다.
+또는, `tryCatch()`의 `error_bad_argument` 클래스를 사용해서, 특정한 에러를 handle하도록할 수도 있다.
 
 ``` r
 tryCatch(
@@ -780,7 +782,7 @@ tryCatch(
 ## [1] "bad_argument"
 ```
 
-tryCatch()를 여러 개의 handlers와 커스텀 클래스들과 함께 사용할 때, 시그널의 클래스 벡터를 매치하는 첫 번째 핸들러가 호출된다. 최선의 매치가 아니라. the first handler to match any class in the signal's class vector is called. 이러한 이유에서, 가장 특정한 핸들러를 맨 첨에 놓아야한다. 다음의 코드는 원하는대로 되질 않는다.
+`tryCatch()`를 여러 개의 handlers와 커스텀 클래스들과 함께 사용할 때, <br />   시그널의 클래스 벡터를 매치하는 첫 번째 핸들러가 호출된다. 최선의 매치가 아니라. <br /> the first handler to match any class in the signal's class vector is called. <br /> 이러한 이유에서, 가장 특정한 핸들러를 맨 첨에 놓아야한다. <br /> 다음의 코드는 원하는대로 되질 않는다.
 
 ``` r
 tryCatch(
@@ -798,21 +800,21 @@ tryCatch(
 8.6 Applications
 ----------------
 
-R의 컨디션 시스템에 대한 기본적인 툴들을 다 배워봤으니, 몇몇 응용들을 해보자. 이 section의 목표는, tryCatch()나 withCallingHandlers()의 모든 가능한 사용법에 대해 배우는게 아니라, 자주 일어나는 몇몇 일반적인 패턴들을 그려illustrate보는 것. 이러고나면 창조적인 주스들이 흘러서(ㅋㅋ), 새로운 문제를 만났을 때, 유용한 해결법을 생각해낼 수 있을 것이다. Hopefully these will get your creative juices flowing, so when you encounter a new problem you can come up with a useful solution.
+R의 컨디션 시스템에 대한 기본적인 툴들을 다 배워봤으니, 몇몇 응용들을 해보자. <br /> 이 section의 목표는, `tryCatch()`나 `withCallingHandlers()`의 모든 가능한 사용법에 대해 배우는게 아니라, <br />   자주 일어나는 몇몇 일반적인 패턴들을 그려illustrate보는 것. <br /> 이러고나면 너의 창조적인 주스를 흐르게 해서(ㅋㅋ), 새로운 문제를 만났을 때, 유용한 해결법을 생각해낼 수 있을 것이다. <br /> Hopefully these will get your creative juices flowing, so when you encounter a new problem you can come up with a useful solution.
 
-<details> <summary>...</summary> 중학교 때인가, 영어 선생이 이런 말을 했었다. '영어는 그림을 그리는 언어라고 한다. 그만큼 표현이 풍부하다.' 당시에는 말도 안 된다고 생각했다. 무슨 ㅋㅋ 우리나라 말도 얼마나 풍부한 표현이 많고 시적인 표현도 많고 좋은 문학 작품도 많고.. (물론 접한 영문학은 많지 않지만(..이건 지금도..)) 그런데 그로부터 10년 이상이 지나고, 그 동안 여러가지 우리나라 문학이나, 수천 수만가지 영어 텍스트들을 접하고 나니, 영어가 더 표현력이 풍부한 것 같다. 시나 소설 같은 문학적인 분야에선 몰라도, 일상적인 표현에서는 영어가 더 표현력이 풍성하다. 머릿속에 당장 떠오르는 표현으로도, Sounds good! 을 우리나라 말로 번역하려하면 '좋아요'밖에 없다. 뭐 이건 너무 단편적일지라도, 경험적으로, 당시 영어 선생에게 동의할 수 밖에 없다. </details> <br /> <br />
+<details> <summary>...</summary> 중학교 때인가, 영어 선생이 이런 말을 했었다. <br /> '영어는 그림을 그리는 언어라고 한다. 그만큼 표현이 풍부하다.' <br /> 당시에는 말도 안 된다고 생각했다. 무슨 ㅋㅋ 우리나라 말도 얼마나 풍부한 표현이 많고 시적인 표현도 많고 좋은 문학 작품도 많고.. <br /> (물론 접한 영문학은 많지 않지만(..이건 지금도..)) <br /> 그런데 그로부터 10년 이상이 지나고, 그 동안 여러가지 우리나라 문학이나, 수천 수만가지 영어 텍스트들을 접하고 나니, <br /> 영어가 더 표현력이 풍부한 것 같다. <br /> 시나 소설 같은 문학적인 분야에선 몰라도, 일상적인 표현에서는 영어가 더 표현력이 풍성하다. <br /> 머릿속에 당장 떠오르는 표현으로도, Sounds good! 을 우리나라 말로 번역하려하면 '좋아요'밖에 없다. <br /> 뭐 이건 너무 단편적일지라도, 경험적으로, 당시 영어 선생에게 동의할 수 밖에 없다. </details> <br /> <br />
 
 들어가기 전에, 이미 한 번 다 봐본 내가 정리를 해봤다.
 
-1.  에러가 발생했을 때, 에러 대신에 지정해놓은 디폴값을 반환하도록.
-2.  1번을 더 확장해서, 성공했을 때는 그 값을, 실패했을 땐, 지정해놓은 값을 반환하도록.
-3.  resignal을 맨 처음 봤을 때는, resign의 명사형인가? 생각했는데, 그게 아니고, re - signal이다. warning이 나왔을 때, 이걸 error로 바꿔서 return하도록.
-4.  Record, 무슨 무슨 값들이 나왔는지 기록하는 것.
-5.  No default behaviour, 이건 설명하기가 좀 힘듬.
+1.  Failure values, 에러가 발생했을 때, 에러 대신에 지정해놓은 디폴값을 반환하도록. <br />
+2.  Success and failure values, 1번을 더 확장해서, 성공했을 때는 그 값을, 실패했을 땐, 지정해놓은 값을 반환하도록. <br />
+3.  Resignal, 맨 처음 봤을 때는, resign의 명사형인가? 생각했는데, 그게 아니고, re - signal이다. <br /> warning이 나왔을 때, 이걸 error로 바꿔서 return하도록. <br />
+4.  Record, 무슨 무슨 값들이 나왔는지 기록하는 것. <br />
+5.  No default behaviour, 이건 설명하기가 좀 힘듬. 읽어봐야함.
 
 ### 8.6.1 Failure values
 
-에러 핸들러로부터 반환return되는 값에 따라, 단순하지만 유용한 몇 개의 tryCatch() 패턴들이 있다. 가장 간단한 케이스는, 에러가 발생할 때, 디폴트 값에다가 wrapper을 씌우는 것이다.
+에러 핸들러로부터 반환return되는 값에 따라, 단순하지만 유용한 몇 개의 `tryCatch()` 패턴들이 있다. <br /> 가장 간단한 케이스는, 에러가 발생할 때, 디폴트 값에다가 wrapper을 씌우는 것이다.
 
 ``` r
 fail_with <- function(expr, value = NULL) {
@@ -828,7 +830,7 @@ fail_with(log("x"), NA_real_)
 ## [1] NA
 ```
 
-좀 더 복잡한 응용은, base::try()다. 아래에, try2()는 base::try()의 에센스만 뽑았다. 원래의 try()는, tryCatch()를 사용하지 않은 경우 에러 메세지를 더 보여줘야 되어서, 더 복잡하다.
+좀 더 복잡한 응용은, `base::try()`다. <br /> 아래에, `try2()`는 `base::try()`의 에센스만 뽑았다. <br /> 원래의 `try()`는, `tryCatch()`를 사용하지 않은 경우 에러 메세지를 더 보여줘야 되어서, 더 복잡하다.
 
 ``` r
 try2 <- function(expr, silent = FALSE) {
@@ -859,9 +861,9 @@ try2(stop("Hi"), silent = TRUE)
 
 ### 8.6.2 Success and failure values
 
-이 패턴을 확장시켜서, 만약 코드가 성공적으로 evaluate되면 어떤 값을 return하도록(success\_val) 하고, 실패하면 다른 값을 return하도록(error\_val) 할 수 있다.
+이 패턴을 확장시켜서, 만약 코드가 성공적으로 evaluate되면 어떤 값을 return하도록(`success_val`) 하고, <br />   실패하면 다른 값을 return하도록(`error_val`) 할 수 있다.
 
-이 패턴은 하나의 작은 트릭만 있으면 된다: 사용자 공급 코드를 evaluate하고, success\_val 만약 코드가 에러를 내면, success\_val로는 가지 못하고, 대신에 error\_val을 return한다.
+이 패턴은 하나의 작은 트릭만 있으면 된다: <br />   사용자 공급 코드를 evaluate하고, `success_val` <br />   만약 코드가 에러를 내면, `success_val`로는 가지 못하고, 대신에 `error_val`을 return한다.
 
 ``` r
 foo <- function(expr) {
@@ -889,7 +891,7 @@ does_error <- function(expr) {
 }
 ```
 
-혹은 어떠한 컨디션이라도 캡쳐하는데도 쓸 수 있다. rlang::catch\_cnd()처럼
+혹은 어떠한 컨디션이라도 캡쳐하는데도 쓸 수 있다. `rlang::catch_cnd()`처럼
 
 ``` r
 catch_cnd <- function(expr) {
@@ -903,7 +905,7 @@ catch_cnd <- function(expr) {
 }
 ```
 
-try()의 변형variant을 만드는데 있어 이 패턴을 사용할 수도 있다. try()의 문제 중 하나는, 코드가 성공했는지 아닌지를 판단하는게 상당히 어렵다는 것. 오브젝트를 특정한 클래스와 함께 return하는 것보다는, result와 error라는 2개의 요소component를 갖고 있는 리스트를 return하는 것이 더 나은 것 같다.
+`try()`의 변형variant을 만드는데 있어 이 패턴을 사용할 수도 있다. <br /> `try()`의 문제 중 하나는, 코드가 성공했는지 아닌지를 판단하는게 상당히 어렵다는 것. <br /> 오브젝트를 특정한 클래스와 함께 return하는 것보다는, <br />   result와 error라는 2개의 요소component를 갖고 있는 리스트를 return하는 것이 더 나은 것 같다.
 
 ``` r
 safety <- function(expr) {
@@ -927,11 +929,11 @@ str(safety(stop("Error!")))
 ##   ..- attr(*, "class")= chr [1:3] "simpleError" "error" "condition"
 ```
 
-이건 purrr::safely()와 밀접한 관련이 있다. 이건 function operator인데, [Section 11.2.1]()에서 배우게 될 것이다.
+이건 `purrr::safely()`와 밀접한 관련이 있다. <br /> 이건 function operator인데, [Section 11.2.1]()에서 배우게 될 것이다.
 
 ### 8.6.3 Resignal
 
-컨디션이 시그널되었을 때 디폴트 값을 return하는 것과 마찬가지로, 핸들러들은 좀 더 정보가 많은 에러 메세지들을 만드는데 사용될 수 있다. 하나 간단한 응용은, 하나의 코드 블락에 대해 options(warn = 2)과 같이 작동하는 함수를 만드는 것. 아이디어는 간단하다: 에러를 만들어냄으로써 경고를 다룬다. we handle warnings by throwing an error.
+컨디션이 시그널되었을 때 디폴트 값을 return하는 것과 마찬가지로, <br />   핸들러들은 좀 더 정보가 많은 에러 메세지들을 만드는데 사용될 수 있다. <br /> 하나 간단한 응용은, 하나의 코드 블락에 대해 `options(warn = 2)`과 같이 작동하는 함수를 만드는 것. <br /> 아이디어는 간단하다: 에러를 만들어냄으로써 경고를 다룬다. <br /> we handle warnings by throwing an error.
 
 ``` r
 warning2error <- function(expr) {
@@ -950,11 +952,11 @@ warning2error({
 ## Error: Hello
 ```
 
-성가신 메세지의 소스를 찾으려고 할 때, 비슷한 함수를 작성할 수 있다. Section 22.6에서 더 볼 수 있다.
+성가신 메세지의 소스를 찾으려고 할 때, 비슷한 함수를 작성할 수 있다. <br /> Section 22.6에서 더 볼 수 있다.
 
 ### 8.6.4 Record
 
-다른 흔한 패턴은, 나중의 조사investigation를 위해 컨디션들을 기록record해두는 것. 여기서 문제는, calling 핸들러들은 side-effects를 위해서 호출되기에 값을 return받을 수 없다. 하지만 대신에 몇몇 오브젝트를 수정해줘야 한다.
+다른 흔한 패턴은, 나중의 조사investigation를 위해 컨디션들을 기록record해두는 것. <br /> 여기서 문제는, calling 핸들러들은 side-effects를 위해서 호출되기에 값을 return받을 수 없다. <br /> 하지만 대신에 몇몇 오브젝트를 수정해줘야 한다.
 
 ``` r
 catch_cnds <- function(expr) {
@@ -990,7 +992,7 @@ catch_cnds({
 ## <message: c>
 ```
 
-근데, 또 에러를 캡쳐하기 원한다면 어떻게 해야할까? tryCatch()안의 withCallingHandlers()를 감싸야한다. 만약 에러가 발생한다면, 그게 마지막 컨디션이 될 것이다.
+근데, 또 에러를 캡쳐하기 원한다면 어떻게 해야할까? <br /> `tryCatch()`안의 `withCallingHandlers()`를 감싸야한다. <br /> 만약 에러가 발생한다면, 그게 마지막 컨디션이 될 것이다.
 
 ``` r
 catch_cnds <- function(expr) {
@@ -1036,11 +1038,11 @@ catch_cnds({
 ##  24. base::withCallingHandlers(...)
 ```
 
-이것이, knitr을 지원하는 evaluate 패키지([Wickham and Xie 2018](https://github.com/r-lib/evaluate))의 핵심 아이디어다. 모든 아웃풋을 특별한 데이터 구조로 캡쳐해서, 나중에 replay될 수 있도록 해준다. 전체적으로는, evaluate 패키지가 여기있는 것들보다 훨씬 복잡하다. plots랑 text 아웃풋들도 다뤄야하기 때문.
+이것이, knitr을 지원하는 evaluate 패키지([Wickham and Xie 2018](https://github.com/r-lib/evaluate))의 핵심 아이디어다. <br /> 모든 아웃풋을 특별한 데이터 구조로 캡쳐해서, 나중에 replay될 수 있도록 해준다. <br /> 전체적으로는, evaluate 패키지가 여기있는 것들보다 훨씬 복잡하다. <br /> plots랑 text 아웃풋들도 다뤄야하기 때문.
 
 ### 8.6.5 No default behaviour
 
-마지막으로 유용한 패턴은, message나 warning 혹은 error로부터 inherit하지 않는 컨디션을 시그널하는 것. 이 말은, 디폴트 행동behaviour이 없기 때문에, 컨디션이 아무런 효과effect가 없다는 것. 사용자가 따로 딱 정해주지 않는 이상. 예를 들어, 컨디션들에 따른 로깅 시스템을 상상해볼 수 있다.
+마지막으로 유용한 패턴은, `message`나 `warning` 혹은 `error`로부터 inherit하지 않는 컨디션을 시그널하는 것. <br /> 이 말은, 디폴트 행동behaviour이 없기 때문에, 컨디션이 아무런 효과effect가 없다는 것. <br /> 사용자가 따로 딱 정해주지 않는 이상. <br /> 예를 들어, 컨디션들에 따른 로깅 시스템을 상상해볼 수 있다.
 
 ``` r
 log <- function(message, level = c("info", "error", "fatal")) {
@@ -1049,13 +1051,13 @@ log <- function(message, level = c("info", "error", "fatal")) {
 }
 ```
 
-다음과 같이, log()를 호출할 때, 컨디션은 시그널되지만, 아무런 디폴트 핸들러가 없기 때문에, 아무일도 일어나지 않는다.
+다음과 같이, <br /> `log()`를 호출할 때, 컨디션은 시그널되지만, 아무런 디폴트 핸들러가 없기 때문에, 아무일도 일어나지 않는다.
 
 ``` r
 log("This code was run")
 ```
 
-logging을 activate하기 위해서, log 컨디션을 이용해 무언가를 해주는 핸들러가 필요하다. 밑에다, 파일에다가 logging 메세지들을 기록하는, record\_log() 함수를 정의해놨다.
+logging을 activate하기 위해서, log 컨디션을 이용해 무언가를 해주는 핸들러가 필요하다. <br /> 밑에다, 파일에다가 logging 메세지들을 기록하는, `record_log()` 함수를 정의해놨다.
 
 ``` r
 record_log <- function(expr, path = stdout()) {
@@ -1092,7 +1094,7 @@ record_log(ignore_log_levels(log("Hello"), "info"))
 ```
 
 <p class="comment">
-<strong>base R에서는</strong> <br /> 컨디션 오브젝트를 손으로 만들고, signalCondition(), cnd\_muffle()로 시그널하려하면 안 될 것이다. 대신에 muffle restart라는걸 다음과 같이 정의해야한다.
+<strong>base R에서는</strong> <br /> 컨디션 오브젝트를 손으로 만들고, <code>signalCondition()</code>, <code>cnd\_muffle()</code>로 시그널하려하면 안 될 것이다. <br /> 대신에 muffle restart라는걸 다음과 같이 정의해야한다. <br />
 
 ``` r
 withRestarts(signalCondition(cond), muffle = function() NULL)
@@ -1109,8 +1111,8 @@ restarts는 현재로선 이 책의 범위를 넘지만, 3판쯤에는 포함될
 
 1.  error, warning, message
 
-2.  try() 혹은 tryCatch()
+2.  `try()` 혹은 `tryCatch()`
 
-3.  tryCatch()는 wrapped code의 실행을 끝내는, exiting handler를 만듬. withCallingHandlers()는 wrapped code의 실행에 영향을 주지 않는, calling handler를 만듬.
+3.  `tryCatch()`는 wrapped code의 실행을 끝내는, exiting handler를 만듬. <br /> `withCallingHandlers()`는 wrapped code의 실행에 영향을 주지 않는, calling handler를 만듬.
 
-4.  왜냐하면, tryCatch90를 이용해서 특정한 타입의 에러를 캡쳐할수도 있다. 반면에, 단순히 에러 문자열error strings를 비교에 기대는 것은 메세지가 translate될 수 있어 위험할 수 있음
+4.  왜냐하면, `tryCatch()`를 이용해서 특정한 타입의 에러를 캡쳐할수도 있다. <br /> 반면에, 단순히 에러 문자열error strings를 비교에 기대는 것은 메세지가 translate될 수 있어 위험할 수 있음
