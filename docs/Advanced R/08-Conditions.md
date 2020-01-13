@@ -696,7 +696,7 @@ border-radius: 5px;
 }
 </style>
 <p class="comment">
-<strong>base R에서는</strong> <br /> rlang을 쓰지않고 커스텀 에러를 만들고 싶다면, 컨디션 오브젝트를 직접 만들고by hand, <br /> <code>stop()</code>에게 전달해주면 된다.
+<strong>base R에서는</strong> <br /> rlang을 쓰지않고 커스텀 에러를 만들고 싶다면, 컨디션 오브젝트를 직접 만들고by hand, <br /> 아래처럼, <code>stop()</code>에게 전달해주면 된다.
 
 ``` r
 stop_custom <- function(.subClass, message, call = NULL, ...) {
@@ -751,18 +751,6 @@ my_log(1:10, base = letters)
 
 ``` r
 library(testthat)
-```
-
-    ## Warning: package 'testthat' was built under R version 3.5.3
-
-    ## 
-    ## Attaching package: 'testthat'
-
-    ## The following objects are masked from 'package:rlang':
-    ## 
-    ##     is_false, is_null, is_true
-
-``` r
 err <- catch_cnd(my_log("a"))
 expect_s3_class(err, "error_bad_argument")
 expect_equal(err$arg, "x")
@@ -1095,11 +1083,12 @@ record_log(ignore_log_levels(log("Hello"), "info"))
 
 <p class="comment">
 <strong>base R에서는</strong> <br /> 컨디션 오브젝트를 손으로 만들고, <code>signalCondition()</code>, <code>cnd\_muffle()</code>로 시그널하려하면 안 될 것이다. <br /> 대신에 muffle restart라는걸 다음과 같이 정의해야한다. <br />
-
+</p>
 ``` r
 withRestarts(signalCondition(cond), muffle = function() NULL)
 ```
 
+<p class="comment">
 restarts는 현재로선 이 책의 범위를 넘지만, 3판쯤에는 포함될거라 생각한다.
 </p>
 ### 8.6.6 Exercises
@@ -1109,7 +1098,7 @@ restarts는 현재로선 이 책의 범위를 넘지만, 3판쯤에는 포함될
 8.7 Quiz answers
 ----------------
 
-1.  error, warning, message
+1.  `error`, `warning`, `message`
 
 2.  `try()` 혹은 `tryCatch()`
 

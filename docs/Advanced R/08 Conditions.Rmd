@@ -213,6 +213,7 @@ lag(1:3, k = 1.5)
 When you deprecate a function you want to allow older to continue to work(so ignoring the warning is OK) <br />
 but you want to encourage the user to switch to a new function.
 
+
 2. 문제를 복구recover할 수 있다고 상당히 확신reasonably certain할 때. <br />
 만약에 문제 해결이 가능하다고 100% 확신한다면, 아무런 메세지가 필요없을 것이다. <br />
 만약 문제 해결할 수 있을지 확신할 수 없다면, 에러를 내도록 하는게 낫다.
@@ -778,7 +779,7 @@ border-radius: 5px;
 <p class="comment">
 <strong>base R에서는</strong> <br />
 rlang을 쓰지않고 커스텀 에러를 만들고 싶다면, 컨디션 오브젝트를 직접 만들고by hand, <br />
-<code>stop()</code>에게 전달해주면 된다.
+아래처럼, <code>stop()</code>에게 전달해주면 된다.
 
 ```{r eval=FALSE}
 stop_custom <- function(.subClass, message, call = NULL, ...) {
@@ -833,7 +834,7 @@ my_log(1:10, base = letters)
 (간단히 찾아보니, 프로그래밍에서 소스 코드의 특정 모듈이, 의도된 대로 정확히 작동하는지 검증하는 절차) <br />
 다음의 코드는 에러를 캡쳐하고, 우리가 기대한 구조를 가지고 있다는 걸 보여준다.
 
-```{r}
+```{r warning=FALSE, message=FALSE}
 library(testthat)
 err <- catch_cnd(my_log("a"))
 expect_s3_class(err, "error_bad_argument")
@@ -1162,9 +1163,11 @@ record_log(ignore_log_levels(log("Hello"), "info"))
 <strong>base R에서는</strong> <br />
 컨디션 오브젝트를 손으로 만들고, <code>signalCondition()</code>, <code>cnd_muffle()</code>로 시그널하려하면 안 될 것이다. <br />
 대신에 muffle restart라는걸 다음과 같이 정의해야한다. <br />
+</p>
 ```{r eval=FALSE}
 withRestarts(signalCondition(cond), muffle = function() NULL)
 ```
+<p class="comment">
 restarts는 현재로선 이 책의 범위를 넘지만, 3판쯤에는 포함될거라 생각한다.
 </p>
 
@@ -1174,7 +1177,7 @@ ___
 
 ## 8.7 Quiz answers
 
-1. error, warning, message
+1. `error`, `warning`, `message`
 
 2. `try()` 혹은 `tryCatch()`
 
