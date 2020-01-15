@@ -178,6 +178,90 @@ Section 18.4.1에서 `lobstr::ast()`를 이용해 탐구해볼 것이다.
 
 ___
 ## 18.3 Expressions
+AST에 존재하는 데이터 구조를 통틀어 expressions라고 부른다.
+**expression**은, code를 parsing함으로써 생성되는 base types 집합의 어떤 멤버다.:
+	constant scalars, symbols, call objects, and pairlists.
+
+위의 4개가, `expr()`로 캡쳐한 코드를 표현represent할 수 있는 데이터 구조들.
+그리고 `is_expression(expr(...))`은 항상 참이다.
+
+constants, symbols, call objects가 가장 중요하고, 밑에 차례대로 설명되어 있다.
+pairlists와 empty symbols는 더 특화된specialsed 것이어서 Section 18.6.1와 Section 18.6.2에서 다루겠다.
+
+주의: base R 다큐먼트에서는 "expression"은 두 가지를 의미하기 위해서 쓰인다.
+위의 정의 말고도, `expression()`나 `parse()`에서 return되는 오브젝트를 지칭refer할 때도 쓰인다.
+본질적으로는 이것도 expressions의 리스트다. 위에서 정의한대로.
+여기서는 이것들을 expression vectors라고 부를 것이다. Section 18.6.3에서 다룰 것
+
+
+
+### 18.3.1 Constants
+Scalar constants는 AST의 가장 간단한 요소component다. 
+좀 더 정확하게, **constant**는 `NULL`이거나 길이 1짜리 atomic vector(혹은 scalar)이다.
+예를 들어, `TRUE`, `1L`, `2.5`, `"x"` 같은 것들.
+constant인지 체크를 하고 싶다면, `rlang::is_syntactic_literal()`을 이용하면 된다.
+
+constants는, constant를 표현represent하기 위해 사용된 expression이, 같은 constant라는 점에서, 
+	자체인용self-quoting이다.
+Constatns are self-quoting in the sense that the expression used to represent a constant is the same constant.
+무슨 말이냐면,
+```{r collapse=TRUE}
+identical(expr(TRUE), TRUE)
+identical(expr(1), 1)
+identical(expr(2L), 2L)
+identical(expr("x"), "x")
+```
+
+이렇게, constant를 represent하기 위해 사용된 expression이 constant라는 것. 
+그래서 self-quoting.
+
+### 18.3.2 Symbols
+**symbol**은 오브젝트의 이름을 represent하는 것. 예를 들어, `x`, `mtcars`, `mean`
+base R에서는, symbol과 name이라는 단어가 혼용되어 쓰인다. (그래서 `is.name()`, `is.symbol()`이 동일함.)
+여기서는 symbol이라고 일관성있게 부를 것이다. name이라는 건 여러가지 뜻들을 갖기 때문.
+
+2가지 방법으로 symbol을 만들 수 있다. 
+1. `expr()`로 오브젝트를 지칭하는 코드를 캡처링함으로써, by capturing code that references an object
+2. 혹은 `rlang::sym()`을 이용해서, string을 symbol로 바꿈으로써, turning a string into a symbol
+
+```{r collapse=TRUE}
+expr(x)
+sym("x")
+```
+
+symbol을 다시 string으로 바꾸려고 한다면, `as.character()` 혹은 `rlang::as_string()`을 써라.
+`as_string()`을 쓴다면, 길이 1짜리 character vector을 확실하게 얻게 된다는 점에서 이점이 있음.
+
+```{r collapse=TRUE}
+as_string(expr(x))
+```
+
+symbol은, 따옴표quotes없이 print되기 때문에 인지할 수 있다.
+또는, `str()`을 쓰면 symbol인지를 말해주고, `is.symbol()`이 TRUE인지를 통해서 확인할 수도 있다.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### 18.3.3 Calls
+
+### 18.3.4 Summary
+
+### 18.3.5 Exercises
+
+
 
 
 ___
