@@ -1,9 +1,0 @@
----
-title: "17-0 Metaprogramming Introduction"
-output:
-  md_document:
-    variant: markdown_github
----
-
-## Introduction
-
