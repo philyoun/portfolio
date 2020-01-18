@@ -6,51 +6,51 @@ output:
 ---
 
 ## 19.1 Introduction
-이제 R 코드의 tree 구조에 대해 이해를 했으니, 
-	`expr()`나 `ast()`가 work하는 원리에 대해 알아보자: 바로 quotation.
-tidy evaluation에서, 모든 quoting 함수는 사실 quasiquoting 함수다. 
+이제 R 코드의 tree 구조에 대해 이해를 했으니, <br />
+	&emsp;&emsp;`expr()`나 `ast()`가 work하는 원리에 대해 알아보자: 바로 quotation. <br />
+tidy evaluation에서, 모든 quoting 함수는 사실 quasiquoting 함수다. <br />
 왜냐하면 unquoting 또한 지원하기 때문.
 
-quotation은 unevaluated expression을 캡처링하는 act인데 비해, 
-	unquotation은 quoted expression이었을 부분을 선택적으로 evaluate하는 그런 기능.
-이걸 다 합쳐서 quasiquotation이라고 함.
-quasiquotation은 어떤 함수를 create하는 것을 쉽게 만들어준다.
-	어떤 함수? 함수 작성자author가 만든 코드와 함수 사용자user가 만든 코드를 결합combine해주는 함수.
+quotation은 unevaluated expression을 캡처링하는 act인데 비해, <br />
+	&emsp;&emsp;unquotation은 quoted expression이었을 부분을 선택적으로 evaluate하는 그런 기능. <br />
+이걸 다 합쳐서 quasiquotation이라고 함. <br />
+quasiquotation은 어떤 함수를 create하는 것을 쉽게 만들어준다. <br />
+	&emsp;&emsp;어떤 함수? 함수 작성자author가 만든 코드와 함수 사용자user가 만든 코드를 결합combine해주는 함수. <br />
 이게 넓은 범위의 어려운 문제들을 해결해준다.
 
-quasiquotation은 tidy evaluation의 3가지 기둥 중 하나다.
+quasiquotation은 tidy evaluation의 3가지 기둥 중 하나다. <br />
 나머지 둘인 quosures와 data mask에 대해서는 Chapter 20에서 배울 것.
 
-홀로 사용했을 때에는, quasiquotation은 가장 유용한 프로그래밍.
-특히나 코드를 만드는데generating 있어서.
+홀로 사용했을 때에는, quasiquotation은 가장 유용한 프로그래밍. <br />
+특히나 코드를 만드는데generating 있어서. <br />
 하지만 다른 테크닉들과 결합되면, tidy evaluation은 data analysis를 위한 강력한 툴이 된다.
 
 ### Outline
-- Section 19.2에서는 quasiquotation의 개발 동기가 되는 함수, `cement()`에 대해 알아봄.
-  `paste()`와 비슷하게 작동하지만, 자동으로 함수 인자들을 따옴표quote해주기 때문에, 직접 안 해도 된다.
+- Section 19.2에서는 quasiquotation의 개발 동기가 되는 함수, `cement()`에 대해 알아봄. <br />
+  &emsp;&emsp;`paste()`와 비슷하게 작동하지만, 자동으로 함수 인자들을 따옴표quote해주기 때문에, 직접 안 해도 된다.
 
-- Section 19.3에서는 expressions를 quote하는 도구를 준다. 
-  그 expression을 작성자가 만들었든 사용자가 만들었든, rlang을 사용하든 base R을 사용하든.
+- Section 19.3에서는 expressions를 quote하는 도구를 준다. <br />
+  &emsp;&emsp;그 expression을 작성자가 만들었든 사용자가 만들었든, rlang을 사용하든 base R을 사용하든.
 
-- Section 19.4에서는, rlang quoting 함수와 base quoting 함수 간의 가장 큰 차이점을 소개한다.: 
-	`!!`로 unquoting하는 것과 `!!!`로 unquoting하는 것.
+- Section 19.4에서는, rlang quoting 함수와 base quoting 함수 간의 가장 큰 차이점을 소개한다.: <br />
+	&emsp;&emsp;`!!`로 unquoting하는 것과 `!!!`로 unquoting하는 것.
 
-- Section 19.5에서는, quoting하는 동작을 비활성화disable하는데 base R 함수들이 사용하는,
-	3개의 주요 non-quoting 테크닉들을 다룬다.
+- Section 19.5에서는, quoting하는 동작을 비활성화disable하는데 base R 함수들이 사용하는, <br />
+	&emsp;&emsp;3개의 주요 non-quoting 테크닉들을 다룬다.
 
-- Section 19.6에서는, `!!!`을 사용할 수 있는 또 다른 장소, `...`을 받는 함수에 대해 알아본다.
-	또, 특별한 연산자인 `:=`를 소개하는데, 얘는 인자 이름argument names을 다이나믹하게 바꿀 수 있도록 해준다.
+- Section 19.6에서는, `!!!`을 사용할 수 있는 또 다른 장소, `...`을 받는 함수에 대해 알아본다. <br />
+	&emsp;&emsp;또, 특별한 연산자인 `:=`를 소개하는데, 얘는 인자 이름argument names을 다이나믹하게 바꿀 수 있도록 해준다.
 
-- Section 19.7에서는, 몇몇 코드 생성을 자연적으로 필요로 하는 문제를 해결하는데 있어, 
-	quoting의 실용적인 사용법 몇 개를 보여준다.
+- Section 19.7에서는, 몇몇 코드 생성을 자연적으로 필요로 하는 문제를 해결하는데 있어, <br />
+	&emsp;&emsp;quoting의 실용적인 사용법 몇 개를 보여준다.
 
 - Section 19.8에서는, quasiquotation에 대해 짧은 역사로 마무리. 혹시나 누군가 궁금해할까봐...
 
 ### Prerequisites
-동기 부여에 대한 전체적인 개요와 기본적인 단어들을 위해, [Chapter 17](https://blog-for-phil.readthedocs.io/en/latest/Advanced%20R/17-Big-Picture/), metaprogramming overview를 읽고 오자.
+동기 부여에 대한 전체적인 개요와 기본적인 단어들을 위해, [Chapter 17](https://blog-for-phil.readthedocs.io/en/latest/Advanced%20R/17-Big-Picture/), metaprogramming overview를 읽고 오자. <br />
 그리고 [Section 18.3](https://blog-for-phil.readthedocs.io/en/latest/Advanced%20R/18-Expressions/#183-expressions)에 설명되어 있는, expression의 tree 구조에 친숙해야 한다.
 
-코드 측면에서는, 대부분의 경우, rlang에 있는 툴들을 사용할 것이다.
+코드 측면에서는, 대부분의 경우, rlang에 있는 툴들을 사용할 것이다. <br />
 하지만 chapter의 끝 부분에서, purrr과 연동해 강력한 응용을 보게 될 것이다.
 ```{r warning=FALSE, message=FALSE}
 library(rlang)
@@ -59,24 +59,24 @@ library(purrr)
 
 
 ### Related work
-quoting 함수들은, Lisp **macros**와 깊은 관련이 있다. 
-하지만 macros는 보통 컴파일-타임에 실행되는데, R에는 이게 존재하지 않는다.
-그리고 항상 input이랑 output이 AST다. 이걸 R에다가 구현하려는 접근법으로는 Lumley([2001](https://www.r-project.org/doc/Rnews/Rnews_2001-3.pdf))를 참고해라.
-quoting 함수들은, 소수만 아는, Lisp의 fexprs와 더 밀접한 연관이 있는데, 이 함수들은, 모든 인자들을 디폴트로 quote한다.
+quoting 함수들은, Lisp **macros**와 깊은 관련이 있다. <br />
+하지만 macros는 보통 컴파일-타임에 실행되는데, R에는 이게 존재하지 않는다. <br />
+그리고 항상 input이랑 output이 AST다. 이걸 R에다가 구현하려는 접근법으로는 Lumley([2001](https://www.r-project.org/doc/Rnews/Rnews_2001-3.pdf))를 참고해라. <br />
+quoting 함수들은, 소수만 아는, Lisp의 fexprs와 더 밀접한 연관이 있는데, 이 함수들은, 모든 인자들을 디폴트로 quote한다. <br />
 이 용어들은, 다른 프로그래밍 언어에서 연관된 작업related work을 찾아볼 때, 유용하다.
 
 ___
 ## 19.2 Motivation
-unquoting의 필요성을 보여주는, 구체적인 예시와 함께 시작해보자. 
-결국엔 이게 quasiquotation으로 연결
+unquoting의 필요성을 보여주는, 구체적인 예시와 함께 시작해보자. <br />
+결국엔 이게 quasiquotation으로 연결. <br />
 words를 joining함으로써 strings를 만든다고 상상해보자.
 ```{r collapse=TRUE}
 paste("Good", "morning", "Hadley")
 paste("Good", "afternoon", "Alice")
 ```
 
-이렇게 따옴표quotes를 다 넣는건 지루하다. 그냥 생 단어bare words를 사용하고 싶다.
-그러고 싶다면, 다음의 함수를 사용하면 된다.
+이렇게 따옴표quotes를 다 넣는건 지루하다. 그냥 생 단어bare words를 사용하고 싶다. <br />
+그러고 싶다면, 다음의 함수를 사용하면 된다. <br />
 (각 조각들에 대해선 걱정하지마라. 나중에 배울 것이다.)
 
 ```{r}
@@ -91,14 +91,14 @@ cement(Good, morning, Hadley)
 cement(Good, afternoon, Alice)
 ```
 
-형식적으로, 이 함수는 모든 인풋들을 따옴표quote해준다.
-자동적으로 각 인자argument에다가 따옴표를 넣어준다고 생각할 수도 있는데,
-그건 정확한 사실은 아니다. 왜냐하면 중간 결과물들이 expression이지, string이 아니기 때문.
-하지만 여전히 유용한 근사치approximations이긴하다. 
+형식적으로, 이 함수는 모든 인풋들을 따옴표quote해준다. <br />
+자동적으로 각 인자argument에다가 따옴표를 넣어준다고 생각할 수도 있는데, <br />
+그건 정확한 사실은 아니다. 왜냐하면 중간 결과물들이 expression이지, string이 아니기 때문. <br />
+하지만 여전히 유용한 근사치approximations이긴하다. <br />
 그리고 이게 "quote"라는 용어의 근본적인 의미기도 하고.
 
-이 함수는 더 이상 따옴표를 하나하나 안 쳐도 된다는 점에서 nice하다.
-하지만 문제는, variables를 사용하고 싶을 때 발생한다.
+이 함수는 더 이상 따옴표를 하나하나 안 쳐도 된다는 점에서 nice하다. <br />
+하지만 문제는, variables를 사용하고 싶을 때 발생한다. <br />
 `paste()` 때는 variables 사용하기 쉬웠다. 그냥 따옴표를 안치면 됐으니깐.
 
 ```{r collapse=TRUE}
@@ -114,20 +114,20 @@ paste("Good", time, name)
 cement(Good, time, name)
 ```
 
-input을 명백하게explicitly, unquote할 방법이 필요하다.
-`cement()`라는 함수가 자동적인 따옴표 치는 걸 막아줄 그런 방법.
+input을 명백하게explicitly, unquote할 방법이 필요하다. <br />
+`cement()`라는 함수가 자동적인 따옴표 치는 걸 막아줄 그런 방법. <br />
 여기선 , `time`과 `name`을, `Good`과는 다르게 다루어줘야 한다.
 
-quasiquotation은 이걸 할 수 있는 방법을 준다. 
-`!!`, unquote라고 불리는 기본적인 도구. 뱅뱅이라고 부름.
+quasiquotation은 이걸 할 수 있는 방법을 준다. <br />
+`!!`, unquote라고 불리는 기본적인 도구. 뱅뱅이라고 부름. <br />
 이건 quoting 함수에게 quote하지 말 것을 전달해준다.
 
 ```{r collapse=TRUE}
 cement(Good, !!time, !!name)
 ```
 
-`cement()`와 `paste()`를 직접적으로 비교하는건 유용하다.
-`paste()`는 인자들arguments을 evaluate하기 때문에, quote가 필요하면 해줘야 함.
+`cement()`와 `paste()`를 직접적으로 비교하는건 유용하다. <br />
+`paste()`는 인자들arguments을 evaluate하기 때문에, quote가 필요하면 해줘야 함. <br />
 `cement()`는 인자들arguments을 quote하기 때문에, unquote가 필요하면 해줘야 한다.
 
 ```{r eval=FALSE}
@@ -144,8 +144,8 @@ quote된 인자들arguments과, evaluate된 인자들을 구분하는 것은 중
 
 `paste()`는 모든 인자들을 evaluate하고, `cement()`는 모든 인자들을 quote한다.
 
-어떤 인자가 quote된건지 evaluate된건지 확신이 없다면, 코드를 함수 밖에서 실행해보라.
-만약에 작동하지 않는다거나, 다른 행동을 한다면, 인자는 quote된 것.
+어떤 인자가 quote된건지 evaluate된건지 확신이 없다면, 코드를 함수 밖에서 실행해보라. <br />
+만약에 작동하지 않는다거나, 다른 행동을 한다면, 인자는 quote된 것. <br />
 예를 들어서, `library()`에서 첫 번째 인자는 quote일까, evaluate일까?
 
 ```{r collapse=TRUE, error=TRUE}
@@ -158,46 +158,465 @@ MASS
 ```
 그러니깐 quote되어 있는 것임.
 
-인자가 quote된건지 evaluate된건지에 대해 말하는 것은,
-	함수가 non-standard evaluation(NSE)를 사용하는것인지 아닌지를, 
+인자가 quote된건지 evaluate된건지에 대해 말하는 것은, <br />
+	&emsp;&emsp;함수가 non-standard evaluation(NSE)를 사용하는것인지 아닌지를, <br />
 좀 더 정확하게 나타내는 것.
 
-난 가끔, 하나 혹은 여러 개의 인자들을 quotes하는 함수들을, 짧게 quoting function이라고 부를 것이다.
-하지만 일반적으로, quoted 인자들에 대해 얘기할 것이다.
-	왜냐하면 거기서부터 차이가 발생하는 것이기 때문.
+난 가끔, 하나 혹은 여러 개의 인자들을 quotes하는 함수들을, 짧게 quoting function이라고 부를 것이다. <br />
+하지만 일반적으로, quoted 인자들에 대해 얘기할 것이다. <br />
+	&emsp;&emsp;왜냐하면 거기서부터 차이가 발생하는 것이기 때문.
 
 ### 19.2.2 Exercises
 
 ___
 ## 19.3 Quoting
+quasiquotation의 첫 번째 파트는 quotation이다. 
+	expression을 evaluate하지 않고 캡쳐하는 것.
+
+expression이 직접적으로 혹은 간접적으로 공급될 수 있기 때문에, 2개의 함수들이 필요하다. 
+	공급되는supplied 것은 lazily-evaluated function argument를 통해서.
+We'll need a pair of functions / because the expression can be supplied directly or indirectly,
+	via lazily-evaluated function argument.
+rlang 패키지의 quoting 함수들로 시작해보자. 그러고나서 base R로 돌아오자.
+
+
+### 19.3.1 Capturing expressions
+4개의 중요한 quoting 함수들이 있다.
+인터랙티브한 탐구를 할 때, 가장 중요한건 expr()이다.
+얘는 인자argument를 공급받은 그대로 캡쳐해준다.
+
+```{r collapse=TRUE}
+expr(x + y)
+
+expr(1 / 2 / 3)
+```
+
+(띄어쓰기나 코멘트는 expression의 부분이 아니기 때문에, 
+	quoting 함수에 의해 캡쳐되지 않는다는 걸 기억하자.)
+
+expr()은 인터랙티브한 탐구를 하기에 좋다.
+왜냐하면, 개발자가 타입한 걸 캡쳐해 준다는 점에서 쓸모가 많음.
+함수 내에서는 별로 쓸모가 없음. It's not so useful inside a function.
+
+```{r collapse=TRUE}
+f1 <- function(x) expr(x)
+f1(a + b + c)
+```
+
+이 문제를 해결하기 위해서는 다른 함수가 필요함. enexpr()
+이 함수는 함수 호출자caller가 함수에 제공한 것을 캡쳐해준다.
+	어떻게? lazy evaluation을 작동시키는 internal promise object를 찾아봄으로써.([Section 6.5.1]())
+This captures what the caller supplied to the function
+	by looking at the internal promise object that powers lazy evaluation.
+
+```{r collapse=TRUE}
+f2 <- function(x) enexpr(x)
+f2(a + b + c)
+```
+
+여기서 en은 enrich의 en이다. 더 풍부하게 한다는 의미.
+
+...에 있는 모든 인자들arguments을 캡쳐하기 위해서는, enexprs()를 사용해야 한다.
+
+```{r collapse=TRUE}
+f <- function(...) enexprs(...)
+f(x = 1, y = 10 * z)
+```
+
+마지막으로, exprs()는 인터랙티브하게 expressions의 리스트를 만드는데 유용.
+```{r collapse=TRUE}
+exprs(x = x ^ 2, y = y ^ 3, z = z ^ 4)
+```
+
+이건 이것과 같은 것임.
+`list(x = expr(x ^ 2), y = expr(y ^ 3), z = expr(z ^ 4))`
+
+요약해보면, enexpr()과 enexprs()는 사용자에 의해 제공된 arguments들을 캡쳐하는데 사용.
+	to capture the expressions supplied as arguments by the user
+expr()과 exprs()는 니가 공급한 expressions를 캡쳐할 때 사용.
+	to capture expressions that you supply
+
+
+### 19.3.2 Capturing symbols
+
+가끔, 사용자가 임의의 expression이 아닌, 변수 이름variable name만을 정하도록 하고 싶을 수 있다.
+이럴 때에는 ensym()이나 ensyms()를 이용하면 된다.
+
+이것들은 enexpr()과 enexprs()의 변형variant이다. 
+얘들은, 캡쳐된 expression이 symbol이나 string인지를 체크해줌.(string의 경우에는 symbol로 변환됨)
+만약 다른거라면, 에러를 낸다.
+
+```{r collapse=TRUE}
+f <- function(...) ensyms(...)
+f(x)
+f("x")
+```
+
+
+### 19.3.3 With base R
+
+위의 각 rlang 함수들은, base R에 동일한 것들이 다 있다.
+가장 큰 차이점은, base R에 있는 것들은 unquoting을 지원하지 않는다는 것.(곧 다룰 것)
+그래서 base R의 것들은 quoting functions이다. quasiquoting functions가 아니라.
+
+expr()의 base 버전은 quote()다.
+```{r collapse=TRUE}
+quote(x + y)
+```
+
+enexpr()의 가장 가까운 base 버전은 substitute()
+```{r collapse=TRUE}
+f3 <- function(x) substitute(x)
+f3(x + y)
+```
+
+exprs()의 가장 가까운 base 버전은 alist()
+```{r collapse=TRUE}
+alist(x = 1, y = x + 2)
+```
+
+enexprs()의 가장 가까운 base 버전은 substitute()에 써져있지는 않은 기능.
+```{r collapse=TRUE}
+f <- function(...) as.list(substitute(...()))
+f(x = 1, y = 10 * z)
+```
+
+두 개의 또 다른 중요한 base quoting 함수들이 있다.
+- bquote()는 quasiquotation의 제한된 형식limited form을 제공해준다. Section 19.5에서 다룸.
+- ~, formula는 environment도 캡쳐하는 quoting function. 이건 quosure의 영감이 되었다. 
+Chapter 20의 주제이고, Section 20.3.4에서 다룬다.
+
+
+### 19.3.4 Substitution
+substitute()를, unevaluated arguments를 캡쳐하는데 쓰는걸 자주 볼 것이다.
+하지만, 얘는 quoting하는 것 뿐 아니라, 이름대로 substitution도 해준다.
+symbol이 아닌 expression을 주더라도, current env에 정의된 symbols의 값으로 substitute해줌.
+
+```{r collapse=TRUE}
+f4 <- function(x) substitute(x * 2)
+f4(a + b + c)
+```
+
+내 생각엔 이게 코드를 더 이해하기 어렵게하는 것 같다.
+왜냐하면, context 밖에서는 substitute(x + y)가 x를 대체하기 위함인지, y를 대체하기 위함인지, 
+	둘 다를 대체하기 위해서인지 말할 수 없음.
+그래서, substitution을 위해서 substitute()를 사용하고 싶다면, 다음과 같이 두 번째 argument도 쓰길 권한다.
+```{r collapse=TRUE}
+substitute(x * y * z, list(x = 10, y = quote(a + b)))
+```
+
+
+### 19.3.5 Summary
+quoting을 할 때, 두 가지 중요한 구분이 있다.
+
+1. 개발자developer에 의해 제공된supplied 코드인지 혹은 사용자user에 의해 제공된 코드인지?
+즉, 함수의 body에 제공되는 fixed인건지? 아님 인자argument로 제공되는 varying인지?
+is it fixed(supplied in the body of the function) or varying(supplied via an argument)
+
+2. 하나의 expression을 캡쳐하고 싶은지? 혹은 여러 개의 expression을 캡쳐하고 싶은지?
+
+이런 조건들로 2 by 2 table을 그려볼 수 있는데, rlang으로는,
+
+
+Table 19.1: rlang quasiquoting functions
+
+|               |   Developer  |      User      |
+|---------------|:------------:|----------------|
+|     One       |   `expr()`   |   `enexpr()`   |
+|     Many      |   `exprs()`  |   `enexprs()`  |
+
+
+Table 19.2: base R quoting functions
+
+|               |   Developer  |               User              |
+|---------------|:------------:|---------------------------------|
+|     One       |   `quote()`  |         `substitute()`          |
+|     Many      |   `alist()`  |   `as.list(substitute(...()))`  |
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+### 19.3.6 Exercises
 
 ___
 ## 19.4 Unquoting
+이 때까지는, base R quoting 함수 대신, rlang quoting 함수들을 씀으로써 비교적 작은 이득을 봤다.:
+좀 더 일관적인consistent 네이밍 체계scheme를 가지고 있음.
+큰 차이는, rlang의 quoting 함수들은 unquote도 할 수 있기 때문에, 사실 quasiquoting이라는 것.
+
+Unquoting은 원래라면 quoted되었을 expression의 부분을, 선택적으로 evaluate할 수 있도록 허용해주는 것.
+이건 AST 템플릿을 이용해서, AST들을 효과적으로 merge할 수 있도록 허용해준다.
+
+base 함수들은 unquoting을 사용하지 않는만큼, 다른 기법techniques들을 사용한다. Section 19.5의 주제.
+
+Unquoting은 quoting의 inverse 중 하나다.
+unquoting은, expr()안에서 evaluate하고 싶은 코드를 선택적으로 할 수 있도록 해준다.
+그래서 expr(!!x)는 x와 같음.
+
+Chapter 20에서, 또 다른 inverse인, evaluation에 대해서도 배울 것.
+expr() 밖에서 일어나는 일임. 그래서, 결론적으로 eval(expr(x))와 x는 같은 것.
+
+'벗다'라는 동사의 반의어가 (옷을)'입다'가 될 수도 있고, (장갑을)'끼다'가 될 수도 있고, (신발을)'신다'가 될 수도 있는 것과 비슷한 느낌
+
+
+### 19.4.1 Unquoting one argument
+
+함수 호출function call에서, 하나의 인자argument를 unquote하고 싶다면 !!을 사용하자.
+!!은 single expression을 받고, evaluate하고, AST 결과를 inline해준다.
+
+```{r collapse=TRUE}
+x <- expr(-1)
+expr(f(!!x, y))
+```
+
+다이어그램으로 이해를 하는게 가장 쉬운 것 같다.
+!! 는 AST에서 자리표시자placeholder를 소개하는데, 점선 경계선으로 표시된 걸 볼 수 있다.(1번 그림)
+여기서 x라는 placeholder가 AST로 대체되었는데, 점선으로 연결되어있다.(2번 그림)
+
+![Figure 19.1](https://d33wubrfki0l68.cloudfront.net/6460470e66f39052d794dd365141a7cc0cb02e56/08719/diagrams/quotation/bang-bang.png)
+
+그러니깐 placeholder라는건 여기 무언가가 들어와야된다는 걸 알려주는 그런 것.
+!!x라는 자리에 뭔가가 들어와줘야 됩니다~이런 것.
+
+콜 오브젝트call objects와 마찬가지로, !!는 symbol이나 constatns와도 작동을 한다.
+
+```{r collapse=TRUE}
+a <- sym("y")
+b <- 1
+expr(f(!!a, !!b))
+```
+
+![Figure 19.2](https://d33wubrfki0l68.cloudfront.net/a4d49ceb36f81bbe3516a6fead7a9116cc80eaae/873ca/diagrams/quotation/simple.png)
+
+만약, !!의 오른쪽이 function call이라면, !!는 그걸 evaluate하고, 결과값을 넣는다.
+
+```{r collapse=TRUE}
+mean_rm <- function(var) {
+  var <- ensym(var)
+  expr(maen(!!var, na.rm = TRUE))
+}
+
+expr(!!mean_rm(x) + !!mean_rm(y))
+```
+
+!!는 expressions과 작동하기 때문에, 연산자 우선순위operator precedence를 보존한다. 
+```{r collapse=TRUE}
+x1 <- expr(x + 1)
+x2 <- expr(x + 2)
+
+expr(!!x1 / !!x2)
+```
+
+![Figure 19.3](https://d33wubrfki0l68.cloudfront.net/321539c223c071eb51ce7ebb0dcad1b5a17961ff/5434b/diagrams/quotation/infix.png)
+
+만약 expression의 텍스트를 단순하게 붙여넣었다면, x + 1 / x + 2이라는, 
+  다음과 같은 굉장히 다른 AST를 가진 결과를 얻었을 것.
+![Figure 19.4](https://d33wubrfki0l68.cloudfront.net/a4781343679b3a1c54cfbea85a8f030adf674660/54aec/diagrams/quotation/infix-bad.png)
+
+### 19.4.2 Unquoting a function
+!!는 함수의 인자argument를 대체하기 위해 가장 흔하게 사용되는 것임.
+하지만 함수를 대체하는데에도 쓸 수 있다.
+문제가 하나 있는데, 연산자 우선순위operator precedence이다. 
+예를 들어, expr(!!f(x, y))라고 하면 f(x, y) 의 결과를 unquote해버리기 때문에, 
+	괄호가 하나 더 필요하다. expr((!!f)(x, y)) 이렇게. 다음의 예를 보자.
+```{r collapse=TRUE}
+f <- expr(foo)
+expr((!!f)(x, y))
+```
+
+아래와 비교를 해보자.
+```{r collapse=TRUE, error=TRUE}
+expr(!!f(x, y))
+```
+
+f가 call일 때도 작동을 한다.
+```{r collapse=TRUE}
+f <- expr(pkg::foo)
+expr((!!f)(x, y))
+```
+
+AST를 보면 더 이해가 잘 됨.
+
+![Figure 19.5](https://d33wubrfki0l68.cloudfront.net/7f0161e9585104328391cc9e9d173a8f246beddf/e2498/diagrams/quotation/fun.png)
+
+너무 많은 괄호가 필요하기에, rlang::call2()를 이용해서 더 깔끔하게 쓸 수도 있다.
+```{r collapse=TRUE}
+f <- expr(pkg::foo)
+call2(f, expr(x), expr(y))
+```
+
+
+### 19.4.3 Unquoting a missing argument
+매우 가끔, missing argument를 unquote하는 것이 유용할 때도 있다.(Section 18.6.2)
+하지만 naive한 approach로는 안 된다.
+```{r collapse=TRUE, error=TRUE}
+arg <- missing_arg()
+expr(foo(!!arg, !!arg))
+```
+
+rlang::maybe_missing() 라는 helper를 써서 이 문제를 해결할 수 있다.
+```{r collapse=TRUE}
+expr(foo(!!maybe_missing(arg), !!maybe_missing(arg)))
+```
+
+
+### 19.4.4 Unquoting in special forms
+
+unquoting하면 syntax error가 일어나는 몇 가지 특별한 형식들forms이 있다.
+$를 예로 들어보자.
+$ 다음에는 항상 variable name이 와야지, 또 다른 expression이 와서는 안 된다.
+이 말인즉슨, $를 사용해서 unquote하면 syntax error가 뜬다.
+
+```{r collapse=TRUE, error=TRUE}
+expr(df$!!x)
+```
+
+여기서 unquoting이 작동하게 하려면, prefix form으로 써줘야한다.
+```{r collapse=TRUE}
+x <- expr(x)
+expr(`$`(df, !!x))
+```
+
+### 19.4.5 Unquoting many arguments
+!! 는 일대일one-to-one 대체replacement.
+!!!(unquote-splice라고 부르고, 뱅뱅뱅이라고 읽음)는 일대다one-to-many 대체.
+얘는 expression의 리스트를 받고, !!!가 있는 자리에 그걸 삽입한다.
+
+```{r collapse=TRUE}
+xs <- exprs(1, a, -b)
+expr(f(!!!xs, y))
+
+# 이름으로 줄 수도 있다.
+ys <- set_names(xs, c("a", "b", "c"))
+expr(f(!!!ys, d = 4))
+```
+
+![Figure 19.6](https://d33wubrfki0l68.cloudfront.net/9e60ab46ad3c470bc27437b05fcd53fef781039d/17433/diagrams/quotation/bang-bang-bang.png)
+
+!!!는, ...를 받는 어떠한 rlang 함수에도 쓸 수 있다.
+...가 evaluated되건 quoted되건 상관없이.
+Section 19.6에서 다시 다룰건데, call2()에서 유용하다고 알아두자.
+```{r collapse=TRUE}
+call2("f", !!!xs, expr(y))
+```
+
+### 19.4.6 The polite fiction of !!
+
+이 때까지, !!와 !!!가 +, -, ! 따위와 같은 일반적인 prefix 연산자라고 생각할 수 있다.
+하지만 그렇지 않음.
+R의 관점에서, !!와 !!!는 그저 !의 반복일 뿐임.
+```{r collapse=TRUE}
+!!TRUE
+!!!TRUE
+```
+
+!! 와 !!!는 rlang의 모든 quoting functions안에서 특별하게 행동하는 거다.
+이 안에서는 단항 연산자unary인 +나 - 같은 우선권을 가진 실제 연산자real operator처럼 행동한다.
+이 말인즉슨, rlang안에서는 이걸 구현하느라 힘들었겠지만, 이렇게 되어서
+	(!!x) + (!!y) 대신에 !!x + !!y라고 쓸 수 있게 되었다.
+
+이렇게 fake operator를 쓰는 것의 가장 큰 단점은,
+	quasiquoting functions 밖에서 !!를 잘못 사용했을 때, silent error를 갖게 된다는 것.
+
+대부분의 경우 문제가 안 된다.
+왜냐하면 !!는 expressions나 quosures를 unquote할 때 사용하기 때문.
+expressions는 부정negation 연산자를 지원하지 않기 때문에, 다음과 같은 argument type error를 갖게 된다.
+
+```{r collapse=TRUE, error=TRUE}
+x <- quote(variable)
+!!x
+```
+
+즉, expression에다가 !을 넣네 마네를 하는게 아예 불가능.
+
+하지만 다음과 같이 numeric 값들과 작업할 땐, silent하게 틀린 결과를 갖게 된다.\\
+
+```{r collapse=TRUE}
+df <- data.frame(x = 1:5)
+y <- 100
+with(df, x + !!y)
+```
+
+이건 1:5 + !!100과 같은 결과.
+
+이러한 단점을 가졌는데, 
+	왜 일반적인 함수 호출regular function calls을 사용하지 않고 new syntax를 쓰는지 궁금할 수 있다.
+사실, tidy evaluation의 초기 버전은 UQ(), UQS()와 같은 함수 호출function calls을 사용했다. 
+하지만, 진짜 함수 호출function calls이 아니어서, 이렇게 척하는 것은 잘못된 결과가 나오나보다.
+However, they're not really function calls, and pretending they are leads to a misleading mental mode.
+그래서, 우린 !!와 !!!가 차악의 해결책이라고 봤다.
+
+이유 1. 보기에 세보이고visually strong, 이미 존재하는 문법syntax 같아 보이지 않는다. 
+!!x나 !!!x를 봤을 때, 뭔가 흔하지 않는 일이 일어나고 있다고 생각할 수 있다.
+
+이유2. 이중부정double negation은 R에서 일반적인 패턴이 아니기 때문에, 
+	거의 사용되지 않는 syntax를 사용한 것.
+	정 필요하다면, 괄호를 사용하면 된다. !(!x)
+
+### 19.4.7 Non-standard ASTs
+
+unquoting을 사용하면, non-standard ASTs를 만들기가 쉽다. 
+	non-standard ASTs는, expression이 아닌 요소들components을 포함한 ASTs.
+
+underlying objects들을 직접적으로 manipulating함으로써, non-standard ASTs를 만들 수 있는데, 
+우연적으로 하기는 힘들다?
+
+이것들은 유효valid하고, 가끔 쓸모 있는데, 정확한 이용은 이 책의 범위를 벗어난다.
+하지만 배워두는 것이 중요한데, 잘못된 방법으로 deparsed될 수 있고, printed될 수 있기 때문.
+
+예를 들어, complex objects를 inline할 때, attributes가 프린트되지 않는다.
+이게 헷갈리는 output을 낳는다.
+
+```{r collapse=TRUE}
+x1 <- expr(class(!!data.frame(x = 10)))
+x1
+eval(x1)
+```
+
+confusion을 없애기 위해 2가지 툴들이 있다. rlang::expr_print()와 lobstr::ast()
+
+```{r collapse=TRUE}
+expr_print(x1)
+lobstr::ast(!!x1)
+```
+
+와! 안 헷갈린다!
+
+또 다른 헷갈리는 케이스는 integer sequence를 inline할 때 일어난다.
+```{r collapse=TRUE}
+x2 <- expr(f(!!c(1L, 2L, 3L, 4L, 5L)))
+x2
+expr_print(x2)
+lobstr::ast(!!x2)
+```
+
+operator precedence 때문에 코드로는 만들 수 없는, regular ASTs를 만드는 것도 가능하다.
+이 경우에, R은 AST에서는 존재하지 않는 것들에 대해서는 괄호를 쳐준다.
+
+```{r collapse=TRUE}
+x3 <- expr(1 + !!expr(2 + 3))
+x3
+
+
+lobstr::ast(!!x3)
+```
+
+### 19.4.8 Exercises
 
 ___
 ## 19.5 Non-quoting
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ___
 ## 19.6 `...` (dot-dot-dot)
