@@ -584,10 +584,323 @@ lobstr::ast(!!x3)
 19.5 Non-quoting
 ----------------
 
+들어가기 전에: quote한다는게 뭔지 알았음. 그래서 unquote를 할 때가 있었고, 이를 19.4에서 했음 근데 19.5는 Non-quoting임. unquote가 아닌 non-quoting은 또 뭔지?
+
+base R은 quasiquotation을 implement한 하나의 함수가 있다. bquote() 얘는 unquoting하는데 .()를 사용한다.
+
+``` r
+xyz <- bquote((x + y + z))
+bquote(-.(xyz) / 2)
+## -(x + y + z)/2
+```
+
+bquote()라는 함수를, base R의 어떤 함수도 사용하지 않는다. 그리고 이 함수가, 어떻게 R 코드가 작성되는지에 별 영향을 안 주었다. bquote()를 효과적으로 사용할 수 없는, 3가지 문제가 있다.
+
+1.  니 코드에만 쉽게 쓸 수 있다. 사용자user가 제공supply하는 임의의arbitrary 코드에는 적용하기 힘들다.
+2.  리스트에 저장되어 있는 여러 개의 expression들을 unquote할 수 있도록 해주는 unquote-splice operator를 제공하지 않는다. 그러니까 rlang에서 !!!에 해당하는게 없다.
+3.  environment와 동반된 코드를 handle하기에는 무리가 있다. 이건 특히 subset()과 같은, data frame의 문맥에서 코드를 evaluate하는 함수에 치명적이다.
+
+인자argument를 quote하는 base 함수들은, indirect specification을 허용해주기 위해 다른 테크닉을 사용한다. base R은 unquoting을 사용하기보다, 선택적으로 quoting off를 사용하는데, 그래서 나는 이걸 **non-quoting** 테크닉이라고 부른다.
+
+<details> <summary>개인적인 정리</summary> 그러니까 결론은 unquoting을 안 쓴다는 것. rlang 패키지의 함수들은 quoting 함수들이지만, 선택적으로 unquote를 할 수 있어서, quasiquotation이라고 했는데, base R의 함수들은 리얼 quoting 함수들(unquote를 못하는) unquote를 할 수 있는 함수라곤 bquote()하나인데, 위에 써진 문제점들이 있으니깐, unquoting 대신 quoting off를 할 수 있는 non-quoting 테크닉을 사용. </details> <br /> <br />
+
+base R에서 볼 수 있는 4가지의 기본 형식들이 있다. - 한 쌍의 quoting, non-quoting 함수들. 예를 들어, *는*2*개**의**a**r**g**u**m**e**n**t**s**를**받**는**데*, 2*번**째**a**r**g**u**m**e**n**t**는**q**u**o**t**e**된**다*.*p**r**e**f**i**x**f**o**r**m**으**로**쓰**면**더**알**아**보**기**쉽**다* : *m**t**c**a**r**s*cyl 을 `$`(mtcars, cyl)처럼 쓸 수 있음. 만약에 variable을 간접적으로 refer하고 싶다면, \[\[을 사용할 수도 있다. 이건 변수의 이름을 string으로 받아주기 때문.
+
+``` r
+x <- list(var = 1, y = 2)
+var <- "y"
+
+x$var
+## [1] 1
+
+x[[var]]
+## [1] 2
+```
+
+$와 가깝게 연관있는 3개의 quoting 함수들이 있다. subset(), transform(), with() 이것들은 $의 wrapper들로 간주되며, interactive한 사용에만 적합한 것. 그래서 모두가 \[를 사용한 non-quoting 대안이 있다. &lt;-, assign()은 $와 비슷하게, ::, getExportedValue()는 \[와 비슷하게 작동한다.
+
+-   quoting과 non-quoting 인자들arguments라는 하나의 쌍. 예를 들어, rm()은 생 변수 이름을 ...에다가 공급할 수 있게 해주거나,이게 non-quoting list에다가 변수 이름들의 character vector를 공급할 수 있게 해준다. 이게 quoting
+
+``` r
+x <- 1
+rm(x)
+
+y <- 2
+vars <- c("y", "vars")
+rm(list = vars)
+```
+
+data()와 save()도 비슷하게 작동한다.
+
+-   다른 인자argument가 quoting인지 non-quoting인지를 컨트롤하는 인자argument. 예를 들어 library()에서, character.only라는 인자argument는, 첫 인자argument인 package의, quoting behavior를 컨트롤한다.
+
+``` r
+library(MASS)
+
+pkg <- "MASS"
+library(pkg, character.only = TRUE)
+```
+
+demo(), detach(), example(), require()도 비슷하게 작동한다.
+
+-   Evaluation이 실패하면 quoting. 예를 들어서, help()의 첫 번째 arguent를 string으로 evaluate하면 non-quoting이다. evaluation이 실패하면, 첫 번째 argument는 quoted. 그러니깐, 먼저 evaluate를 해보고, 안 되면 quote를 하는 것.
+
+``` r
+help(var) # 이러면 var의 다큐먼트가 나온다.
+
+var <- "mean"
+help(var) # 이러면 var이라는 변수를 evaluate해보고, mean에 대한 다큐먼트가 나온다.
+
+var <- 10
+help(var) # 이러면 evaluation을 해보고 실패한 뒤, quote를 해서 var에 대한 다큐먼트가 나온다.
+```
+
+ls(), page(), match.fun()도 비슷하게 작동한다.
+
+quoting 함수들의 중요한 다른 class는, base modelling과 plotting functions. 소위 standard non-standard evaluation 룰들을 따르는 것들. <http://developer.r-project.org/nonstandard-eval.pdf>
+
+예를 들어, lm()은 weight이랑 subset 인자들을 quote한다. 그리고 formula 인자와 사용되었을 땐, plotting 함수는 aesthetic 인자(col, cex 등)들을 quote한다. plotting 함수는 aesthetic arguments를 quote한다.
+
+그래서 다음의 예와 같이, col = iris$Species 대신에 col = Species만 써도 된다.
+
+``` r
+palette(RColorBrewer::brewer.pal(3, "Set1"))
+plot(
+    Sepal.Length ~ Petal.Length,
+    data = iris,
+    col = Species,
+    pch = 20,
+    cex = 2
+)
+```
+
+![](19-Quasiquotation_files/figure-markdown_github/unnamed-chunk-48-1.png)
+
+이 함수들은 indirect specification을 할 수 있는, 만들어져 있는built-in 옵션들이 없지만, unquoting을 시뮬레이트할 수 있는 방법을, Section 20.6에서 배울 것이다.
+
 ------------------------------------------------------------------------
 
 19.6 `...` (dot-dot-dot)
 ------------------------
+
+!!!은 유용하다. 왜냐하면 호출call에 넣고 싶은 것이 expression의 리스트인 경우가 흔하기 때문이다. 사실, 이런 패턴이 다른 곳elsewhere에서도 흔하다. 다음 2개의 motivating problems를 보아라.
+
+-   ...에 넣고 싶은 elements가, 이미 리스트에 저장되어 있는 경우에 어떻게 하겠는가? 예를 들어, 데이터 프레임들의 리스트가 있고, rbind()를 하고 싶다고 해보자.
+
+``` r
+dfs <- list(
+  a = data.frame(x = 1, y = 2),
+  b = data.frame(x = 3, y = 4)
+)
+```
+
+이 특정한 예에서는 rbind(dfs*a*, *d**f**s*b)를 하겠지만, 임의의 길이에 대해서는 어떻게 일반화할건지?
+
+-   argument의 이름을 간접적으로 supply하고 싶다면? 예를 들면, single column 데이터 프레임을 만들고 싶다. 칼럼 이름은 variable에 저장되어있고.
+
+``` r
+var <- "x"
+val <- c(4, 3, 9)
+```
+
+그러니까 다음과 같이 만들고 싶다는 것.
+
+``` r
+x
+4
+3
+9
+```
+
+setNames(data.frame(val), var)로도 할 수 있겠지만, 우아하지 않다inelegant. 더 나은 방법은?
+
+생각할 수 있는 한 가지 방법은 quasiquotation과 명백하게 parallel한 걸 그려보는 것. One way to think about these problems is to draw explicit parallels to quasiquotation.
+
+1번 문제. 여러 개의 데이터 프레임들을 row-binding하는 것은, unquote-splicing하는 것과 같다. 리스트 안의 개별적인 원소들individual elements을 호출call 안으로 inline하고 싶다.
+
+``` r
+dplyr::bind_rows(!!!dfs)
+```
+
+라는데, 이거 안 된다.
+
+!!! 없이 그냥 해야한다. Hadley가 묘사하고 싶은 것은, 파이썬에서 임의의 개수의 원소들을 받게 될 때 사용하는 `*args`, `**kwarg` 와 같은, argument unpacking이라고 부르는 것과 연관된 걸 설명하려나본데, 이 케이스는 아니다. Ruby, Go, PHP, Julia 같은 프로그램에선 spatting이라고 하나보다.
+
+...로 넘겨주고 싶은 elements가, 이미 리스트에 저장되어 있는 경우에 !!!를 이용해서 unquoting slice하려는 걸 알겠는데, 잘못된 케이스를 보여준 것 같다.
+
+2번 문제. =의 왼쪽을 unquoting하는 것과 같다. var을 interpreting하지말고, val 변수에 저장되어 있는 값들을 쓰고 싶음.
+
+``` r
+tibble::tibble(!!var := val)
+## # A tibble: 3 x 1
+##       x
+##   <dbl>
+## 1     4
+## 2     3
+## 3     9
+```
+
+= 대신에 := 쓴 것을 인지하자.
+
+``` r
+tibble::tibble(!!var = val)
+## Error: <text>:1:22: 예기치 않은 '='입니다
+## 1: tibble::tibble(!!var =
+##                          ^
+```
+
+:=는 마치 퇴화된 기관vestigial organ과 같다. R의 parser에 의해 인지recognised는되는데, 이것과 연관되어있는 코드는 없다. =와 비슷하게 보이지만, 반대 쪽에 expression이 올 수 있도록 허용해주고, =보다 좀 더 유연한 대안flexible alternative이 된다.
+
+base R은 다른 접근을 취하는데, Section 19.6.4에서 다룰 것이다. 얘는 좀 신기하게 하던데. do.call()과 몇몇 도움으로 모든 걸 해냄.
+
+이렇게 quoting arguments없이 이러한 툴들을 support해주는 함수들을, tidy dots를 갖고 있다고 한다. We say that functions that support these tools, without quoting arguments, have tidy dots.
+
+니가 만든 함수가 tidy dots 행동behavior을 갖도록 하려면, list2()를 이용하면 된다. To gain tidy dots behavior in your own function, all you need to do is use list2(). 다음 Section에서 바로 하게 된다.
+
+### 19.6.1 Examples
+
+list2()를 이용할 수 있는 하나의 예는, attributes를 유연하게 설정하게끔, attributes()에다가 wrapper을 씌워줄때.
+
+``` r
+set_attr <- function(.x, ...) {
+  attr <- rlang::list2(...)
+  attributes(.x) <- attr
+  .x
+}
+
+attrs <- list(x = 1, y = 2)
+attr_name <- "z"
+
+1:10 %>% 
+  set_attr(w = 0, !!!attrs, !!attr_name := 3) %>%
+  str()
+##  int [1:10] 1 2 3 4 5 6 7 8 9 10
+##  - attr(*, "w")= num 0
+##  - attr(*, "x")= num 1
+##  - attr(*, "y")= num 2
+##  - attr(*, "z")= num 3
+```
+
+### 19.6.2 `exec()`
+
+tidy dots가 없는 함수들에 대해서도 이러한 테크닉을 쓰고 싶다면? 하나의 옵션은 rlang::exec()을 써서, some arguments를 ...로 직접적으로 받고, 나머지는 리스트로 indirect하게 받는 그런 함수를 호출하는 것.
+
+``` r
+# 직접적으로 받은 것.
+exec("mean", x = 1:10, na.rm = TRUE, trim = 0.1)
+## [1] 5.5
+
+# 간접적으로 받은 것.
+args <- list(x = 1:10, na.rm = TRUE, trim = 0.1)
+exec("mean", !!!args)
+## [1] 5.5
+
+# 혼합으로 받은 것.
+params <- list(na.rm = TRUE, trim = 0.1)
+exec("mean", x = 1:10, !!!params)
+## [1] 5.5
+```
+
+그래서, tidy dots가 없는 그런 함수들에 대해서도, rlang::exec()을 이용해서, !!!로 공급해주면 된다.
+
+rlang::exec()은 또한 인자 이름들을 간접적으로 제공하는 것도 가능케 해준다.
+
+``` r
+arg_name <- "na.rm"
+arg_val <- TRUE
+exec("mean", 1:10, !!arg_name := arg_val)
+## [1] 5.5
+```
+
+마지막으로, 호출하고 싶은 함수 이름들의 벡터 or 함수들의 리스트를 가지고 있다면 유용하다.
+
+``` r
+x <- c(runif(10), NA)
+funs <- c("mean", "median", "sd")
+
+purrr::map_dbl(funs, exec, x, na.rm = TRUE)
+## [1] 0.5591024 0.5868184 0.3340233
+```
+
+exec()은 call2()와 밀접하게 연관되어 있다. call2()는 expression을 return하고, exec()는 evaluate를 한다.
+
+### 19.6.3 `dots_list()`
+
+list2()는 다른 편리한 특징: 디폴트로, 마지막에 비어있는 인자들arguments을 다 무시한다. tibble::tibble()과 같은 함수에서는 이러한 특성이 유용한데, 왜냐면 변수 순서를 맘대로 바꿀 수 있다는 뜻이기 때문. 무슨 말인지 이해 안 될수도 있는데, 그냥 다음의 예를 보면 된다.
+
+``` r
+tibble::tibble(
+    y = 1:5,
+    z = 3:-1,
+    x = 5:1,
+)
+
+data.frame(
+    y = 1:5, 
+    z = 3:-1,
+    x = 5:1
+)
+```
+
+위 2개의 차이란? tibble은 마지막이 ,로 끝나도 상관이 없다는 것. 그래서 y, z를 그냥 그대로 잘라내서 뒤에 붙여도 작동 그에 비해 data.frame은 마지막 줄에 ,를 추가하고, z 줄에 ,를 없애야 작동.
+
+list2()는, rlang::dots\_list()의 wrapper다. dots\_list()의 가장 흔한 것들을, 디폴트로 셋해놓은 게 list2(). 아예 dots\_list()를 직접 호출함으로써, 더 많은 컨트롤을 얻을 수 있다.
+
+-   .ignore\_empty를 쓰면, 정확하게 어떤 인자들arguments을 무시할지 컨트롤할 수 있다. 디폴트는 끝에 나오는 하나의 인자single trailing argument를 무시하는거고, 모든 missing arguments를 무시할 수도, 아니면 다 무시하지 않을 수도 있다. 위의 tibble에서 ,로 끝나도 상관 없는 것은, .ignore\_empty가 디폴트로 'trailing'이기 때문.
+
+-   .homonyms는 만약 여러 개의 인자들이 같은 이름을 쓸 때, 어떻게 할지를 컨트롤한다. `dots_list(x = 1, x = 2)` 같은 걸 어떻게 할 건지?
+
+-   무시되지 않은 empty 인자들이 있을 때, .preserve\_empty는 어떻게 할지를 컨트롤한다. 디폴트는 에러를 반환하는거고, .preserve\_empty = TRUE라고 하면 missing symbols를 반환한다. dots\_list()로 함수 호출을 만들 때 이용하는거라면 유용.
+
+``` r
+str(dots_list(x = 1, x = 2))
+## List of 2
+##  $ x: num 1
+##  $ x: num 2
+
+str(dots_list(x = 1, x = 2, .homonyms = "first"))
+## List of 1
+##  $ x: num 1
+
+str(dots_list(x = 1, x = 2, .homonyms = "last"))
+## List of 1
+##  $ x: num 2
+
+str(dots_list(x = 1, x = 2, .homonyms = "error"))
+## Error: Arguments can't have the same name.
+## We found multiple arguments named `x` at positions 1 and 2
+```
+
+### 19.6.4 With base R
+
+base R은 이 여러가지 문제들을 하나의 도구로 해결한다. : do.call() do.call()은 2개의 주요한 인자들main arguments을 받는데, 하나는 what, 어떤 함수를 호출할지. 다른 하나는 args, 그 함수에게 패스해줄 list of arguments 그래서 do.call("f", list(x, y, z))라고 한다면, f(x, y, z)라는 뜻이다.
+
+1.  do.call()은 위에 1번 문제를 깔끔하게 풀어준다. 여러 개의 데이터 프레임들을 rbind해줌.
+
+``` r
+do.call("rbind", dfs)
+##   x y
+## a 1 2
+## b 3 4
+```
+
+1.  좀 더 발전을 시키면, 2번 문제도 do.call()을 사용해서 해결할 수 있다. 먼저 list of arguments를 만들고, 그 리스트에 이름을 붙여준 다음, do.call()을 사용하면 된다.
+
+``` r
+var <- "x"
+val <- c(4, 3, 9)
+
+args <- list(val)
+names(args) <- var
+
+do.call("data.frame", args)
+##   x
+## 1 4
+## 2 3
+## 3 9
+```
+
+### 19.6.5 Exercises
 
 ------------------------------------------------------------------------
 
