@@ -986,53 +986,242 @@ hadley가 이걸 보고 감명받아서 tidyverse에 많이 썼는데, 지금은
 
 ___
 ## 19.7 Case studies
+quasiquotation에 대한 아이디어를 단단하게 만들기 위해, <br />
+	&emsp;&emsp;이 섹션에서는 real problems을 해결하는 몇 가지 케이스들을 모아놓았다. <br />
+몇몇 케이스에서는 purrr도 썼다. <br />
+quasiquotation과 functional programming의 조합combination이 특히나 우아하더라.elegant
 
+### 19.7.1 `lobstr::ast()`
+`lobstr::ast()`에 있어 일어나는 번거로운 일들을 quasiquotation은 해결해준다. <br />
+이미 캡쳐된 expression을 `ast()`해보면 어떻게 될까?
+```{r collapse=TRUE}
+z <- expr(foo(x, y))
+lobstr::ast(z)
+```
 
+`ast()`는 첫 번째 인자를 quote하기 때문에, `!!`로 unquoting을 해줘야 한다. <br />
+unquoting을 해주면 해결이 된다.
+```{r collapse=TRUE}
+lobstr::ast(!!z)
+```
 
+### 19.7.2 Map-reduce to generate code
+quasiquotation은 코드를 만드는데generating code 있어 강력한 툴이 되어준다. <br />
+특히나 `purrr::map()`이나 `purrr::reduce()`와 결합combine되어 사용될 때 강력. <br />
+예를 들어, coefficients가 정해진 linear model을 가지고 있다고 생각해보자.
+```{r}
+intercept <- 10
+coefs <- c(x1 = 5, x2 = -4)
+```
+목표: 이걸 `10 + (x1 * 5) + (x2 * -4)` 라는 expression으로 바꾸고 싶음.
 
+가장 먼저 해야할 것은 '캐릭터 names 벡터'를 'symbols 리스트'로 바꾸는 것. <br />
+`rlang::syms()`가 딱 이런 상황을 위해 디자인되었다. <br />
+```{r collapse=TRUE}
+coef_sym <- syms(names(coefs))
+coef_sym
+```
 
+`(x1 * 5)`, `(x2 * -4)` 이것들을 만들어야 되는데, <br />
+그리고 이 각 변수 이름variable name과 이 계수를 combine해야 한다. <br />
+`rlang::expr()`, `purrr::map2()`를 이용해서 할 수 있다. <br />
+	&emsp;&emsp;`map2()`는 `map()`의 다변수 버전.
 
+```{r collapse=TRUE}
+summands <- map2(coef_sym, coefs, ~ expr((!!.x * !!.y)))
+summands
+```
 
+이제 여기다 intercept도 포함을 시켜주자. <br />
+그냥 summands 벡터의 첫 번째에 추가해주면 됨.
 
+```{r collapse=TRUE}
+summands <- c(intercept, summands)
+summands
+```
 
+`reduce()`는 각 terms를 single sum으로 만들어주는 역할([Section 9.5](https://blog-for-phil.readthedocs.io/en/latest/Advanced%20R/09-Functionals/#95-reduce-family))
+```{r collapse=TRUE}
+eq <- reduce(summands, ~ expr(!!.x + !!.y))
+eq
+```
 
+이걸 좀 더 일반적general이게 만들어보자. <br />
+사용자가 계수 이름을 제공supply하게끔 하고, 여러가지 변수 이름 쓰지말고(`x1`, `x2`, ...) 그냥 변수 하나(`x`)에다가 인덱스로. <br />
+예를 들어서, `x, c(10, 5, -4)`라고 사용자가 제공supply하면, 결과물이 <br />
+  &emsp;&emsp;`10 + (5 * x[[1L]]) + (-4 * x[[2L]])` 이렇게 나오도록 해보자.
+```{r collapse=TRUE}
+var <- expr(y)
+coef_sym <- map(seq_along(coefs), ~ expr((!!var)[[!!.x]]))
+coef_sym
+```
 
+이러면 됐고, 이걸 wrapper로 씌워서, 함수로 만들어 좀 더 깔끔하게.
 
+```{r}
+linear <- function(var, val) {
+	var <- ensym(var)
+	coef_name <- map(seq_along(val[-1]), ~expr((!!var)[[!!.x]])) # val[-1]의 개수만큼 1L, 2L,... 만듬
 
+	# (5 * x[[1L]]), (-4 * x[[2L]])의 꼴들을 만들어야
+	summands <- map2(val[-1], coef_name, ~expr((!!.x * !!.y)))
+	summands <- c(intercept, summands)
 
+	# 마지막으로 한 줄로 만들기
+	reduce(summands, ~expr(!!.x + !!.y))
+}
+```
 
+확인해보자.
 
+```{r collapse=TRUE}
+linear(x, c(10, 5, -4))
+```
+`ensym()`을 사용한 것을 인지할 것: 사용자로 하여금, 한 개 변수의 이름을 공급하길 원한다.
+	&emsp;&emsp;복잡한 expression이 아니라.
 
+### 19.7.3 Slicing an array
 
+차원dimension과 인덱스index가 주어졌을 때, array에서 해당 부분을 추출하고 싶다치자. <br />
+`slice(x, 1, 3)`이라고 하면, first dimension에서 third slice, 즉, `x[3, , ]` <br />
+`slice(x, 3, 1)`이라고 하면, third dimension에서 first slice, 즉, `x[, , 1]` <br />
+`slice(x, 2, 3)`이라고 하면, second dimension에서 third slice, 즉, `x[, 3, ]` <br />
+missing 인자들arguments을 다뤄야 하기 때문에 좀 어렵다. 
 
+여러 개의 missing arguments를 다루는 호출call을 생성해야 한다. <br />
+먼저, `rep()`와 `missing_arg()`를 이용해, missing arguments의 리스트를 만들어야 한다. <br />
+그리고나서 call로 unquote해줘야한다.
+```{r collapse=TRUE}
+indices <- rep(list(missing_arg()), 3)
+expr(x[!!!indices])
+```
 
+그리고 subset 할당을 이용해 원하는 곳에다 index를 넣어주면 됨.
+```{r collapse=TRUE}
+indices[[2]] <- 1
+expr(x[!!!indices])
+```
 
+이걸 `stopifnot()`들을 넣어서, 인터페이스를 깔끔하게 만들고, 함수로 wrap해보자.
+```{r}
+slice <- function(x, along, index) {
+	stopifnot(length(along) == 1)
+	stopifnot(length(index) == 1)
+	
+	# stopifnot(length(along) == 1, length(index) == 1) # 이렇게 써도 되는거아닌가?
+	
+	nd <- length(dim(x))
+	indices <- rep(list(missing_arg()), nd)
+	indices[along] <- index
 
+	expr(x[!!!indices])
+}
+```
 
+```{r collapse=TRUE}
+x <- array(sample(30), c(5, 2, 3))
+slice(x, 1, 3)
 
+slice(x, 2, 2)
 
+slice(x, 3, 1)
+```
 
+그리고 이걸 `eval()`을 이용해서 값을 진짜로 볼 수도 있음.
+```{r collapse=TRUE}
+eval(slice(x, 1, 3))
+```
+
+### 19.7.4 Creating functions
+quotation의 강력한 응용 중 하나는, 함수를 손으로by hand 만들 수 있다는 것. <br />
+`rlang::new_function()`을 사용해서. <br />
+이 함수는, <br />
+	&emsp;&emsp;arguments, body, env(얘는 옵션)라는 3개의 요소들components을 받아 함수를 생성하는 그런 함수. <br />
+([Section 6.2.1](https://blog-for-phil.readthedocs.io/en/latest/Advanced%20R/06-Functions/#621-function-components))
+
+```{r collapse=TRUE}
+new_function(
+  exprs(x = , y = ),
+  expr({x + y})
+)
+```
+
+주의: `exprs()`에 아무런 인자들이 없으면, 디폴트 없이 인자들을 만들어준다.
+
+`new_function()`을 쓰는 한 예로는, scalar 혹은 symbol arguments를 쓰는 function factories의 대체제. <br />
+예를 들어, 함수를 숫자만큼 제곱하는 함수를, 생성하는 함수를 작성할 수 있다. <br />
+we could write a function that generates functions / that raise a function to the power of a number.
+
+```{r collapse=TRUE}
+power <- function(exponent) {
+	new_function(
+		exprs(x = ),
+		expr({
+			x ^ !!exponent
+		}),
+		caller_env()
+	)
+}
+power(0.5)
+```
+
+`new_function()`의 또 다른 응용으로, `graphics::curve()`와 같은 것도 만들 수 있다. <br />
+함수를 만들지 않고서, 수학적 표현을 그릴 수 있도록 해주는 것임.
+
+```{r}
+curve(sin(exp(4 * x)), n = 1000)
+```
+
+이 코드에서, `x`는 대명사pronoun다. <br />
+`x`는 하나의 값으로 딱 정해진게 아니라, plot에서 range별로 변하는 그런 placeholder이다. <br />
+it doesn't represent a single concrete value, but is instead a placeholder <br />
+	&emsp;&emsp;that varies over the range of the plot.
+
+`curve()`를 implement하는 하나의 방법은, <br />
+	&emsp;&emsp;해당 표현식을 하나의 인자 `x`를 가진 함수로 바꾸고, 해당 함수를 호출하는 것.
+
+```{r eval=FALSE}
+curve2 <- function(expr, xlim = c(0, 1), n = 100) {
+  expr <- enexpr(expr)
+  f <- new_function(expr(x = ), expr)
+  
+  x <- seq(xlim[1], xlim[2], length = n)
+  y <- f(x)
+  
+  plot(x, y, type = "l", ylab = expr_text(expr))
+}
+
+curve2(sin(exp(4 * x)), n = 1000)
+```
+
+`curve()`와 같이, 대명사를 가진 expression을 사용하는 함수들을, **anaphoric** functions라고 한다.
+
+### 19.7.5 Exercises
 
 ___
 ## 19.8 History
 
+quasiquotation이라는 아이디어는 오래되었다. <br />
+1940년대 초기, 철학자 Wilard van Orman Quine에 의해 처음 개발되었다. <br />
+철학에서 먼저 필요했던 이유는, 단어를 언급하는 것과 사용하는 것간의 구분을 지어야했기 때문.
 
+quasiquotation은, 1970년대 중반 Lisp라는 프로그래밍 언어에서 처음으로 사용되었다.(Bawden 1999) <br />
+Lisp는 quoting 함수로 `````을, unquoting하는데 `,`을 사용한다. <br />
+Lisp의 유산인 대부분의 언어들은 비슷하게 작동한다. <br />
+예를 들어, Racket은 `````와 `@`를, Clojure은 `````와 `~`를, Julia는 `;`와 `@`를 사용. <br />
+이 언어들은 하나의 quoting 함수가 있고, 이걸 명백하게 호출해야 한다.
 
+하지만 R에서는, 많은 함수들이 하나 이상의 인풋들을 quote한다. <br />
+이건 애매모호함ambiguity를 일으키지만(인자argument가 quote된건지 아닌건지를 다큐먼트 읽어보고 알아내야하기 때문), <br />
+	&emsp;&emsp;간결하고 우아한 데이터 탐구 코드를 허락한다. <br />
+	&emsp;&emsp;allows for concise and elegant data exploration code. <br />
+base R에서는, 딱 하나의 함수인 `bquote()`만이 quasiquotation을 지원한다. <br />
+이건 2003년 Thomas Lumley에 의해 작성된 것. <br />
+하지만, 위에서 말한 `bquote()`는 주요한 한계들이 있어서 R 코드에 넓게 적용되진 못함.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+이 한계들을 해결하려는 Hadley의 노력으로, lazyeval 패키지를 만들었다. <br />
+하지만 문제들 분석이 불완전했고, lazyeval이 몇몇 문제들을 해결하긴 했는데, 다른 문제들을 만들었음. <br />
+Lionel Henry와 함께 작업을 해서, tidy evaluation 프레임워크(2017)로 모든 걸 제대로 해결함. <br />
+tidy evaluation의 새로움에도 불구하고, 풍부하고 강력한 이론이기 때문에, <br />
+	&emsp;&emsp;한 번 마스터하고 나면 많은 어려운 문제들을 훨씬 쉽게 해결할 수 있어서, 여기서 다루었다.
 
